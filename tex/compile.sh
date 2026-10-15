@@ -12,3 +12,4 @@ rm *.out *.aux *.bbl *.blg *.fdb_latexmk *.fls main.log *.gz *.lof *.lot *.toc
 
 # open ../paper/"A Systematic Characterization of Fine-Tuning Strategies Across CNN, Vision Transformer, and Hybrid Architectures for Medical Image Classification.pdf"
 
+open main.pdf
