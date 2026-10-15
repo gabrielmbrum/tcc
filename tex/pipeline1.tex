@@ -1,0 +1,88 @@
+\begin{figure}[!hbtp]
+    \centering
+    % Escala em 80% para garantir que cabe bem na página do TCC
+    \resizebox{0.80\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        % Estilos
+        recntagle/.style={
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        title_block/.style={
+            rectangle, rounded corners=3pt, inner sep=4.5pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {
+            thick, ->, >={Stealth[length=2.5mm]}
+        },
+        box_delimitador/.style = {
+            rectangle, rounded corners=8pt, draw=black!70, fill=black!2, line width=0.8pt
+        },
+        sub_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            draw=black!70, fill=blue!5, line width=0.7pt, font=\small
+        },
+        embed_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            draw=black!70, fill=blue!15, line width=0.7pt, font=\small\bfseries
+        },
+        img_node/.style = {
+            rectangle, minimum size=1.2cm, draw=black!70, fill=white,
+            line width=0.6pt, inner sep=2pt, align=center, font=\scriptsize
+        }
+    ]
+
+        % 1. Entrada de Dados
+        \node (input) [recntagle, minimum width=4cm] {1. Entrada de Dados};
+        \node (input_img) [img_node, below=0.3cm of input] {Imagem\\RGB}; 
+        
+        % 2. CAIXA DA DUPLA VIA
+        \node (twostream_box) [box_delimitador, minimum width=12.5cm, minimum height=7cm, below=0.8cm of input_img] {};
+        \node (twostream_title) [title_block] at (twostream_box.north) {2. Extração de Características (Dupla Via)};
+
+        % Títulos das vias
+        \node (via_seq_title) [font=\bfseries\small] at ([xshift=-3.2cm, yshift=2.6cm]twostream_box.center) {Via Sequencial (Topológica)};
+        \node (via_vis_title) [font=\bfseries\small] at ([xshift=3.2cm, yshift=2.6cm]twostream_box.center) {Via Visual (Espacial)};
+
+        % Setas dividindo a entrada (AGORA PARAM NA BORDA SUPERIOR DA CAIXA)
+        \draw [arrow] (input_img.south) -- ++(0,-0.25cm) -| ([xshift=-3.2cm]twostream_title.north);
+        \draw [arrow] (input_img.south) -- ++(0,-0.25cm) -| ([xshift=3.2cm]twostream_title.north);
+
+        % --- VIA SEQUENCIAL ---
+        \node (complex_net) [sub_block, text width=4.5cm, below=0.4cm of via_seq_title] {Modelagem em Rede Complexa\\(Variação do raio $r$)};
+        \node (rnn) [sub_block, text width=4.5cm, below=0.6cm of complex_net] {Rede Neural Recorrente\\(LSTM)};
+        \node (embed_top) [embed_block, text width=4.5cm, below=0.6cm of rnn] {Embedding Topológico};
+
+        \draw [arrow] (via_seq_title.south) -- (complex_net.north);
+        \draw [arrow] (complex_net.south) -- (rnn.north);
+        \draw [arrow] (rnn.south) -- (embed_top.north);
+
+        % --- VIA VISUAL ---
+        \node (cnn) [sub_block, text width=4.5cm, below=0.4cm of via_vis_title] {Rede Híbrida Visual\\(CNN / Atenção - CoAtNet)};
+        \node (embed_vis) [embed_block, text width=4.5cm] at ([xshift=6.4cm]embed_top.center) {Embedding Espacial};
+
+        \draw [arrow] (via_vis_title.south) -- (cnn.north);
+        \draw [arrow] (cnn.south) -- (embed_vis.north);
+
+        % 3. CAIXA DE FUSÃO TARDIA
+        \node (fusion_box) [box_delimitador, minimum width=6.5cm, minimum height=1.8cm, below=0.8cm of twostream_box] {};
+        \node (fusion_title) [title_block] at (fusion_box.north) {3. Fusão Tardia (Late Fusion)};
+        
+        \node (concat) [sub_block, minimum width=5cm] at ([yshift=-0.15cm]fusion_box.center) {Concatenação dos Embeddings};
+
+        % Setas ligando os embeddings à fusão
+        \draw [arrow] (embed_top.south) |- (concat.west);
+        \draw [arrow] (embed_vis.south) |- (concat.east);
+
+        % 4. CLASSIFICADOR FINAL
+        \node (classif) [recntagle, minimum width=5.5cm, below=0.8cm of fusion_box] {4. Classificador Final (MLP)};
+        \node (output) [recntagle, fill=green!15, draw=green!60!black, minimum width=5.5cm, below=0.8cm of classif] {Diagnóstico / Patologia};
+
+        \draw [arrow] (fusion_box.south) -- (classif.north);
+        \draw [arrow] (classif.south) -- (output.north);
+
+    \end{tikzpicture}%
+    }
+    \caption{Arquitetura proposta do modelo híbrido \textit{Two-Stream} para classificação de imagens médicas, integrando extração visual por CNN e extração de características topológicas em grafos via LSTM.}
+    \label{fig:pipeline_tcc}
+\end{figure}

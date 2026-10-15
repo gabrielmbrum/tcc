@@ -1,0 +1,150 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[portuguese]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{titlesec}
+
+\geometry{top=2cm,bottom=2cm,left=2.5cm,right=2.5cm}
+
+\titleformat{\section}
+  {\normalfont\large\bfseries}
+  {\thesection}{1em}{}
+  
+\newcommand{\p}{\rule[-0.8mm]{26mm}{3.5mm}}
+
+\begin{document}
+
+\begin{center}
+
+\rule{\textwidth}{0.6pt}
+\vspace{0.01cm}
+
+{\Large\bfseries
+Classificação de Imagens Médicas via Fusão de Deep Learning e Redes Complexas utilizando Redes Neurais Recorrentes}
+
+\rule{\textwidth}{0.6pt}
+
+\vspace{0.5cm}
+
+\begin{tabular}{rl}
+\textbf{Aluno:} & Gabriel Martins Brum \\[4pt]
+\textbf{Orientador:} & Prof.\ Dr(a).\ Leandro Alves Neves \\[8pt]
+\end{tabular}
+
+Instituto de Biociências, Letras e Ciências Exatas -- IBILCE \\
+\vspace{2pt}
+Universidade Estadual Paulista (UNESP) \\
+\vspace{2pt}
+São José do Rio Preto -- SP, Brasil \\
+
+\vspace{0.1cm}
+
+\textit{E-mail:} \href{mailto:g.brum@unesp.br}{g.brum@unesp.br}
+
+\end{center}
+
+\vspace{1cm}
+
+\section{Introdução}
+
+O avanço das arquiteturas de aprendizado profundo revolucionou a análise computacional ao permitir a extração de características semânticas complexas com alta precisão. Contudo, no domínio da saúde, a aplicação dessas técnicas frequentemente esbarra na escassez de imagens médicas anotadas, decorrente de rigorosos protocolos de privacidade, altos custos e da necessidade de especialistas para rotulação \cite{litjens2017survey}. Para mitigar essa limitação, o aumento de dados (\textit{Data Augmentation}) consolidou-se como uma etapa essencial. Ao expandir o espaço amostral, essas técnicas atuam como fortes regularizadores, reduzindo o sobreajuste (\textit{overfitting}) e viabilizando o treinamento de modelos complexos em domínios restritos \cite{perez2017effectiveness, shorten2019survey}.
+
+Além das abordagens convencionais de transformação de imagem, a modelagem topológica oferece uma via promissora para o enriquecimento estrutural dos dados. Fundamentada na teoria dos grafos \cite{euler1736solutio}, a abstração de Redes Complexas mapeia a dinâmica de sistemas intrincados \cite{BOCCALETTI2006175}. Trabalhos pioneiros \cite{BACKES2013168} demonstraram que, ao modelar os pixels de uma textura como vértices e estabelecer arestas baseadas em um raio de distância euclidiana $r$, obtêm-se descritores topológicos robustos. A literatura evoluiu para incorporar o peso dessas arestas a partir de diferenças de intensidade \cite{RIBAS2020107189}. Contudo, diferentemente das abordagens clássicas de análise de textura -- que comumente operam sobre imagens em escala de cinza, o presente projeto inova ao estender essa modelagem topológica para imagens RGB originais, capturando a complexa relação estrutural entre os canais de cor presentes em exames médicos.
+
+A expansão progressiva do raio $r$ gera uma sequência ordenada de descritores, caracterizando uma dinâmica análoga a uma série temporal na qual as macroestruturas dependem da organização das microestruturas. Para capturar essa evolução espacial histórica, as Redes Neurais Recorrentes (RNNs) \cite{hochreiter1997long, cho2014learning} emergem como a solução ideal, interpretando a variação do grafo como passos sequenciais e gerando representações altamente discriminatórias.
+
+Para integrar essas dinâmicas topológicas com os atributos semânticos explícitos da imagem, arquiteturas híbridas de dupla via (\textit{Two-Stream Networks}) consolidaram-se como uma estratégia de alto impacto \cite{simonyan2014two}. A proposta deste trabalho é processar, em paralelo, as assinaturas estruturais (via RNN) e as características espaciais visuais da imagem (através de arquiteturas baseadas em convolução e atenção, inspiradas em modelos como a CoAtNet \cite{dai2021coatnet}). A união dessas vias por meio de fusão tardia (\textit{Late Fusion}) e concatenação de \textit{embeddings} visa estabelecer um classificador coeso e de precisão superior para cenários de dados limitados.
+
+\section{Objetivos, Relevância e Exequibilidade}
+
+\subsection{Objetivos}
+Este trabalho visa desenvolver e avaliar um modelo híbrido de dupla via com fusão tardia que integre características visuais profundas e dinâmicas topológicas (em canais RGB) para a classificação de imagens médicas, visando otimizar a capacidade de generalização na identificação de patologias em conjuntos de dados restritos.
+
+\subsubsection{Descrição dos objetivos:}
+\begin{enumerate}
+    \item \textbf{Modelagem Topológica RGB:} Processar imagens médicas em seus canais de cor originais utilizando Redes Complexas, variando o raio de conexão para extrair sequencialmente as métricas de textura.
+    \item \textbf{Extração de Características em Dupla Via:} Implementar, em paralelo, uma arquitetura recorrente (RNN) para interpretar a dependência histórica da expansão do grafo --- gerando o \textit{embedding} topológico --- e um modelo visual híbrido (convolução e atenção) para extrair os padrões locais e globais da imagem --- gerando o \textit{embedding} espacial.
+    \item \textbf{Fusão Tardia (\textit{Late Fusion}):} Projetar a camada de integração que concatena as saídas de ambas as vias, alimentando o classificador final denso.
+    \item \textbf{Avaliação de Impacto:} Avaliar a performance do modelo frente a abordagens de via única, mensurando estatisticamente o ganho preditivo proporcionado pela inclusão topológica.
+\end{enumerate}
+
+\subsection{Relevância}
+A pesquisa explora a sinergia entre o conteúdo visual explícito e a organização matemática invisível dos tecidos biológicos. Ao aplicar essa lógica diretamente em imagens RGB, o modelo não apenas preserva a riqueza colorimétrica original dos exames, como também utiliza as assinaturas de grafos como uma poderosa técnica de regularização estrutural. O processamento dessa evolução por RNNs oferece uma perspectiva metodológica inovadora que pode resultar em diagnósticos auxiliados por computador mais robustos e confiáveis, apoiando diretamente a tomada de decisão clínica.
+
+\subsection{Exequibilidade}
+O projeto é tecnicamente e cronologicamente viável. O modelo será desenvolvido utilizando \textit{frameworks} de aprendizado de máquina consolidados na linguagem Python. O processamento dos grafos e o treinamento paralelo poderão ser executados utilizando plataformas de computação em nuvem com suporte a aceleradores gráficos (GPUs), garantindo o desempenho computacional necessário sem a exigência de infraestrutura física local. Além disso, o estudo apoia-se em bases de imagens médicas devidamente anonimizadas, isentando a pesquisa de impedimentos éticos relacionados à coleta direta de dados de pacientes.
+
+\section{Revisão Bibliográfica Resumida}
+
+A literatura acerca da classificação de imagens médicas evoluiu significativamente, saindo de extratores manuais de características para o domínio das Redes Neurais Convolucionais (CNNs) \cite{litjens2017survey}. Mais recentemente, a necessidade de capturar dependências de longo alcance impulsionou a adoção de \textit{Vision Transformers} (ViT) \cite{dosovitskiy2020image} e arquiteturas híbridas de atenção \cite{dai2021coatnet, shamshad2023transformers}, que unem eficiência indutiva e representação de contexto global.
+
+Paralelamente, a modelagem via Redes Complexas consolidou-se como um recurso estrutural robusto. Trabalhos como os de Backes et al. \cite{BACKES2013168} e Ribas et al. \cite{RIBAS2020107189} comprovaram que a extração de métricas topológicas -- como o grau e o peso das conexões -- supera abordagens clássicas na discriminação de texturas em escala de cinza. Contudo, há uma lacuna na exploração dessas dinâmicas topológicas aplicadas diretamente às interações colorimétricas dos canais RGB em exames médicos.
+
+Ademais, a variação do raio de conexão de um grafo produz uma assinatura sequencial inerente, frequentemente subutilizada por modelos estáticos. Para processar essa série estrutural, Redes Neurais Recorrentes (como LSTMs) \cite{hochreiter1997long} são ideais devido ao seu estado oculto de memorização. Integrar esses múltiplos níveis de abstração exige uma abordagem arquitetural robusta. A estratégia de dupla via (\textit{Two-Stream}) introduzida por Simonyan e Zisserman \cite{simonyan2014two} permite que informações heterogêneas sejam processadas de forma ótima antes de sua integração via fusão tardia. A presente pesquisa fundamenta-se nesse arcabouço para propor um modelo unificado, estendendo o estado da arte das redes complexas bidimensionais para um panorama sequencial multimodal.
+
+\section{Metodologia Resumida}
+
+A metodologia abrange cinco atividades sequenciais, desde a aquisição dos dados até a validação estatística do modelo de dupla via.
+
+
+\subsection{Atividade 1 - Obtenção e Preparação dos Dados} 
+Serão utilizadas cinco bases de imagens médicas de complexidades variadas: 
+
+\begin{itemize}
+    \item \textbf{CR:} 165 imagens distribuídas em 2 classes;
+    \item \textbf{LA:} 528 imagens distribuídas em 4 classes;
+    \item \textbf{LG:} 265 imagens distribuídas em 2 classes;
+    \item \textbf{NHL:} 374 imagens distribuídas em 3 classes;
+    \item \textbf{UCSB:} 68 imagens distribuídas em 2 classes.
+\end{itemize}
+
+
+Visando a estabilidade do treinamento, serão aplicadas rotinas de aumento de dados restritas aos conjuntos de treino. A divisão para testes seguirá o \textit{Stratified k-Fold Cross-Validation} \cite{kohavi1995study}, garantindo proporcionalidade e isenção na avaliação.
+
+\subsection{Atividade 2 - Modelagem Topológica} 
+Em contraste com métodos tradicionais baseados em níveis de cinza, as imagens manterão seus canais RGB. O espaço de cores e a disposição dos pixels serão mapeados para grafos. Ao variar sistematicamente o raio de conexão ($r$), métricas topológicas direcionais e ponderadas serão sequencialmente extraídas, descrevendo a evolução espacial e a interação dos canais da imagem.
+
+\subsection{Atividade 3 - Extração de Características (Vias Independentes)} 
+O processamento seguirá por duas frentes de aprendizado profundo:
+\begin{itemize}
+    \item \textbf{Via Sequencial (RNN):} A série de descritores topológicos alimentará a arquitetura recorrente, que aprenderá a dinâmica da expansão estrutural para gerar o \textit{embedding} do grafo.
+    \item \textbf{Via Visual (CNN/Atenção):} A imagem original RGB será submetida a uma rede de atenção para extração direta de características semânticas, ajustada via \textit{fine-tuning} para extrair o \textit{embedding} espacial profundo.
+\end{itemize}
+
+\subsection{Atividade 4 - Fusão Tardia e Classificação} 
+A integração ocorrerá no final da rede. Os \textit{embeddings} das vias independente serão concatenados, formatando um vetor de alta densidade informativa. Essa assinatura multimodal alimentará um perceptron multicamadas (\textit{Fully Connected}) responsável pelo cômputo das probabilidades e classificação final da patologia.
+
+\subsection{Atividade 5 - Avaliação e Análise de Desempenho} 
+O impacto do modelo híbrido será quantificado através das iterações do \textit{k-Fold}. Serão empregadas métricas padrão da literatura (como Acurácia, \textit{F1-Score} e Área Sob a Curva ROC), permitindo comparar empiricamente o desempenho do classificador unificado frente aos modelos rodando as vias visual e topológica de forma isolada.
+
+\section{Cronograma e Plano de Trabalho}
+
+\begin{table}[h]
+\centering
+\scalebox{0.75}{
+\begin{tabular}{||c||ll|ll|ll||}
+\hline\hline
+\multicolumn{1}{||c||}{Atividades} & \multicolumn{1}{c|}{$1^{o}$ bimestre} & \multicolumn{1}{c|}{$2^{o}$ bimestre} & \multicolumn{1}{c|}{$3^{o}$ bimestre} &
+\multicolumn{1}{c|}{$4^{o}$ bimestre} & \multicolumn{1}{c|}{$5^{o}$ bimestre} &
+\multicolumn{1}{c|}{$6^{o}$ bimestre}  \\ \hline\hline
+ 1 & \p & \p &   &   &   &   \\ \hline
+ 2 & \p & \p &  &  &   &   \\ \hline
+ 3 &  & \p & \p &  &  &  \\ \hline
+ 4 &  &  & \p & \p & \p & \\ \hline 
+ 5 &  &  &  &  & & \p\\ \hline \hline
+\end{tabular}
+}
+\caption{Cronograma de atividades em bimestres.}
+\end{table}
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}
