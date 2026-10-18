@@ -4,16 +4,27 @@
 \section{Extração de \textit{Features}}
 \label{sec:extracao-features}
 
-Em reconhecimento de padrões, uma \textit{feature} (característica) é uma medida numérica que resume algum aspecto relevante do dado. No caso de imagens, esses aspectos incluem bordas, texturas, formas e padrões de cor, e a extração de \textit{features} é o processo que mapeia a imagem bruta para uma representação de menor dimensão, sobre a qual o classificador opera \cite{ramossoto2025miafex}. Em imagens médicas, uma \textit{feature} corresponde a uma característica ou padrão relevante para a tarefa diagnóstica, como forma, tamanho, textura, densidade ou intensidade das estruturas observadas \cite{dehbozorgi2025}. A qualidade dessa representação influencia diretamente a capacidade de generalização do classificador, especialmente quando há poucos dados disponíveis \cite{ramossoto2025miafex}, cenário recorrente na área da saúde em razão de protocolos de privacidade, custos de aquisição e da necessidade de especialistas para a rotulação \cite{litjens2017survey}.
+Em reconhecimento de padrões, uma \textit{feature} é uma medida numérica que resume aspectos relevantes, os quais no caso de imagens, incluem bordas, texturas, formas e padrões de cor.A extração de \textit{features} é o processo que mapeia a imagem bruta para uma representação de menor dimensão, que pode, por exemplo, ser utilizada para melhorar o processo de classificação de modelos de \textit{deep learning} \cite{ramossoto2025miafex}. Em imagens médicas, uma \textit{feature} corresponde a uma característica ou padrão relevante para a tarefa diagnóstica, como forma, tamanho, textura, densidade ou intensidade das estruturas observadas \cite{dehbozorgi2025}. A qualidade dessa representação influencia diretamente a capacidade de generalização do classificador, especialmente quando há poucos dados disponíveis, cenário recorrente na área da saúde em razão de protocolos de privacidade, custos de aquisição e da necessidade de especialistas para a rotulação \cite{litjens2017survey}.
 
-Não existe um método de extração universalmente superior. Segundo \citeonline{ahmed2023review}, a escolha depende de fatores como a disponibilidade e a dimensionalidade dos dados, a existência de rótulos e o paradigma de aprendizado (supervisionado ou não supervisionado). Nas subseções seguintes, os métodos são organizados em três famílias: (i) descritores clássicos, projetados manualmente; (ii) representações aprendidas por redes profundas sobre a imagem; e (iii) representações aprendidas sobre dados sequenciais por redes recorrentes, com destaque para as \textit{features} de natureza topológica que motivam este trabalho.
+Não existe um método de extração que seja superior em todos os casos de uso. Segundo \citeonline{ahmed2023review}, a escolha depende de fatores como a disponibilidade e a dimensionalidade dos dados, a existência de rótulos e o paradigma de aprendizado (supervisionado ou não supervisionado). Nas subseções seguintes, os métodos são organizados em três famílias: (i) descritores clássicos (\textit{handcrafted}); (ii) representações aprendidas por redes profundas sobre a imagem; e (iii) representações aprendidas sobre dados sequenciais por redes recorrentes, com destaque para as \textit{features} de natureza topológica que motivam este trabalho.
 
 \subsection{Descritores clássicos (\textit{handcrafted})}
 \label{subsec:features-classicas}
 
-Os descritores clássicos são calculados por procedimentos matemáticos fixados previamente, sem aprendizado a partir dos dados. Entre os mais utilizados em imagens médicas estão: estatísticas de primeira ordem (como média e desvio padrão da intensidade); a matriz de coocorrência de níveis de cinza (GLCM) e as \textit{features} de Haralick \cite{haralick1973textural}, que descrevem a relação espacial entre pares de pixels; os padrões binários locais (LBP) e seu antecessor, o espectro de textura \cite{he1989texture,wang1990texture}; o histograma de gradientes orientados (HOG) \cite{dalal2005histograms}; os filtros de Gabor; e a transformada de características invariantes à escala (SIFT) \cite{ramossoto2025miafex,ahmed2023review}. Um conjunto frequentemente adotado em estudos de \textit{radiomics} é o do pacote \textit{pyradiomics}, que agrega estatísticas de primeira ordem e matrizes de textura (GLCM, GLSZM, GLRLM, NGTDM e GLDM), totalizando 93 \textit{features} por imagem em \citeonline{dehbozorgi2025}. Quando o vetor resultante é grande, é comum aplicar seleção ou redução de dimensionalidade, por exemplo com análise de componentes principais (PCA) \cite{dehbozorgi2025,ahmed2023review}.
+Os descritores clássicos são calculados por procedimentos matemáticos fixados previamente, sem aprendizado a partir dos dados. Entre os mais utilizados em imagens médicas estão: 
 
-Três desses descritores (GLCM, LBP e HOG) são adotados neste trabalho como métodos comparativos da técnica proposta. Eles são amplos em uso na análise de imagens médicas: em \citeonline{dehbozorgi2025}, por exemplo, o conjunto de \textit{features} estatísticas é composto por média, desvio padrão, LBP, GLCM e HOG, e \citeonline{ramossoto2025miafex} também os incluem entre os extratores clássicos de referência. Cada um é descrito a seguir.
+\begin{itemize}
+	\item Estatísticas de primeira ordem (média e desvio padrão da intensidade);
+	\item Matriz de coocorrência de níveis de cinza (GLCM) e as \textit{features} de Haralick, que descrevem a relação espacial entre pares de pixels \cite{haralick1973textural};
+	\item Padrões binários locais (LBP) e seu antecessor, o espectro de textura \cite{he1989texture,wang1990texture};
+	\item Histograma de gradientes orientados (HOG) \cite{dalal2005histograms};
+	\item Filtros de Gabor;
+	\item Transformada de características invariantes à escala (SIFT) \cite{ramossoto2025miafex,ahmed2023review}.
+\end{itemize}
+
+Um conjunto frequentemente adotado em estudos de \textit{radiomics} é o do pacote \textit{pyradiomics}, que agrega estatísticas de primeira ordem e matrizes de textura (GLCM, GLSZM, GLRLM, NGTDM e GLDM), totalizando 93 \textit{features} por imagem em \citeonline{dehbozorgi2025}. Quando o vetor resultante é grande, é comum aplicar seleção ou redução de dimensionalidade, por exemplo com análise de componentes principais (PCA) \cite{dehbozorgi2025,ahmed2023review}.
+
+Três desses descritores (GLCM, LBP e HOG) são adotados neste trabalho como métodos comparativos da técnica proposta. Eles são amplos em uso na análise de imagens médicas: em \citeonline{dehbozorgi2025}, por exemplo, o conjunto de \textit{features} estatísticas é composto por média, desvio padrão, LBP, GLCM e HOG, e \citeonline{ramossoto2025miafex} também os incluem entre os extratores clássicos de referência.
 
 \subsubsection{Matriz de coocorrência de níveis de cinza (GLCM)}
 \label{subsubsec:glcm}
@@ -30,18 +41,18 @@ O espectro de textura (\textit{texture spectrum}) foi proposto por \citeonline{h
 
 O HOG foi proposto por \citeonline{dalal2005histograms} para detecção de pessoas, e descreve a imagem pela distribuição local das direções de gradiente. A janela é dividida em pequenas regiões espaciais (células), e em cada célula acumula-se um histograma das orientações de gradiente ponderadas pela magnitude. Para ganhar invariância a iluminação e sombreamento, as respostas são normalizadas quanto ao contraste em blocos maiores e sobrepostos, e a concatenação dos histogramas normalizados forma o descritor, que alimenta um classificador (no trabalho original, uma máquina de vetores de suporte (SVM) linear). A configuração padrão dos autores usa filtro de gradiente $[-1, 0, 1]$ sem suavização, nove \textit{bins} de orientação entre 0° e 180°, blocos de $16\times16$ pixels formados por quatro células de $8\times8$ pixels, normalização L2-Hys e passo de 8 pixels entre blocos, em uma janela de $64\times128$ pixels. O descritor reduziu as taxas de falsos positivos em mais de uma ordem de magnitude em relação ao melhor detector baseado em \textit{wavelets} de Haar e levou a separação quase perfeita no conjunto MIT de pedestres \cite{dalal2005histograms}. Embora tenha sido concebido para um problema de detecção, o HOG é amplamente empregado como descritor de bordas e forma em imagens médicas \cite{ramossoto2025miafex}.
 
-\paragraph{Papel como métodos comparativos.} GLCM, LBP e HOG descrevem a imagem a partir de relações locais entre pixels (pares de tons de cinza, códigos de vizinhança e orientações de gradiente), em escalas e vizinhanças definidas previamente e, em geral, sobre imagens em níveis de cinza. A técnica proposta neste trabalho, em contraste, modela a imagem RGB como um grafo e analisa a evolução de suas medidas topológicas à medida que o raio de conexão aumenta, de modo que a comparação com esses três descritores permite avaliar o ganho de uma representação topológica sequencial sobre as abordagens clássicas de textura e forma.
+%\paragraph{Papel como métodos comparativos.} GLCM, LBP e HOG descrevem a imagem a partir de relações locais entre pixels (pares de tons de cinza, códigos de vizinhança e orientações de gradiente), em escalas e vizinhanças definidas previamente e, em geral, sobre imagens em níveis de cinza. A técnica proposta neste trabalho, em contraste, modela a imagem RGB como um grafo e analisa a evolução de suas medidas topológicas à medida que o raio de conexão aumenta, de modo que a comparação com esses três descritores permite avaliar o ganho de uma representação topológica sequencial sobre as abordagens clássicas de textura e forma.
 
-Esses métodos têm vantagens de interpretabilidade e baixo custo de treinamento, mas apresentam limitações importantes. De acordo com \citeonline{ramossoto2025miafex}, eles capturam padrões locais simples (bordas e gradientes), mas têm dificuldade em representar características de alto nível, não modelam o contexto global da imagem, são sensíveis a ruído e artefatos e escalam mal para dados de alta dimensão. Em um estudo comparativo com imagens de histologia (H\&E), raio-X de tórax e tomografia de coerência óptica (OCT) da retina, \citeonline{dehbozorgi2025} observaram que as \textit{features} estatísticas e de \textit{radiomics} foram as mais lentas de extrair e as de menor desempenho: na base de H\&E, a extração estatística levou cerca de uma hora e atingiu 90,8\% de sensibilidade média, enquanto a ResNet50 reduziu o tempo em quatro vezes e elevou a sensibilidade a 96,9\%. Resultado semelhante aparece fora do domínio de imagens: em detecção de arritmia por eletrocardiograma (ECG), \citeonline{ye2021arrhythmia} compararam descritores manuais (intervalos RR, FFT, \textit{wavelets}, estatísticas de ordem superior e funções de Hermite) com a alimentação do sinal bruto em classificadores profundos, e concluíram que o sinal bruto superou as \textit{features} manuais em todos os classificadores avaliados, embora os classificadores profundos tenham apresentado maior tempo de inferência.
+%Esses métodos têm vantagens de interpretabilidade e baixo custo de treinamento, mas apresentam limitações importantes. De acordo com \citeonline{ramossoto2025miafex}, eles capturam padrões locais simples (bordas e gradientes), mas têm dificuldade em representar características de alto nível, não modelam o contexto global da imagem, são sensíveis a ruído e artefatos e escalam mal para dados de alta dimensão. Em um estudo comparativo com imagens de histologia (H\&E), raio-X de tórax e tomografia de coerência óptica (OCT) da retina, \citeonline{dehbozorgi2025} observaram que as \textit{features} estatísticas e de \textit{radiomics} foram as mais lentas de extrair e as de menor desempenho: na base de H\&E, a extração estatística levou cerca de uma hora e atingiu 90,8\% de sensibilidade média, enquanto a ResNet50 reduziu o tempo em quatro vezes e elevou a sensibilidade a 96,9\%. Resultado semelhante aparece fora do domínio de imagens: em detecção de arritmia por eletrocardiograma (ECG), \citeonline{ye2021arrhythmia} compararam descritores manuais (intervalos RR, FFT, \textit{wavelets}, estatísticas de ordem superior e funções de Hermite) com a alimentação do sinal bruto em classificadores profundos, e concluíram que o sinal bruto superou as \textit{features} manuais em todos os classificadores avaliados, embora os classificadores profundos tenham apresentado maior tempo de inferência.
 
 \subsection{Extração por aprendizado profundo}
 \label{subsec:features-profundas}
 
-Redes neurais convolucionais (CNNs) aprendem, de forma hierárquica e a partir dos próprios dados, filtros que vão de bordas e texturas nas primeiras camadas a padrões semânticos nas camadas finais, o que as tornou a abordagem dominante em análise de imagens médicas \cite{litjens2017survey}. Uma estratégia amplamente usada em domínios com poucos dados é a transferência de aprendizado (\textit{transfer learning}), na qual uma rede pré-treinada em uma base grande, como a ImageNet, é empregada como extrator de \textit{features}: a imagem é propagada pela rede e a ativação de uma camada intermediária ou final é usada como vetor de características. Em \citeonline{dehbozorgi2025}, cinco redes pré-treinadas (VGG16, ResNet50, DenseNet121, MobileNetV2 e InceptionV3) produziram entre 512 e 2048 \textit{features} por imagem, com tempos de extração de aproximadamente 10 minutos (MobileNetV2, a mais rápida) a 15 minutos (DenseNet121), e em geral superaram os métodos estatísticos e de \textit{radiomics} em sensibilidade nas três modalidades; na base de OCT, por exemplo, a DenseNet121 alcançou 98,6\%, contra 91\% do \textit{radiomics}. Os autores destacam, porém, limitações do uso de redes profundas: necessidade de GPUs, dependência de grandes bases de dados e baixa interpretabilidade.
+Redes neurais convolucionais (CNNs) aprendem filtros que vão de bordas e texturas nas primeiras camadas a padrões semânticos nas camadas finais, o que as tornou a abordagem dominante em análise de imagens médicas \cite{litjens2017survey}. Uma estratégia amplamente usada em domínios com poucos dados é a transferência de aprendizado (\textit{transfer learning}), na qual uma rede pré-treinada em uma base grande, como a ImageNet, é empregada como extrator de \textit{features}: a imagem é propagada pela rede e a ativação de uma camada intermediária ou final é usada como vetor de características. Em \citeonline{dehbozorgi2025}, cinco redes pré-treinadas (VGG16, ResNet50, DenseNet121, MobileNetV2 e InceptionV3) produziram entre 512 e 2048 \textit{features} por imagem, com tempos de extração de aproximadamente 10 minutos (MobileNetV2, a mais rápida) a 15 minutos (DenseNet121), e em geral superaram os métodos estatísticos e de \textit{radiomics} em sensibilidade nas três modalidades; na base de OCT, por exemplo, a DenseNet121 alcançou 98,6\%, contra 91\% do \textit{radiomics}. Os autores destacam, porém, limitações do uso de redes profundas: necessidade de GPUs, dependência de grandes bases de dados e baixa interpretabilidade.
 
 A necessidade de capturar dependências de longo alcance motivou o uso de \textit{Vision Transformers} (ViT) \cite{dosovitskiy2020image} e de arquiteturas híbridas que combinam convolução e atenção, como a CoAtNet \cite{dai2021coatnet}, discutidas em revisões sobre \textit{transformers} em imagens médicas \cite{shamshad2023transformers}. Tanto CNNs quanto ViTs, contudo, tendem ao sobreajuste quando treinados em bases pequenas ou com alta variância intraclasse \cite{ramossoto2025miafex}. Para atenuar esse problema, \citeonline{ramossoto2025miafex} propuseram o MIAFEx, que utiliza o \textit{token} de classificação ([CLS]) de um \textit{Transformer} encoder como representação global da imagem e o refina por meio de pesos aprendíveis (multiplicação elemento a elemento sobre o vetor de dimensão 768), permitindo amplificar ou atenuar dimensões conforme sua relevância. As \textit{features} resultantes podem alimentar classificadores tradicionais. Em bases médicas pequenas, o MIAFEx superou extratores clássicos, CNNs e ViTs; em contrapartida, os autores reportam que essa vantagem diminui à medida que o conjunto de dados cresce. Como exemplo, na base de biópsias histológicas com classificador SVM, o MIAFEx obteve 81,25\% de acurácia, contra no máximo 56,25\% dos descritores clássicos avaliados.
 
-Outro aspecto relevante é a escala. Lesões e estruturas de interesse variam em tamanho e aparência, e extratores de escala única tendem a ter dificuldade em representá-las. No contexto de segmentação, a MMS-Net \cite{zhao2023mmsnet} combina módulos de conexão de salto (\textit{skip connection modules}), que extraem contexto multiescala local, com uma rede piramidal de \textit{features} (FPN), que agrega informação multiescala global, e manteve resultados competitivos mesmo com apenas 50\% e 20\% dos dados de treino. Essa ideia de analisar a imagem em vários níveis de vizinhança é análoga à variação progressiva do raio de conexão nos modelos de redes complexas discutidos adiante.
+Lesões e estruturas de interesse variam em tamanho e aparência, e extratores de escala única tendem a ter dificuldade em representá-las, assim naturalmente a utilização de modelos que unam CNNs e ViT tendem a aprimorar tarefas com imagens histopatológicas. No contexto de segmentação, a MMS-Net \cite{zhao2023mmsnet} combinou módulos de conexão de salto (\textit{skip connection modules}), que extraem contexto multiescala local, com uma rede piramidal de \textit{features} (FPN), que agrega informação multiescala global, e manteve resultados competitivos mesmo com apenas 50\% e 20\% dos dados de treino. Essa ideia de analisar a imagem em vários níveis de vizinhança é análoga à variação progressiva do raio de conexão nos modelos de redes complexas discutidos em \ref{sec:redes-complexas}.
 
 \subsection{Extração de \textit{features} sequenciais com redes recorrentes}
 \label{subsec:features-recorrentes}
@@ -61,83 +72,98 @@ Uma terceira família de métodos extrai \textit{features} da organização estr
 
 O trabalho que inspirou esta proposta \cite{ribas2024colorspectral} leva essa ideia para imagens coloridas por meio da \textit{Spatio-Spectral Network} (SSN), proposta originalmente por \citeonline{Scabini_2020}, um grafo direcionado em que as conexões dentro de cada canal de cor (rede $W$) representam as características espaciais e as conexões entre canais (rede $B$) representam padrões espectrais. A partir de um conjunto de raios, calculam-se medidas de vértice (grau de saída, força de entrada e força de saída) e, com elas, treina-se uma rede neural aleatorizada (\textit{Randomized Neural Network}), cuja camada oculta tem pesos sorteados e cuja camada de saída é resolvida por mínimos quadrados, para prever a dinâmica de evolução da rede. Os pesos aprendidos na camada de saída são então adotados como descritor da imagem. O método combina, portanto, uma modelagem manual (a SSN) com um aprendizado de representação (a rede neural), e superou diversas técnicas da literatura, inclusive CNNs profundas, em quatro bases de textura colorida. Os próprios autores apontam como limitação a interpretação física das representações aprendidas \cite{ribas2024colorspectral}.
 
-\subsection{Síntese}
-\label{subsec:features-sintese}
-
-O Quadro~\ref{quad:features-sintese} resume os trabalhos discutidos. Dois pontos orientam as escolhas metodológicas desta proposta. Primeiro, as evidências indicam que \textit{features} aprendidas superam descritores manuais em desempenho e em tempo de extração \cite{dehbozorgi2025,ye2021arrhythmia}, mas que modelos profundos treinados com poucos dados tendem ao sobreajuste \cite{ramossoto2025miafex}, o que justifica o uso de modelos pré-treinados, de arquiteturas com atenção e de regularização em bases médicas pequenas. Segundo, descritores topológicos oferecem uma representação estrutural complementar à aparência visual \cite{ribas2024colorspectral}, e redes recorrentes são adequadas para resumir sequências desses descritores em um \textit{embedding} \cite{jun2020rnnae}. Assim, este trabalho extrai dois \textit{embeddings} em paralelo: um \textit{embedding} topológico, gerado por uma RNN sobre a sequência de descritores do grafo RGB em diferentes raios, e um \textit{embedding} espacial, gerado por um modelo visual híbrido de convolução e atenção. A integração desses vetores é tratada na Seção~\ref{sec:fusao-tardia}.
-
-\begin{table}[htbp]
-\centering
-\caption{Síntese dos trabalhos sobre extração de \textit{features} discutidos nesta seção.}
-\label{quad:features-sintese}
-\footnotesize
-\begin{tabular}{p{3.0cm} p{2.7cm} p{4.3cm} p{4.6cm}}
-\hline
-\textbf{Trabalho} & \textbf{Domínio} & \textbf{Extração de \textit{features}} & \textbf{Resultado reportado} \\
-\hline
-\citeonline{haralick1973textural} & Fotomicrografias, fotos aéreas e imagens de satélite & GLCM e 14 medidas de textura & Acurácia de teste de 89\%, 82\% e 83\% nas três bases \\
-\citeonline{wang1990texture} & Texturas naturais (Brodatz) & Espectro de textura ($3\times3$, 6561 unidades) & Acurácia média de 97,5\% em quatro texturas, com distância mínima \\
-\citeonline{dalal2005histograms} & Detecção de pessoas & HOG (células e blocos normalizados) e SVM linear & Redução de falsos positivos em mais de uma ordem de magnitude frente a descritores com \textit{wavelets} \\
-\citeonline{dehbozorgi2025} & H\&E, raio-X, OCT & Estatísticas, \textit{radiomics} e CNNs pré-treinadas & \textit{Features} profundas com maior sensibilidade e menor latência (OCT: 98,6\% com DenseNet121 \textit{vs.} 91\% com \textit{radiomics}) \\
-\citeonline{ramossoto2025miafex} & Imagens médicas (bases pequenas) & ViT com refinamento do \textit{token} [CLS] & Superou extratores clássicos, CNNs e ViTs em bases pequenas; vantagem diminui com mais dados \\
-\citeonline{zhao2023mmsnet} & Segmentação médica & Multiescala (SCM e FPN) & Resultados competitivos com 50\% e 20\% dos dados de treino \\
-\citeonline{ahmed2023review} & Mamografia e RM & Revisão (GLCM, Haralick, Gabor, LBP, PCA, LVQ) & Escolha do método depende dos dados e da tarefa \\
-\citeonline{ye2021arrhythmia} & ECG & \textit{Features} manuais \textit{vs.} sinal bruto & Sinal bruto em CNN foi o melhor, com maior tempo de inferência \\
-\citeonline{jun2020rnnae} & Marcha (esqueleto) & Autoencoder LSTM/GRU & \textit{Features} do autoencoder superaram os dados originais; LSTM AE superou GRU AE \\
-\citeonline{zhi2019slstm} & Expressões faciais (vídeo) & LSTM esparsa (SLSTM) & Seleção automática de \textit{features} e menor complexidade \\
-\citeonline{jeswani2026deepfake} & \textit{Deepfake} (vídeo) & CNN e GRU/LSTM & ResNeXt50 + LSTM: acurácia de 0,80 e F1 de 0,75 (10 vídeos de teste) \\
-\citeonline{wu2024statistical} & Dados complexos (imagem, texto, áudio) & CNN, RNN e atenção & Superior a uma DNN convencional (curvas de acurácia) \\
-\citeonline{nair2025multimodal} & Biometria multimodal & MobileNetV2 e RNN com atenção & Acurácia de 99,50\% após fusão e SVM \\
-\citeonline{ribas2024colorspectral} & Textura colorida & SSN e rede neural aleatorizada & Superou diversos métodos, inclusive CNNs profundas, em quatro bases \\
-\hline
-\end{tabular}
-\end{table}
+% \subsection{Síntese}
+% \label{subsec:features-sintese}
+%
+% O Quadro~\ref{quad:features-sintese} resume os trabalhos discutidos. Dois pontos orientam as escolhas metodológicas desta proposta. Primeiro, as evidências indicam que \textit{features} aprendidas superam descritores manuais em desempenho e em tempo de extração \cite{dehbozorgi2025,ye2021arrhythmia}, mas que modelos profundos treinados com poucos dados tendem ao sobreajuste \cite{ramossoto2025miafex}, o que justifica o uso de modelos pré-treinados, de arquiteturas com atenção e de regularização em bases médicas pequenas. Segundo, descritores topológicos oferecem uma representação estrutural complementar à aparência visual \cite{ribas2024colorspectral}, e redes recorrentes são adequadas para resumir sequências desses descritores em um \textit{embedding} \cite{jun2020rnnae}. Assim, este trabalho extrai dois \textit{embeddings} em paralelo: um \textit{embedding} topológico, gerado por uma RNN sobre a sequência de descritores do grafo RGB em diferentes raios, e um \textit{embedding} espacial, gerado por um modelo visual híbrido de convolução e atenção. A integração desses vetores é tratada na Seção~\ref{sec:fusao-tardia}.
+%
+% \begin{table}[htbp]
+% \centering
+% \caption{Síntese dos trabalhos sobre extração de \textit{features} discutidos nesta seção.}
+% \label{quad:features-sintese}
+% \footnotesize
+% \begin{tabular}{p{3.0cm} p{2.7cm} p{4.3cm} p{4.6cm}}
+% \hline
+% \textbf{Trabalho} & \textbf{Domínio} & \textbf{Extração de \textit{features}} & \textbf{Resultado reportado} \\
+% \hline
+% \citeonline{haralick1973textural} & Fotomicrografias, fotos aéreas e imagens de satélite & GLCM e 14 medidas de textura & Acurácia de teste de 89\%, 82\% e 83\% nas três bases \\
+% \citeonline{wang1990texture} & Texturas naturais (Brodatz) & Espectro de textura ($3\times3$, 6561 unidades) & Acurácia média de 97,5\% em quatro texturas, com distância mínima \\
+% \citeonline{dalal2005histograms} & Detecção de pessoas & HOG (células e blocos normalizados) e SVM linear & Redução de falsos positivos em mais de uma ordem de magnitude frente a descritores com \textit{wavelets} \\
+% \citeonline{dehbozorgi2025} & H\&E, raio-X, OCT & Estatísticas, \textit{radiomics} e CNNs pré-treinadas & \textit{Features} profundas com maior sensibilidade e menor latência (OCT: 98,6\% com DenseNet121 \textit{vs.} 91\% com \textit{radiomics}) \\
+% \citeonline{ramossoto2025miafex} & Imagens médicas (bases pequenas) & ViT com refinamento do \textit{token} [CLS] & Superou extratores clássicos, CNNs e ViTs em bases pequenas; vantagem diminui com mais dados \\
+% \citeonline{zhao2023mmsnet} & Segmentação médica & Multiescala (SCM e FPN) & Resultados competitivos com 50\% e 20\% dos dados de treino \\
+% \citeonline{ahmed2023review} & Mamografia e RM & Revisão (GLCM, Haralick, Gabor, LBP, PCA, LVQ) & Escolha do método depende dos dados e da tarefa \\
+% \citeonline{ye2021arrhythmia} & ECG & \textit{Features} manuais \textit{vs.} sinal bruto & Sinal bruto em CNN foi o melhor, com maior tempo de inferência \\
+% \citeonline{jun2020rnnae} & Marcha (esqueleto) & Autoencoder LSTM/GRU & \textit{Features} do autoencoder superaram os dados originais; LSTM AE superou GRU AE \\
+% \citeonline{zhi2019slstm} & Expressões faciais (vídeo) & LSTM esparsa (SLSTM) & Seleção automática de \textit{features} e menor complexidade \\
+% \citeonline{jeswani2026deepfake} & \textit{Deepfake} (vídeo) & CNN e GRU/LSTM & ResNeXt50 + LSTM: acurácia de 0,80 e F1 de 0,75 (10 vídeos de teste) \\
+% \citeonline{wu2024statistical} & Dados complexos (imagem, texto, áudio) & CNN, RNN e atenção & Superior a uma DNN convencional (curvas de acurácia) \\
+% \citeonline{nair2025multimodal} & Biometria multimodal & MobileNetV2 e RNN com atenção & Acurácia de 99,50\% após fusão e SVM \\
+% \citeonline{ribas2024colorspectral} & Textura colorida & SSN e rede neural aleatorizada & Superou diversos métodos, inclusive CNNs profundas, em quatro bases \\
+% \hline
+% \end{tabular}
+% \end{table}
 
 \section{Redes Complexas}
 \label{sec:redes-complexas}
 
-A teoria de Redes Complexas (CN - \textit{Complex Networks}) atua como uma abstração para modelar sistemas naturais onde os elementos interagem de maneira não trivial. Em visão computacional, essas redes têm sido empregadas para modelar os pixels de uma imagem e suas adjacências, possibilitando que descritores baseados em topologia quantifiquem propriedades de textura de forma discriminativa \cite{BACKES2013168, ribas2020fusion, ribas2024colorspectral}. Neste trabalho, a abordagem é aplicada a imagens histopatológicas.
-% REVISAR: os trabalhos citados avaliam texturas (Outex, USPTex, MBT, CUReT e folhas de plantas); nenhum deles usa imagens médicas.
+A teoria de Redes Complexas (CN -- \textit{Complex Networks}) atua como uma abstração para modelar sistemas naturais cujos elementos interagem de maneira não trivial \cite{BOCCALETTI2006175}. Essas redes têm sido empregadas para modelar os pixels de uma imagem e suas relações de vizinhança, possibilitando que descritores baseados em topologia quantifiquem propriedades de textura de forma discriminativa \cite{BACKES2013168, ribas2020fusion, ribas2024colorspectral}. Neste trabalho, a abordagem segue a transformação por redes complexas empregada em \citeonline{CNT} e é aplicada a imagens histopatológicas.
 
-Para processar a imagem, a estrutura regular de \textit{grid} de seus pixels é mapeada em um grafo direcionado ponderado $G = (V, E)$, no qual cada pixel na imagem original está associado a um vértice $v \in V$, e a relação entre um par de pixels define a formação de uma aresta e seu respectivo peso, $e \in E$ \cite{CNT}. A formulação original de CNs direcionadas para imagens \cite{BACKES2013168, ribas2020fusion} propõe mapear as conexões restritas a um raio circular de distância $r$, criando uma vizinhança na qual apenas os pixels dentro do raio $r$ ao redor de um dado pixel se conectarão a ele, como descrito a seguir:
+\subsection{Modelagem da imagem como rede direcionada}
+\label{subsec:cn-modelagem}
 
-\begin{equation}\label{eq1}
-\rho_{ij}^2 = (x_i - x_j)^2 + (y_i - y_j)^2, \qquad 0 < \rho_{ij}^2 \leq r^2.
-\end{equation}
-
-Em que $x$ e $y$ representam as coordenadas do pixel correspondente ao nó $v$ na imagem, e $\rho$ descreve a distância euclidiana. Assim como o raio de conexão, a relação entre a intensidade do pixel formará o direcionamento do grafo, onde para $I(x_i, y_i) \geq I(x_j, y_j)$, a conexão torna-se direcionada do nó $v_i$ de saída (\textit{out}) para o nó $v_j$ \cite{CNT, ribas2024colorspectral}.
-% REVISAR: em Ribas et al. (2024) a aresta aponta do vértice de MENOR intensidade para o de MAIOR (p(v_i) < p(v_j)), e é bidirecional se forem iguais; conferir a convenção do CNT e, se diferir, declarar. E a aresta da rede será ponderada pela diferença modular de intensidade entre os vértices, resultando em descritores estruturais que modelam topologicamente o comportamento visual da imagem no raio $r$, de acordo com a Equação \ref{eq2}:
-
+Cada imagem é representada como uma rede complexa direcionada e ponderada $G = (V, E)$, na qual cada pixel é modelado como um vértice e as conexões entre pixels são estabelecidas dentro de um raio espacial máximo $r_{max}$ \cite{CNT}. Para um pixel $i = (x_i, y_i)$ em um canal de cor $c$ da imagem $I$, define-se um vértice $v_i^{(c)} \in V$. Uma aresta direcionada é criada entre os vértices $v_i^{(c)}$ e $v_j^{(c_w)}$ quando a distância euclidiana quadrática entre os pixels satisfaz a Equação~\ref{eq:cn-aresta}:
 \begin{equation}
-w_{ij} = \left| I(x_i, y_i) - I(x_j, y_j) \right|.
-\label{eq2}
+\rho_{ij}^2 = (x_i - x_j)^2 + (y_i - y_j)^2, \qquad 0 < \rho_{ij}^2 \leq r_{max}^2,
+\label{eq:cn-aresta}
 \end{equation}
+em que $x$ e $y$ são as coordenadas dos pixels e $\rho_{ij}$ é a distância euclidiana entre eles. A condição $\rho_{ij}^2 > 0$ exclui laços, isto é, a conexão de um pixel consigo mesmo \cite{BACKES2013168, ribas2020fusion}.
 
-A extração de características da rede envolve computar medidas topológicas em diferentes raios. Neste estudo, foram empregados o grau (\textit{degree}) \cite{BACKES2013168} e a força (\textit{force}) \cite{CNT} como medidas topológicas. Cada uma foi calculada nas versões de entrada e de saída, resultando em grau de entrada, grau de saída, força de entrada e força de saída. O grau quantifica as incidências no vértice $v_i$, contabilizando a quantidade de conexões direcionadas cujas intensidades sejam superiores ou inferiores à do vértice analisado.
-% REVISAR: Ribas et al. (2024) omitem o grau de entrada por ser uma transformação linear do grau de saída (k_in + k_out = k no raio máximo); justificar o uso das quatro medidas.
+Cada aresta é associada a um raio espacial discreto $r \in \{1, 2, \ldots, r_{max}\}$, definido como o menor inteiro que satisfaz $(r-1)^2 < \rho_{ij}^2 \leq r^2$. Essa discretização permite que as medidas da rede sejam acumuladas progressivamente sobre vizinhanças espaciais cada vez maiores \cite{ribas2024colorspectral}.
 
+O peso atribuído a cada aresta é a diferença absoluta de intensidade entre os pixels conectados, conforme a Equação~\ref{eq:cn-peso}:
+\begin{equation}
+w_{ij} = \left| I(x_i, y_i, c) - I(x_j, y_j, c_w) \right|.
+\label{eq:cn-peso}
+\end{equation}
+Dessa forma, a topologia da rede, com arestas restritas à vizinhança definida pela Equação~\ref{eq:cn-aresta}, passa a codificar o comportamento local de variação de intensidade da imagem.
 
-Por outro lado, a medida força \cite{CNT} quantifica essas ligações de forma mais discriminativa, considerando as distâncias e intensidades de cada nó dentro do raio $r$. Cada medida pode ser computada da seguinte forma, levando em consideração também o peso de força que combina a diferença de intensidade normalizada com a distância espacial normalizada na Equação \ref{eq3}:
+O direcionamento de cada aresta é determinado pelas intensidades relativas dos pixels incidentes e vai do pixel de menor intensidade para o de maior intensidade \cite{CNT, ribas2024colorspectral}. Quando $I(x_i, y_i, c) < I(x_j, y_j, c_w)$, a conexão é classificada como de saída (\textit{out}) a partir de $v_i$ e, correspondentemente, de entrada (\textit{in}) em $v_j$; caso contrário, é classificada como de entrada em $v_i$. Conexões entre pixels de mesma intensidade são contabilizadas em ambas as direções. Assim, o grau de saída de um vértice conta seus vizinhos mais claros, e o grau de entrada, seus vizinhos mais escuros.
 
+\subsection{Medidas topológicas: grau e força}
+\label{subsec:cn-medidas}
+
+Duas famílias complementares de medidas topológicas, o grau (\textit{degree}) \cite{BACKES2013168} e a força (\textit{force}) \cite{CNT}, são calculadas para cada vértice acumulando as quantidades correspondentes até o raio $r$, cada uma nas versões de saída e de entrada. O grau quantifica o número de conexões de saída e de entrada dentro da vizinhança considerada, como na Equação~\ref{eq:cn-grau}:
+\begin{equation}
+d_{out}(v_i, r) = \sum_{k=1}^{r} n_{out}(v_i, k),
+\label{eq:cn-grau}
+\end{equation}
+em que $n_{out}(v_i, k)$ é o número de arestas de saída de $v_i$ cujo raio discreto vale $k$. O grau de entrada, $d_{in}(v_i, r)$, é calculado de forma análoga a partir das conexões de entrada, $n_{in}(v_i, k)$.
+
+A força incorpora tanto as diferenças de intensidade quanto a proximidade espacial, fornecendo um descritor sensível aos gradientes locais de textura \cite{CNT}. Para uma rede construída com raio $r$, cada aresta $(v_i, v_j)$ recebe um peso de força que combina a diferença de intensidade normalizada com a distância espacial normalizada, conforme a Equação~\ref{eq:cn-forca-peso}:
 \begin{equation}
 \omega_{ij}^{(r)} =
 \begin{cases}
-\dfrac{w_{ij}}{2L}, & r = 1,\\[6pt]
+\dfrac{w_{ij}}{2L}, & r = 1,\\[8pt]
 \dfrac{1}{2}\left[\dfrac{w_{ij}}{L} + \dfrac{\rho_{ij}^2-1}{r^2-1}\right], & r \geq 2,
 \end{cases}
-\label{eq3}
+\label{eq:cn-forca-peso}
 \end{equation}
- 
-Sendo $L=255$ o nível de intensidade máximo da imagem, e força de saída quantificada acumulada do raio 1 ao raio $r$ em:
+em que $L = 255$ é o nível máximo de intensidade para imagens de 8 bits e $w_{ij}$ é o peso dado pela Equação~\ref{eq:cn-peso}. A força de saída acumulada é então dada pela Equação~\ref{eq:cn-forca}:
 \begin{equation}
-\text{force}_{out}(v_i,r)=\sum_{v_j\in\mathcal{N}^{(r)}_{out}(v_i)}\omega_{ij}^{(r)},
-\label{eq4}
+\text{force}_{out}(v_i, r) = \sum_{v_j \in \mathcal{N}_{out}^{(r)}(v_i)} \omega_{ij}^{(r)},
+\label{eq:cn-forca}
 \end{equation}
-Em que $\mathcal{N}^{(r)}_{out}(v_i)$ representa os nós $v_j$ para os quais $v_i$ possui aresta de saída, e $\mathcal{N}^{(r)}_{in}(v_i)$, os nós que possuem aresta de entrada em $v_i$. A $\text{force}_{in}$ é calculada de forma análoga, com $\mathcal{N}^{(r)}_{in}$.
+em que $\mathcal{N}_{out}^{(r)}(v_i)$ é o conjunto de vértices conectados a $v_i$ por arestas de saída com $\rho_{ij}^2 \leq r^2$, e $\text{force}_{in}$ é definida analogamente sobre as arestas de entrada, com $\mathcal{N}_{in}^{(r)}(v_i)$.
 
-Essas propriedades formam uma estrutura matemática análoga a matrizes densas ou imagens discretas \cite{ribas2024colorspectral, CNT}. Dessa forma, com a quantificação das medidas topológicas sob variados raios de limitação, a representação da rede complexa descreverá o crescimento espacial topológico ao longo dos raios (variações da distância circular $r$) \cite{SCABINI2026, ribas2024colorspectral}. À medida que $r$ aumenta, as características estritamente locais, observadas nos menores raios, dão lugar a características progressivamente mais globais.
+O fator $r^2 - 1$ na Equação~\ref{eq:cn-forca-peso} é o valor máximo de $\rho_{ij}^2 - 1$ dentro de uma vizinhança de raio $r$, o que mantém o termo espacial no intervalo $[0, 1]$. Para $r = 1$, a única distância quadrática possível é $\rho_{ij}^2 = 1$, de modo que o termo espacial é identicamente nulo e o fator $r^2 - 1$ se anularia; por isso, nesse caso o peso se reduz à sua componente de intensidade. Por fim, as medidas se combinam em quatro grandezas por vértice: grau de saída, grau de entrada, força de saída e força de entrada.
 
-Além disso, para estender as matrizes das medidas topológicas aos três canais de cor das imagens histopatológicas \textit{RGB}, a estrutura das formulações pode ser utilizada nas configurações \textit{Between-channel}, \textit{Within-channel} e \textit{Full} \cite{Scabini_2020}. Neste trabalho, considera-se a configuração \textit{Full}, que unifica simultaneamente os processos intracanal e intercanal sob as mesmas métricas \cite{CNT}.
+\subsection{Configurações de canais e raio máximo}
+\label{subsec:cn-configuracoes}
+
+Para estender as medidas aos três canais de cor das imagens histopatológicas RGB, as formulações anteriores podem ser aplicadas em três configurações de rede \cite{Scabini_2020}: \textit{within-channel}, com $c = c_w$; \textit{between-channel}, com $c \neq c_w$; e \textit{full}, que inclui simultaneamente conexões intracanal e intercanal. Neste trabalho adota-se a configuração \textit{full}, de modo a capturar conjuntamente as transições espaciais de intensidade e as relações cromáticas entre canais \cite{CNT}.
+
+Finalmente, o raio máximo $r_{max}$ foi selecionado avaliando-se raios de 1 a 15 em todas as bases de dados, em consonância com valores já considerados na literatura \cite{CNT, SCABINI2026}. O aumento do raio incorpora vizinhanças espaciais progressivamente maiores e modifica a distribuição dos valores topológicos resultantes. A entropia de Shannon, usada para quantificar essas mudanças, cresceu até aproximadamente $r = 10$ e atingiu um platô a partir daí, enquanto a entropia amostral, como medida complementar de complexidade topológica local, teve pico em $r = 10$ e decresceu depois. Essas tendências, em conjunto com achados anteriores de que combinações multiescala de raios são úteis \cite{ribas2024colorspectral, CNT}, motivam a adoção de $r_{max} = 10$. À medida que $r$ cresce, as características estritamente locais dos menores raios dão lugar a características progressivamente mais globais, e é essa evolução ao longo dos raios que forma a sequência processada pela via recorrente (Seção~\ref{sec:rnn-topologicas}).
 
 \section{RNN na Extração de \textit{Features} Topológicas}
 \label{sec:rnn-topologicas}
