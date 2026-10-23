@@ -1,0 +1,204 @@
+\chapter{Materiais e Métodos}
+
+As imagens utilizadas são oriundas de cinco \textit{datasets} histopatológicos, os quais são descritos na Seção \ref{sec:datasets}. Esses conjuntos formam a entrada da etapa de extração de características (Seção \ref{sec:duas-vias}), onde primeiramente gera-se as imagens artificiais, oriundas da CNIT, baseadas nas imagens originais, as quais respectivamente são utilizadas na via de extração de features texturais e na via da MobileViT. Após a etapa de extração de características é realizada uma concatenação dos vetores (Seção \ref{sec:late-fusion}), que é utilizada em um classificador MLP (Seção \ref{sec:mlp}) e então obtêm-se as métricas de classificação.
+
+
+\input{pipeline1.tex}
+
+\section{\textit{Datasets}}
+\label{sec:datasets}
+
+A avaliação foi realizada em \textit{datasets} de imagens histopatológicas com 58 a 528 imagens cada. Os conjuntos abrangem tarefas de classificação binária e multiclasse, com diferentes tamanhos amostrais e graus de desbalanceamento de classes, o que permitiu avaliar as técnicas de aumento de dados sob diferentes condições de disponibilidade de dados. A Tabela~\ref{tab:datasets} resume as características de cada conjunto.
+
+\begin{table}[htb]
+\centering
+\caption{Resumo dos \textit{datasets} utilizados.}
+\label{tab:datasets}
+\small
+\begin{tabular}{llccl}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Tarefa (classes)} & \textbf{Imagens} & \textbf{Classes} & \textbf{Imagens por classe} \\
+\midrule
+UCSB & Mama (benigno / maligno)          & 58  & 2 & 32 / 26 \\
+CR   & Colorretal (benigno / maligno)    & 165 & 2 & 74 / 91 \\
+LA   & Idade (1, 6, 16 e 24 meses)       & 528 & 4 & 100 / 115 / 162 / 151 \\
+LG   & Gênero (macho / fêmea)            & 265 & 2 & 150 / 115 \\
+NHL  & Linfoma (CLL / FL / MCL)          & 374 & 3 & 113 / 139 / 122 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Todas as imagens originais foram redimensionadas para $256 \times 256$ pixels por interpolação de área antes de qualquer técnica de aumento de dados, de modo que tanto as transformações complexas quanto o treinamento da WGAN-GP operassem sobre imagens de mesma dimensão. As transformações complexas (CNIT) operaram diretamente sobre as intensidades RGB discretas de 8 bits, $I \in [0,255]$, preservando os valores fotométricos originais exigidos por sua formulação de métricas com $L=255$. As imagens transformadas resultantes foram, em seguida, mapeadas para a faixa padrão de 8 bits, $[0,255]$. Para a WGAN-GP, as imagens reais foram escaladas para $[-1,1]$ durante o treinamento generativo. As imagens geradas foram então convertidas para a faixa $[0,255]$ e redimensionadas de $256 \times 256$ para $224 \times 224$ pixels por interpolação de área. Por fim, as imagens produzidas por ambas as técnicas foram normalizadas com as médias por canal padrão do ImageNet, $[0{,}485;\ 0{,}456;\ 0{,}406]$, e os respectivos desvios padrão, $[0{,}229;\ 0{,}224;\ 0{,}225]$, antes de serem fornecidas aos modelos de classificação.
+
+No contexto considerado, o \textit{dataset} UCSB \cite{UCSB} é composto por 58 imagens RGB de tecido de câncer de mama (Figura~\ref{fig:dataset-ucsb}), sendo 32 benignas e 26 malignas, e possui o menor número de amostras entre os conjuntos avaliados.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/UCSBB (1).png}
+        \caption{}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/UCSBB (10).png}
+        \caption{} 
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/UCSBM (1).png}
+        \caption{}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/UCSBM (10).png}
+        \caption{}
+    \end{subfigure}
+
+    \caption{Imagens exemplares do conjunto UCSB: (a, b) são tumores benignos e (c, d) são tumores malignos.}
+    \label{fig:dataset-ucsb}
+
+\end{figure}
+
+O \textit{dataset} CR \cite{CR} contém 165 imagens RGB de tecido colorretal, obtidas a partir de 16 seções histológicas representativas de câncer colorretal nos estágios T3 e T4. O conjunto é levemente desbalanceado, com 74 imagens de tecido benigno e 91 de tecido maligno, e aquisições originais com resoluções de $567 \times 430$ a $775 \times 522$ pixels (Figura~\ref{fig:dataset-cr}).
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/CRBenign (1).png}
+        \caption{}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/CRBenign (10).png}
+        \caption{} 
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/CRMalignant (1).png}
+        \caption{}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/CRMalignant (10).png}
+        \caption{}
+    \end{subfigure}
+
+    \caption{Imagens exemplares do conjunto CR: (a, b) são tecidos benignos e (c, d) são tecidos malignos.}
+    \label{fig:dataset-cr}
+
+\end{figure}
+
+Os \textit{datasets} LA e LG \cite{LAeLGeNHL} compreendem micrografias RGB de tecido hepático de camundongos. O LA tem como objetivo classificar a idade dos animais fêmeas em quatro grupos: um mês (100 imagens), seis meses (115), 16 meses (162) e 24 meses (151), totalizando 528 imagens. O LG contém 265 imagens para classificação de gênero, divididas em 150 machos e 115 fêmeas. As Figuras~\ref{fig:dataset-la} e \ref{fig:dataset-lg} apresentam amostras dos dois conjuntos.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/la 1.png}
+        \caption{}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/la 2.png}
+        \caption{} 
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/la 3.png}
+        \caption{}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/la 4.png}
+        \caption{}
+    \end{subfigure}
+
+    \caption{Imagens de cada faixa etária dos camundongos do conjunto LA: um mês (a), seis meses (b), 16 meses (c) e 24 meses (d).}
+    \label{fig:dataset-la}
+
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/lg male 1.png}
+        \caption{}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/lg male 2.png}
+        \caption{} 
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/lg female 1.png}
+        \caption{}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/lg female 2.png}
+        \caption{}
+    \end{subfigure}
+
+    \caption{Imagens de cada gênero dos camundongos do conjunto LG: (a, b) machos e (c, d) fêmeas.}
+    \label{fig:dataset-lg}
+
+\end{figure}
+
+O \textit{dataset} NHL \cite{LAeLGeNHL} contém 374 imagens RGB de linfoma não Hodgkin, distribuídas em três classes diagnósticas: leucemia linfocítica crônica (\textit{chronic lymphocytic leukemia}, CLL, 113 imagens), linfoma folicular (\textit{follicular lymphoma}, FL, 139 imagens) e linfoma de células do manto (\textit{mantle cell lymphoma}, MCL, 122 imagens). Diferentemente de aquisições realizadas em um único centro, o NHL reúne espécimes preparados por diferentes histologistas em diversos hospitais e laboratórios de histopatologia, apresentando marcantes variações de coloração e iluminação entre laboratórios (Figura~\ref{fig:dataset-nhl}). Esse conjunto foi incluído especificamente para avaliar a robustez dos modelos e das técnicas de aumento de dados sob substancial variabilidade de domínio e cromática.
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/CLL (1).png}
+        \caption{}
+    \end{subfigure}\hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/FL (1).png}
+        \caption{} 
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/MCL (1).png}
+        \caption{}
+    \end{subfigure}
+
+    \caption{Amostras do conjunto NHL: (a) CLL, (b) FL e (c) MCL.}
+    \label{fig:dataset-nhl}
+\end{figure}
+
+\section{\textit{Two-Stream Network}}
+\label{sec:duas-vias}
+
+\subsection{Extração de \textit{features} texturais}
+
+\subsection{Extração via MobileViT}
+
+\section{Fusão Tardia}
+\label{sec:late-fusion}
+
+\section{Classificador MLP}
+\label{sec:mlp}
+
+\section{Protocolo de treinamento}
+\label{sec:protocolo}
+
+\subsection{Métricas}
+
+\section{Configuração de ambiente}
+\label{sec:env}

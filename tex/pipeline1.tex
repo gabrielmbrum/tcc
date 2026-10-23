@@ -76,7 +76,7 @@
 
         % 4. CLASSIFICADOR FINAL
         \node (classif) [recntagle, minimum width=5.5cm, below=0.8cm of fusion_box] {4. Classificador Final (MLP)};
-        \node (output) [recntagle, fill=green!15, draw=green!60!black, minimum width=5.5cm, below=0.8cm of classif] {Diagnóstico / Patologia};
+        \node (output) [recntagle, fill=green!15, draw=green!60!black, minimum width=5.5cm, below=0.8cm of classif] {Métricas};
 
         \draw [arrow] (fusion_box.south) -- (classif.north);
         \draw [arrow] (classif.south) -- (output.north);

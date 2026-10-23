@@ -1,0 +1,17 @@
+\chapter{Objetivos}
+
+Este trabalho tem como objetivo geral explorar a utilização de imagens histopatológicas artificiais geradas por redes complexas para criar um \textit{embedding} topológico por meio de uma RNN e uni-lo, por fusão tardia (\textit{feature-level fusion}), a um \textit{embedding} espacial oriundo de uma rede híbrida, investigando se essa técnica de análise topológica e espacial conjunta supera métodos consolidados na literatura. 
+
+Para alcançar o objetivo geral, definem-se os seguintes objetivos específicos:
+
+\begin{itemize}
+    \item Modelar as imagens histopatológicas como redes complexas, variando o raio de conexão para gerar uma sequência de transformações que capture a evolução estrutural e multiescala do tecido celular.
+    
+    \item Implementar e treinar uma Rede Neural Recorrente (LSTM/RNN) capaz de processar a sequência temporal de imagens transformadas para extrair o \textit{embedding} topológico profundo.
+    
+    \item Configurar e treinar a via espacial baseada em uma arquitetura híbrida para processar as imagens microscópicas originais, extraindo um \textit{embedding} espacial focado em características visuais e morfológicas de textura.
+    
+    \item Desenvolver um módulo de fusão tardia para concatenar os \textit{embeddings} espacial e topológico, submetendo o vetor unificado a uma rede perceptron de múltiplas camadas (MLP) para a classificação final.
+    
+    \item Avaliar e validar o desempenho do modelo \textit{Two-Stream} proposto em conjuntos de dados histopatológicos, comparando sua precisão, sensibilidade e robustez frente a arquiteturas de linha de base (\textit{baselines}) consolidadas na literatura.
+\end{itemize}
