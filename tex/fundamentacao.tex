@@ -5,33 +5,132 @@
 
 Em reconhecimento de padrões, uma \textit{feature} é uma medida numérica que representa uma propriedade da imagem, como textura, forma, bordas ou cor. A extração de \textit{features} transforma os pixels em uma representação que pode ser utilizada por um classificador \cite{ramossoto2025miafex}. Em imagens médicas, essas medidas descrevem propriedades como a forma, o tamanho, a textura e a intensidade das estruturas observadas \cite{dehbozorgi2025}. A representação pode ser definida por regras matemáticas ou aprendida a partir dos dados, e essa distinção é relevante em bases médicas pequenas, nas quais a disponibilidade de imagens rotuladas é limitada por custos de aquisição, privacidade e necessidade de especialistas \cite{litjens2017survey}.
 
-\subsection{Descritores clássicos (\textit{handcrafted})}
+Em histopatologia, o tecido é fixado, cortado, corado, em geral pela hematoxilina e eosina (H\&E), e digitalizado. As diferenças de protocolo de coloração e de iluminação entre laboratórios alteram a cor e o contraste da imagem para um mesmo tipo de tecido, e a textura formada pelo arranjo de núcleos, citoplasma e matriz extracelular é uma das principais fontes de informação para o diagnóstico.
+% TODO: incluir referência de patologia computacional / variação de coloração H&E neste parágrafo.
+
+\subsection{Descritores clássicos}
 \label{subsec:features-classicas}
 
-Os descritores clássicos (\textit{handcrafted}) são calculados por regras matemáticas definidas previamente, sem ajuste a partir dos dados. Entre os métodos empregados em imagens médicas estão as estatísticas de primeira ordem, a matriz de coocorrência de níveis de cinza (GLCM), os padrões binários locais (LBP), o histograma de gradientes orientados (HOG), os filtros de Gabor e o SIFT \cite{ramossoto2025miafex,ahmed2023review}. Neste trabalho, GLCM, LBP e HOG são utilizados como métodos de comparação com a abordagem proposta \cite{dehbozorgi2025,ramossoto2025miafex}.
+Os descritores clássicos (\textit{handcrafted}) são calculados por regras matemáticas definidas previamente, sem ajuste a partir dos dados. Entre os métodos empregados em imagens médicas estão as estatísticas de primeira ordem, a matriz de coocorrência de níveis de cinza (GLCM), os padrões binários locais (LBP), o histograma de gradientes orientados (HOG), os filtros de Gabor e o SIFT \cite{ramossoto2025miafex,ahmed2023review,dehbozorgi2025}. As subseções seguintes definem GLCM, LBP e HOG.
 
-\citeonline{haralick1973textural} propuseram caracterizar a textura de um bloco de imagem por matrizes de dependência de tons de cinza, hoje conhecidas como GLCM. Cada elemento $(i,j)$ da matriz registra quantas vezes um pixel de tom $i$ ocorre como vizinho de um pixel de tom $j$, dada uma distância $d$ e uma direção angular (0°, 45°, 90° ou 135°). A partir da matriz normalizada, os autores definiram 14 medidas de textura, entre elas o contraste, a correlação, a variância e a entropia, que foram utilizadas como entradas de classificadores em fotomicrografias, fotografias aéreas e imagens de satélite. Como limitações, \citeonline{he1989texture} apontam que a matriz depende da variação regional do fundo de intensidade da imagem e que a escolha do vetor de deslocamento é problemática.
+\subsubsection{Matriz de coocorrência de níveis de cinza}
 
-O espectro de textura, proposto por \citeonline{he1989texture} a partir do conceito de unidade de textura, codifica cada um dos oito vizinhos de um pixel central em um de três valores (0, 1 ou 2), conforme sua relação de intensidade com o pixel central, o que resulta em $3^8 = 6561$ unidades de textura possíveis. A distribuição de frequência dessas unidades ao longo da imagem funciona como descritor, e a redução das intensidades a três valores diminui o custo de cálculo e elimina a influência do fundo regional de intensidade e do ruído \cite{wang1990texture}. O LBP mantém a ideia de codificar a relação entre o pixel central e seus vizinhos, com codificação binária e descrição da imagem pelo histograma dos códigos.
+A GLCM \cite{haralick1973textural} registra a frequência com que pares de pixels de tons $i$ e $j$ ocorrem separados por um deslocamento definido por uma distância $d$ e um ângulo $\theta$ (0°, 45°, 90° ou 135°). Para uma imagem $I$ com $N_g$ níveis de cinza, a matriz e sua versão normalizada são
 
-O HOG foi proposto por \citeonline{dalal2005histograms} para detecção de pessoas e descreve a imagem pela distribuição local das direções de gradiente. A janela é dividida em células, e cada célula acumula um histograma das orientações de gradiente ponderadas pela magnitude. Os histogramas são normalizados em blocos sobrepostos para reduzir a sensibilidade ao contraste e à iluminação. A concatenação dos histogramas forma o descritor, que alimentou uma máquina de vetores de suporte (SVM) linear e reduziu as taxas de falsos positivos em relação ao melhor detector baseado em \textit{wavelets} de Haar \cite{dalal2005histograms}. Apesar de concebido para detecção, o HOG é empregado como descritor de bordas e forma em imagens médicas \cite{ramossoto2025miafex}.
+\begin{equation}
+P_{d,\theta}(i,j) = \left|\left\{(\mathbf{p},\mathbf{q}) : I(\mathbf{p}) = i,\; I(\mathbf{q}) = j,\; \mathbf{q} = \mathbf{p} + d\,(\cos\theta, \sin\theta)\right\}\right|,
+\qquad
+p(i,j) = \frac{P_{d,\theta}(i,j)}{\sum_{k,l} P_{d,\theta}(k,l)}.
+\label{eq:glcm}
+\end{equation}
+
+A partir de $p(i,j)$ são calculadas medidas de textura, como o contraste, a energia, a homogeneidade, a entropia e a correlação \cite{haralick1973textural}:
+
+\begin{align}
+\text{contraste} &= \sum_{i,j} (i-j)^2\, p(i,j), &
+\text{energia} &= \sum_{i,j} p(i,j)^2, \notag\\
+\text{homogeneidade} &= \sum_{i,j} \frac{p(i,j)}{1 + |i-j|}, &
+\text{entropia} &= -\sum_{i,j} p(i,j)\,\log p(i,j), \notag\\
+\text{correlação} &= \sum_{i,j} \frac{(i-\mu_i)(j-\mu_j)\,p(i,j)}{\sigma_i\,\sigma_j}, & &
+\label{eq:glcm-medidas}
+\end{align}
+
+em que $\mu_i$, $\mu_j$, $\sigma_i$ e $\sigma_j$ são as médias e os desvios padrão das distribuições marginais de $p$. A matriz depende da escolha do vetor de deslocamento e da variação regional do fundo de intensidade da imagem \cite{he1989texture}.
+
+\subsubsection{Padrões binários locais}
+
+O LBP \cite{ojala1996comparative} descreve a textura pela relação entre cada pixel e sua vizinhança, e tem origem no espectro de textura de \citeonline{he1989texture}, que codifica cada vizinho em três valores. No LBP a codificação é binária. Sendo $g_c$ a intensidade do pixel central e $g_p$, com $p = 0, \ldots, P-1$, a intensidade de cada um de seus $P$ vizinhos, o código do pixel é
+
+\begin{equation}
+\mathrm{LBP}_{P,R}(x_c, y_c) = \sum_{p=0}^{P-1} s\left(g_p - g_c\right) 2^{p},
+\qquad
+s(z) =
+\begin{cases}
+1, & z \geq 0,\\
+0, & z < 0.
+\end{cases}
+\label{eq:lbp}
+\end{equation}
+
+Na versão original, $P = 8$ e $R = 1$, os vizinhos são os oito pixels da janela $3 \times 3$ e há $2^8 = 256$ códigos possíveis. \citeonline{ojala2002multiresolution} estenderam o operador a múltiplas resoluções: os $P$ vizinhos ficam igualmente espaçados em um círculo de raio $R$, nas coordenadas
+
+\begin{equation}
+\left(x_p, y_p\right) = \left(x_c + R\cos\frac{2\pi p}{P},\; y_c - R\sin\frac{2\pi p}{P}\right),
+\label{eq:lbp-vizinhos}
+\end{equation}
+
+e as intensidades $g_p$ nas posições que não coincidem com um pixel são obtidas por interpolação bilinear. A imagem é descrita pelo histograma dos códigos, normalizado pelo número de pixels $N$:
+
+\begin{equation}
+H(k) = \frac{1}{N} \sum_{x,y} \mathbb{1}\left[\mathrm{LBP}_{P,R}(x,y) = k\right], \qquad k = 0, 1, \ldots, 2^{P}-1.
+\label{eq:lbp-hist}
+\end{equation}
+
+Os mesmos autores definiram os padrões \textit{uniformes}, que contêm no máximo duas transições entre 0 e 1 no código circular. Com
+
+\begin{equation}
+U\left(\mathrm{LBP}_{P,R}\right) = \left|s(g_{P-1} - g_c) - s(g_0 - g_c)\right| + \sum_{p=1}^{P-1} \left|s(g_p - g_c) - s(g_{p-1} - g_c)\right|,
+\label{eq:lbp-u}
+\end{equation}
+
+o operador invariante à rotação e uniforme é
+
+\begin{equation}
+\mathrm{LBP}^{riu2}_{P,R} =
+\begin{cases}
+\sum_{p=0}^{P-1} s\left(g_p - g_c\right), & U\left(\mathrm{LBP}_{P,R}\right) \leq 2,\\
+P + 1, & \text{caso contrário},
+\end{cases}
+\label{eq:lbp-riu2}
+\end{equation}
+
+cujo histograma tem $P + 2$ posições. A combinação de operadores com diferentes pares $(P, R)$ forma o descritor multirresolução.
+
+\subsubsection{Histograma de gradientes orientados}
+
+O HOG \cite{dalal2005histograms} descreve a imagem pela distribuição local das direções de gradiente. Os gradientes horizontal e vertical, $G_x$ e $G_y$, são obtidos por filtros de derivada, e a magnitude e a orientação de cada pixel são
+
+\begin{equation}
+m(x,y) = \sqrt{G_x(x,y)^2 + G_y(x,y)^2}, \qquad
+\phi(x,y) = \arctan\frac{G_y(x,y)}{G_x(x,y)}.
+\label{eq:hog-grad}
+\end{equation}
+
+A imagem é dividida em células, e cada célula acumula um histograma de $B$ intervalos de orientação em que cada pixel contribui com sua magnitude:
+
+\begin{equation}
+h_{\mathrm{cel}}(b) = \sum_{(x,y) \in \mathrm{cel}} m(x,y)\, \mathbb{1}\left[\phi(x,y) \in \mathrm{intervalo}_b\right], \qquad b = 1, \ldots, B.
+\label{eq:hog-cel}
+\end{equation}
+
+Os histogramas das células de cada bloco, concatenados em um vetor $\mathbf{v}$, são normalizados para reduzir a sensibilidade ao contraste e à iluminação,
+
+\begin{equation}
+\mathbf{v}' = \frac{\mathbf{v}}{\sqrt{\|\mathbf{v}\|_2^2 + \varepsilon^2}},
+\label{eq:hog-norm}
+\end{equation}
+
+em que $\varepsilon$ é uma constante pequena, e os blocos sobrepostos concatenados formam o descritor. O HOG foi concebido para a detecção de pessoas e é empregado como descritor de bordas e de forma em imagens médicas \cite{ramossoto2025miafex}.
 
 \subsection{Extração por aprendizado profundo}
 \label{subsec:features-profundas}
 
-Os descritores \textit{handcrafted} capturam relações locais entre pixels, em escalas e vizinhanças definidas previamente. As redes neurais convolucionais (CNNs), em contraste, aprendem filtros que vão de bordas e texturas nas primeiras camadas até padrões semânticos nas camadas finais, e são amplamente utilizadas em análise de imagens médicas \cite{litjens2017survey}. Em domínios com poucos dados, a transferência de aprendizado (\textit{transfer learning}) permite empregar uma rede pré-treinada em uma base grande, como a ImageNet, como extrator de \textit{features}, e a ativação de uma camada intermediária ou final é utilizada como vetor de características. Em \citeonline{dehbozorgi2025}, cinco redes pré-treinadas (VGG16, ResNet50, DenseNet121, MobileNetV2 e InceptionV3) em geral superaram os métodos estatísticos e de \textit{radiomics} em sensibilidade e em tempo de extração. Os autores apontam como limitações a necessidade de GPUs, a dependência de grandes bases de dados e a baixa interpretabilidade.
+Os descritores \textit{handcrafted} capturam relações locais entre pixels, em escalas e vizinhanças definidas previamente. As redes neurais convolucionais (CNNs), em contraste, aprendem filtros que vão de bordas e texturas nas primeiras camadas até padrões semânticos nas camadas finais, e são amplamente utilizadas em análise de imagens médicas \cite{litjens2017survey}. Os \textit{Vision Transformers} (ViT) representam a imagem como uma sequência de \textit{patches} e utilizam autoatenção para modelar relações entre regiões \cite{dosovitskiy2020image,shamshad2023transformers}.
 
-As CNNs aprendem filtros a partir dos exemplos, enquanto os \textit{Vision Transformers} (ViT) representam a imagem como uma sequência de \textit{patches} e utilizam autoatenção para modelar relações entre regiões \cite{dosovitskiy2020image,shamshad2023transformers}. Em bases médicas pequenas, o ajuste de modelos com muitos parâmetros pode favorecer o sobreajuste. O MIAFEx \cite{ramossoto2025miafex}, por exemplo, modifica o \textit{token} de classificação de um \textit{Transformer} por meio de pesos aprendíveis e superou extratores clássicos, CNNs e ViTs em conjuntos pequenos, com vantagem reduzida à medida que os dados aumentaram. A variação de tamanho e aparência das estruturas também motiva métodos multiescala, e a MMS-Net \cite{zhao2023mmsnet} combinou informações locais e globais e manteve resultados competitivos com uma fração dos dados de treinamento. Neste trabalho, a abordagem multiescala é aplicada à via topológica, na qual os descritores são calculados para raios de conexão crescentes (Seção~\ref{sec:redes-complexas}) e a sequência resultante é processada por uma rede recorrente (Seção~\ref{sec:rnn-topologicas}).
+Em domínios com poucos dados, a transferência de aprendizado (\textit{transfer learning}) permite empregar uma rede pré-treinada em uma base grande, como a ImageNet, como ponto de partida. Na extração de \textit{features}, a ativação de uma camada intermediária ou final é utilizada como vetor de características. No ajuste fino (\textit{fine-tuning}), os pesos pré-treinados servem de inicialização e são atualizados no conjunto-alvo, em geral com taxa de aprendizado menor que a dos módulos inicializados aleatoriamente. Modelos com muitos parâmetros ajustados em poucas imagens estão sujeitos ao sobreajuste, o que torna a regularização e o aumento de dados relevantes. O aumento de dados gera amostras adicionais por transformações que preservam o rótulo, como inversões e rotações.
+% TODO: referências de ImageNet (Deng et al., 2009), de transferência de aprendizado e de aumento de dados.
+
+A variação de tamanho e de aparência das estruturas do tecido motiva descritores multiescala, que descrevem a imagem em vizinhanças de tamanhos crescentes. Na abordagem de redes complexas apresentada a seguir, a escala é controlada pelo raio de conexão.
 
 \section{Redes Complexas}
 \label{sec:redes-complexas}
 
-A teoria de Redes Complexas (CN, do inglês \textit{Complex Networks}) é uma abstração para modelar sistemas naturais cujos elementos interagem de maneira não trivial \cite{BOCCALETTI2006175}. Essas redes foram empregadas para modelar os pixels de uma imagem e suas relações de vizinhança, e descritores baseados em topologia quantificam propriedades de textura a partir dessa modelagem \cite{BACKES2013168, ribas2020fusion, ribas2024colorspectral}. Neste trabalho, a transformação segue a abordagem de \citeonline{CNT} e é aplicada a imagens histopatológicas.
+A teoria de Redes Complexas (CN, do inglês \textit{Complex Networks}) é uma abstração para modelar sistemas naturais cujos elementos interagem de maneira não trivial \cite{BOCCALETTI2006175}. Essas redes foram empregadas para modelar os pixels de uma imagem e suas relações de vizinhança, e descritores baseados em topologia quantificam propriedades de textura a partir dessa modelagem \cite{BACKES2013168, ribas2020fusion, ribas2024colorspectral}. A \textit{Spatio-Spectral Network} (SSN), proposta por \citeonline{Scabini_2020} para a análise de textura colorida, é a modelagem adotada e é descrita a seguir.
 
 \subsection{Modelagem da imagem como rede direcionada}
 \label{subsec:cn-modelagem}
 
-Cada imagem é representada como uma CN direcionada e ponderada $G = (V, E)$, na qual cada pixel é modelado como um vértice e as conexões entre pixels são estabelecidas dentro de um raio máximo $r_{max}$. Para um pixel $i = (x_i, y_i)$ em um canal de cor $c$ da imagem $I$, é definido um vértice $v_i^{(c)} \in V$. Uma aresta direcionada é criada entre os vértices $v_i^{(c)}$ e $v_j^{(c_w)}$, em que $c$ e $c_w$ são os canais de cor do primeiro e do segundo pixel, quando a distância euclidiana quadrática entre os pixels satisfaz a Equação~\ref{eq:cn-aresta}:
+Na SSN \cite{Scabini_2020}, cada imagem é representada como uma CN direcionada e ponderada $G = (V, E)$, na qual cada pixel é modelado como um vértice e as conexões entre pixels são estabelecidas dentro de um raio máximo $r_{max}$. Para um pixel $i = (x_i, y_i)$ em um canal de cor $c$ da imagem $I$, é definido um vértice $v_i^{(c)} \in V$. Uma aresta direcionada é criada entre os vértices $v_i^{(c)}$ e $v_j^{(c_w)}$, em que $c$ e $c_w$ são os canais de cor do primeiro e do segundo pixel, quando a distância euclidiana quadrática entre os pixels satisfaz a Equação~\ref{eq:cn-aresta}:
 \begin{equation}
 \rho_{ij}^2 = (x_i - x_j)^2 + (y_i - y_j)^2, \qquad 0 < \rho_{ij}^2 \leq r_{max}^2,
 \label{eq:cn-aresta}
@@ -43,17 +142,17 @@ O peso atribuído a cada aresta é a diferença absoluta de intensidade entre os
 w_{ij} = \left| I(x_i, y_i, c) - I(x_j, y_j, c_w) \right|.
 \label{eq:cn-peso}
 \end{equation}
-A direção de cada aresta é determinada pelas intensidades dos pixels conectados, do pixel de menor intensidade para o de maior intensidade. Quando $I(x_i, y_i, c) < I(x_j, y_j, c_w)$, a conexão é classificada como de saída (\textit{out}) a partir de $v_i$ e de entrada (\textit{in}) em $v_j$. No caso contrário, ela é classificada como de entrada em $v_i$. Conexões entre pixels de mesma intensidade são contabilizadas em ambas as direções. O grau de saída de um vértice conta seus vizinhos mais claros, e o grau de entrada conta seus vizinhos mais escuros.
+A direção de cada aresta é determinada pelas intensidades dos pixels conectados, do pixel de menor intensidade para o de maior intensidade \cite{Scabini_2020}. Quando $I(x_i, y_i, c) < I(x_j, y_j, c_w)$, a conexão é classificada como de saída (\textit{out}) a partir de $v_i$ e de entrada (\textit{in}) em $v_j$. No caso contrário, ela é classificada como de entrada em $v_i$. Conexões entre pixels de mesma intensidade são contabilizadas em ambas as direções. O grau de saída de um vértice conta, portanto, seus vizinhos mais claros.
 
 \subsection{Medidas topológicas e configurações da rede}
 \label{subsec:cn-medidas}
 
-O grau (\textit{degree}) e a força (\textit{force}) são calculados para cada vértice pela acumulação das quantidades correspondentes até o raio $r$, nas versões de saída e de entrada. O grau quantifica o número de conexões dentro da vizinhança considerada, como na Equação~\ref{eq:cn-grau}:
+O grau (\textit{degree}) e a força (\textit{force}) são calculados para cada vértice pela acumulação das quantidades correspondentes até o raio $r$. O grau de saída quantifica o número de conexões de saída dentro da vizinhança considerada, como na Equação~\ref{eq:cn-grau}:
 \begin{equation}
 d_{out}(v_i, r) = \sum_{k=1}^{r} n_{out}(v_i, k),
 \label{eq:cn-grau}
 \end{equation}
-em que $n_{out}(v_i, k)$ é o número de arestas de saída de $v_i$ cujo raio discreto vale $k$, e o grau de entrada, $d_{in}(v_i, r)$, é calculado de forma análoga a partir de $n_{in}(v_i, k)$. A força incorpora as diferenças de intensidade e a proximidade entre os pixels, o que a torna sensível aos gradientes locais de textura. Para uma rede construída com raio $r$, cada aresta $(v_i, v_j)$ recebe um peso de força que combina a diferença de intensidade normalizada com a distância normalizada, conforme a Equação~\ref{eq:cn-forca-peso}:
+em que $n_{out}(v_i, k)$ é o número de arestas de saída de $v_i$ cujo raio discreto vale $k$. A força incorpora as diferenças de intensidade e a proximidade entre os pixels, o que a torna sensível aos gradientes locais de textura. Para uma rede construída com raio $r$, cada aresta $(v_i, v_j)$ recebe um peso de força que combina a diferença de intensidade normalizada com a distância normalizada, conforme a Equação~\ref{eq:cn-forca-peso}:
 \begin{equation}
 \omega_{ij}^{(r)} =
 \begin{cases}
@@ -67,33 +166,28 @@ em que $L = 255$ é o nível máximo de intensidade para imagens de 8 bits e $w_
 \text{force}_{out}(v_i, r) = \sum_{v_j \in \mathcal{N}_{out}^{(r)}(v_i)} \omega_{ij}^{(r)},
 \label{eq:cn-forca}
 \end{equation}
-em que $\mathcal{N}_{out}^{(r)}(v_i)$ é o conjunto de vértices conectados a $v_i$ por arestas de saída com $\rho_{ij}^2 \leq r^2$, e $\text{force}_{in}$ é definida de forma análoga sobre as arestas de entrada. O fator $r^2 - 1$ na Equação~\ref{eq:cn-forca-peso} é o valor máximo de $\rho_{ij}^2 - 1$ dentro de uma vizinhança de raio $r$, o que mantém o termo de distância no intervalo $[0, 1]$. Para $r = 1$, a única distância quadrática possível é $\rho_{ij}^2 = 1$, de modo que o termo de distância é nulo e o fator $r^2 - 1$ anularia o denominador, e nesse caso o peso é reduzido à componente de intensidade. As medidas resultam em quatro grandezas por vértice: grau de saída, grau de entrada, força de saída e força de entrada.
+em que $\mathcal{N}_{out}^{(r)}(v_i)$ é o conjunto de vértices conectados a $v_i$ por arestas de saída com $\rho_{ij}^2 \leq r^2$, e $\text{force}_{in}$ é definida de forma análoga sobre as arestas de entrada. O fator $r^2 - 1$ na Equação~\ref{eq:cn-forca-peso} é o valor máximo de $\rho_{ij}^2 - 1$ dentro de uma vizinhança de raio $r$, o que mantém o termo de distância no intervalo $[0, 1]$. Para $r = 1$, a única distância quadrática possível é $\rho_{ij}^2 = 1$, de modo que o termo de distância é nulo e o fator $r^2 - 1$ anularia o denominador, e nesse caso o peso é reduzido à componente de intensidade. As medidas por vértice utilizadas são o grau de saída, a força de saída e a força de entrada \cite{ribas2024colorspectral}.
 
-Para estender as medidas aos três canais de cor das imagens histopatológicas RGB, as formulações anteriores podem ser aplicadas em três configurações de rede \cite{Scabini_2020}: \textit{within-channel}, com $c = c_w$, \textit{between-channel}, com $c \neq c_w$, e \textit{full}, que inclui simultaneamente conexões intracanal e intercanal. A configuração \textit{full} é adotada neste trabalho para capturar conjuntamente as transições de intensidade e as relações cromáticas entre canais \cite{CNT}. A rede é construída sobre a imagem em inteiros de 8 bits, antes da normalização aplicada à via visual, pois os pesos e as direções das arestas dependem da comparação de intensidades inteiras, inclusive dos empates. O redimensionamento das imagens altera a textura em nível de pixel, e a etapa em que é aplicado é descrita na metodologia.
+Para estender as medidas aos três canais de cor das imagens RGB, as formulações anteriores podem ser aplicadas em três configurações de rede \cite{Scabini_2020}: \textit{within-channel}, com $c = c_w$, \textit{between-channel}, com $c \neq c_w$, e \textit{full}, que inclui simultaneamente conexões intracanal e intercanal. Como os pesos e as direções das arestas dependem da comparação de intensidades inteiras, inclusive dos empates, a rede é construída sobre a imagem em inteiros de 8 bits, e o redimensionamento altera a textura em nível de pixel.
 
-O raio máximo foi definido por uma heurística baseada na distribuição das medidas topológicas. Raios entre 1 e 15 foram avaliados em todas as bases de dados, em um intervalo definido a partir de valores explorados na literatura \cite{CNT, SCABINI2026}. A entropia de Shannon da distribuição dos valores topológicos cresceu até aproximadamente $r = 10$ e atingiu um platô a partir daí, e a entropia amostral teve pico em $r = 10$ e decresceu depois, conforme a Figura~\ref{fig:entropia-todos-e-media}. Como a entropia da distribuição das medidas não é um critério de classificação, $r_{max} = 10$ constitui uma escolha heurística, apoiada em achados anteriores de que combinações multiescala de raios são úteis \cite{ribas2024colorspectral, CNT}, e a sensibilidade a esse valor é verificada pela comparação de diferentes valores de $R$ na via topológica isolada. À medida que $r$ cresce, as características locais dos menores raios dão lugar a características progressivamente mais globais, e a evolução ao longo dos raios forma a sequência processada pela via recorrente (Seção~\ref{sec:rnn-topologicas}).
+O raio máximo $r_{max}$ determina a escala espacial descrita pelas medidas. Nos raios menores, elas refletem relações locais entre pixels próximos, e, à medida que $r$ cresce, as vizinhanças acumuladas se tornam progressivamente mais amplas. A evolução das medidas ao longo dos raios compõe uma descrição multiescala da textura, tratada na seção seguinte.
 
-\begin{figure}
-	\begin{center}
-		\includegraphics[width=0.95\textwidth]{img/entropia_todos_e_media.png}
-	\end{center}
-	\caption{Entropias de Shannon e amostral em função do raio de conexão (1 a 15) para as bases CR, LA, LG, NHL e UCSB. As linhas tracejadas correspondem a cada base e as linhas contínuas, à média entre as bases.}
-	\label{fig:entropia-todos-e-media}
-\end{figure}
-
-\section{Redes Neurais Recorrentes na Extração de \textit{Features} Topológicas}
+\section{RNN na Extração de \textit{Features}}
 \label{sec:rnn-topologicas}
 
-Na arquitetura proposta, a via sequencial, baseada em uma Rede Neural Recorrente (RNN, do inglês \textit{Recurrent Neural Network}), transforma a evolução topológica da imagem, modelada como CN (Seção~\ref{sec:redes-complexas}), em um \textit{embedding} topológico que é combinado com o \textit{embedding} visual na fusão por concatenação (Seção~\ref{sec:fusao-tardia}). A \textit{Spatio-Spectral Network} depende de um conjunto de raios \cite{Scabini_2020}, e \citeonline{ribas2024colorspectral} exploraram essa dimensão. As medidas topológicas de cada vértice (grau de saída, força de entrada e força de saída) foram calculadas em vários raios $r = \{1, 2, \ldots, R\}$, e os valores obtidos em $r = 1, \ldots, R-1$ formaram um vetor de entrada usado para prever o valor da mesma medida no raio máximo $R$. Os autores descrevem esse procedimento como uma análise multiescala da evolução topológica dos vértices, e a maior acurácia média nos três conjuntos de textura colorida foi obtida pela combinação de duas representações, com $R = 4$ e $R = 10$, o que indica que as escalas locais e as mais amplas contribuem para a discriminação.
+Uma rede neural recorrente (RNN, do inglês \textit{Recurrent Neural Network}) processa dados organizados em sequência. Como \citeonline{ribas2024colorspectral} utilizam a sigla RNN para a rede neural aleatorizada (\textit{Randomized Neural Network}), neste texto a sigla RNN designa exclusivamente a rede recorrente, e a rede aleatorizada é abreviada por RaNN.
 
-A proposta deste trabalho difere no tratamento da sequência. Em \citeonline{ribas2024colorspectral}, a sequência de raios é achatada em um único vetor de entrada de uma rede neural aleatorizada de uma camada oculta, e o descritor da imagem são os pesos da camada de saída, calculados por mínimos quadrados regularizados. O artigo utiliza a sigla RNN para essa rede, que não é recorrente, pois os valores de cada raio entram simultaneamente e a arquitetura não explora a ordem entre eles. Neste trabalho, a sigla RNN designa exclusivamente a rede recorrente. A sequência de raios é tratada como tal, com $R = r_{max} = 10$ passos, em que o passo $t$ corresponde ao raio $r_t = t$. Uma série $x_1, x_2, \ldots, x_R$ é definida, em que $x_t \in \mathbb{R}^{d}$, com $d = 24$, reúne as medidas topológicas calculadas sobre a rede construída com o raio $r_t$, e a RNN lê a série passo a passo, do menor raio para o maior. Essa organização reflete a hipótese de que as macroestruturas da imagem dependem da organização das microestruturas, de modo que o descritor do raio $r_t$ deve ser interpretado à luz do que foi observado nos raios anteriores.
+\subsection{Evolução topológica ao longo dos raios}
+\label{subsec:rnn-evolucao}
 
-As medidas são acumuladas ao longo dos raios e, por isso, crescem de forma monotônica com $r$, e valores de grau e de força atingem a ordem de centenas em $r = 10$, o que satura as portas da rede recorrente. Cada característica é padronizada, com média e desvio padrão ajustados apenas sobre os dados de treino de cada partição da validação cruzada. A diferença entre raios consecutivos constitui uma representação alternativa da sequência, que remove a monotonicidade das medidas acumuladas.
+A descrição da textura pela evolução das medidas topológicas ao longo dos raios tem origem na SSN, que define um conjunto de raios $\{r_1, \ldots, r_R\}$ para a vizinhança dos vértices e analisa as propriedades topológicas da rede por medidas de vértice simples \cite{Scabini_2020,ribas2024colorspectral}. A partir dessa modelagem, \citeonline{ribas2024colorspectral} descreveram a evolução topológica por uma RaNN, uma rede de alimentação direta com uma camada oculta, cujos pesos são gerados aleatoriamente, e com pesos de saída obtidos por mínimos quadrados com regularização de Tikhonov. As medidas de cada vértice (grau de saída, força de entrada e força de saída) foram calculadas em vários raios $r = \{1, 2, \ldots, R\}$, e os valores obtidos em $r = 1, \ldots, R-1$ formaram um vetor de entrada usado para prever o valor da mesma medida no raio máximo $R$. Os pesos da camada de saída da RaNN, treinada para cada imagem, constituem o descritor, e os autores descrevem esse procedimento como uma análise multiescala da evolução topológica dos vértices.
 
-\subsection{Redes recorrentes e \textit{embedding} topológico}
+Na RaNN, os valores de todos os raios entram simultaneamente em uma rede de alimentação direta, sem recorrência. Uma alternativa é ler os descritores de cada raio como uma sequência $x_1, x_2, \ldots, x_R$, do menor raio para o maior, por uma rede recorrente cujos parâmetros são aprendidos a partir do rótulo da classe, em vez de calculados por imagem.
+
+\subsection{Redes recorrentes e \textit{embedding} de sequência}
 \label{subsec:rnn-fundamentos}
 
-Uma RNN processa uma sequência um elemento por vez e mantém um estado interno que carrega informação sobre os elementos anteriores \cite{lecun2015deep}. Na rede recorrente simples de \citeonline{elman1990finding}, o estado oculto depende da entrada atual e do estado anterior, e os parâmetros são compartilhados entre os passos, de modo que sua quantidade não depende do comprimento da sequência. O treinamento por retropropagação enfrenta o desaparecimento ou a explosão dos gradientes à medida que o intervalo entre entrada e saída aumenta \cite{bengio1994learning}, e a LSTM \cite{hochreiter1997long} mitiga esse problema com uma célula de memória $c_t$ controlada por portas. Na formulação usual, que inclui a porta de esquecimento \cite{gers2000learning}, as atualizações são:
+Uma RNN processa um elemento por vez de uma sequência e mantém um estado interno que carrega informação sobre os elementos anteriores \cite{lecun2015deep}. Na rede recorrente simples de \citeonline{elman1990finding}, o estado oculto depende da entrada atual e do estado anterior, e os parâmetros são compartilhados entre os passos, de modo que sua quantidade não depende do comprimento da sequência. O treinamento por retropropagação enfrenta o desaparecimento ou a explosão dos gradientes à medida que o intervalo entre entrada e saída aumenta \cite{bengio1994learning}, e a LSTM \cite{hochreiter1997long} mitiga esse problema com uma célula de memória $c_t$ controlada por portas. Na formulação usual, que inclui a porta de esquecimento \cite{gers2000learning}, as atualizações são:
 \begin{align}
 f_t &= \sigma\!\left(W_f x_t + U_f h_{t-1} + b_f\right), \label{eq:lstm-f}\\
 i_t &= \sigma\!\left(W_i x_t + U_i h_{t-1} + b_i\right), \label{eq:lstm-i}\\
@@ -102,77 +196,51 @@ o_t &= \sigma\!\left(W_o x_t + U_o h_{t-1} + b_o\right), \label{eq:lstm-o}\\
 c_t &= f_t \odot c_{t-1} + i_t \odot \tilde{c}_t, \label{eq:lstm-c}\\
 h_t &= o_t \odot \tanh(c_t), \label{eq:lstm-h}
 \end{align}
-em que $\sigma$ é a função sigmoide, $\odot$ denota o produto elemento a elemento e $f_t$, $i_t$ e $o_t$ são as portas de esquecimento, entrada e saída. A GRU \cite{cho2014learning} é uma alternativa com menos portas e menos parâmetros, e \citeonline{greff2017lstm} concluíram, em um estudo de larga escala com oito variantes da LSTM, que nenhuma melhorou significativamente a LSTM padrão, o que sustenta seu uso como ponto de partida.
+em que $\sigma$ é a função sigmoide, $\odot$ denota o produto elemento a elemento e $f_t$, $i_t$ e $o_t$ são as portas de esquecimento, entrada e saída. A GRU \cite{cho2014learning} é uma alternativa com menos portas e menos parâmetros.
 
 A RNN unidirecional lê a sequência em um único sentido, e a RNN bidirecional \cite{schuster1997bidirectional} utiliza duas redes independentes, uma lendo a sequência na ordem original e outra na ordem inversa, e combina seus estados:
 \begin{equation}
 h_t = \left[\overrightarrow{h}_t \,\Vert\, \overleftarrow{h}_t\right].
 \label{eq:bilstm}
 \end{equation}
-Em classificação de fonemas por quadro, as redes bidirecionais superaram as unidirecionais e a LSTM superou as RNNs convencionais \cite{graves2005framewise}, e os trabalhos mais próximos da proposta que aplicam recorrência a sequências de características utilizam BiLSTM \cite{yousaf2024twostream, priyadarshini2026cnnbilstm, zeng2025mssfn}. Na sequência de raios, a leitura no sentido direto acumula em cada passo a informação das escalas locais nas mais amplas, o que corresponde à hipótese de que a macroestrutura depende da microestrutura. A leitura no sentido inverso fornece a cada raio o acesso ao contexto das escalas mais amplas, e a contribuição dessa segunda direção é verificada por ablação contra a LSTM unidirecional.
-
-A BiLSTM adotada possui uma camada, e a dimensão do estado oculto por direção é descrita na metodologia. Como a imagem inteira recebe um único rótulo, a rede opera no formato \textit{many-to-one}, e o \textit{embedding} topológico é definido como a concatenação dos estados finais de cada direção, $z_{\mathrm{top}} = [\overrightarrow{h}_R \,\Vert\, \overleftarrow{h}_1]$. Esse vetor tem dimensão fixa, o que permite concatená-lo ao \textit{embedding} visual (Seção~\ref{sec:rede-hibrida}). Diferentemente do descritor de \citeonline{ribas2024colorspectral}, cujos pesos de saída são obtidos por mínimos quadrados sem retropropagação, os parâmetros da BiLSTM são aprendidos por gradiente a partir do rótulo da classe, em treinamento de ponta a ponta com o classificador da fusão, e o \textit{embedding} é otimizado para a classificação.
-
-\subsection{Redes recorrentes sobre \textit{features} de imagens e escolha da arquitetura}
-\label{subsec:rnn-literatura}
-
-Embora a recorrência seja associada a sequências temporais, diversos trabalhos a aplicaram a \textit{features} extraídas de imagens médicas, tratando-as como uma sequência ordenada. \citeonline{shalini2026saclstm} organizaram \textit{features} de imagens de histopatologia de mama em sequência para que a LSTM capture relações entre seus elementos que uma CNN, centrada em padrões locais, pode não explorar. \citeonline{mathiyalagi2026hclstm} alimentaram uma CNN-LSTM com \textit{features} de textura da GLCM reduzidas por análise de componentes principais, em tomografias de pulmão, e \citeonline{akanksha2022leukemia} utilizaram \textit{features} SIFT como entrada de uma RNN para classificar leucemia. Em outros casos, a sequência é formada por mapas de uma CNN, como em \citeonline{zeng2025mssfn}, em que uma BiLSTM modelou a relação entre fatias de tomografias de pulmão e sua remoção reduziu a acurácia na ablação. Fora de imagens, \citeonline{lin2022mslstm} mostraram que diferentes comprimentos de sequência de entrada de uma LSTM contêm informações distintas e afetam a acurácia, o que é análogo à escolha do conjunto de raios, e \citeonline{kang2024mmdb} integraram, por uma camada totalmente conectada, um ramo de convoluções dilatadas multiescala com BiLSTM e um ramo sobre informação de estrutura molecular, em uma organização de dupla via semelhante à proposta.
-
-Os resultados muito altos reportados nesses trabalhos provêm, em geral, de conjuntos pequenos, de dados tabulares ou de protocolos com validação limitada, e constituem evidência de viabilidade e não de superioridade. Até onde foi possível verificar na literatura consultada, nenhum desses trabalhos constrói a sequência a partir de descritores topológicos de uma rede em raios crescentes, e a contribuição aqui proposta é essa organização, apoiada na formulação de \citeonline{ribas2024colorspectral}. A literatura consultada também não traz comparação direta entre arquiteturas para esse tipo de sequência, e a escolha da BiLSTM se apoia nas evidências citadas sobre bidirecionalidade e em argumentos de plausibilidade. A GRU conta apenas com a referência original \cite{cho2014learning}, sem evidência comparativa neste contexto, e é mantida como alternativa na ablação. Os \textit{transformers} permitem modelar relações entre elementos da sequência \cite{khan2022transformers}, mas o treinamento a partir de pesos aleatórios pode exigir mais dados do que os disponíveis neste estudo \cite{dosovitskiy2020image}, e a via sequencial não dispõe de modelo pré-treinado para descritores topológicos, com bases médicas de dezenas a poucas centenas de imagens e conjuntos de raios curtos (valores de $R$ entre 4 e 12 em \citeonline{ribas2024colorspectral}).
-
-\citeonline{fawaz2019deep} observam, em revisão de arquiteturas profundas para classificação de séries temporais, que as redes recorrentes raramente são usadas por serem projetadas para uma saída por instante, sofrerem com gradientes em séries longas e serem difíceis de paralelizar. Os dois primeiros motivos são atenuados neste trabalho, pois a rede opera no formato \textit{many-to-one} e a sequência tem 10 passos, e a mesma revisão trata perceptrons multicamadas e CNNs como alternativas legítimas. A vantagem da recorrência é uma hipótese verificada por ablação da via topológica isolada, que compara a BiLSTM com a LSTM, a GRU, um perceptron multicamadas sobre o vetor achatado dos 240 valores ($10 \times 24$) e uma CNN unidimensional sobre a sequência. Se o perceptron multicamadas apresentar desempenho equivalente, esse resultado é reportado e a contribuição da recorrência não é sustentada.
+Quando a sequência inteira recebe um único rótulo, a rede opera no formato \textit{many-to-one}: em vez da saída de cada passo, utiliza-se um vetor de dimensão fixa que resume a sequência, obtido do estado final de cada direção, $\left[\overrightarrow{h}_T \,\Vert\, \overleftarrow{h}_1\right]$, com $T$ passos. Esse vetor, denominado \textit{embedding} da sequência, pode ser concatenado a vetores de outras fontes de informação (Seção~\ref{sec:fusao-fundamentacao}). Diferentemente dos pesos de saída da RaNN, obtidos por mínimos quadrados sem retropropagação, os parâmetros de uma LSTM são aprendidos por gradiente, e o \textit{embedding} pode ser otimizado em conjunto com o classificador.
 
 \section{Redes Híbridas para Extração de \textit{Features} Visuais}
 \label{sec:rede-hibrida}
 
-Na arquitetura proposta, a via visual extrai, diretamente da imagem RGB, o \textit{embedding} visual que é combinado com o \textit{embedding} topológico na fusão (Seção~\ref{sec:fusao-tardia}). As CNNs extraem padrões locais, como bordas, texturas e pequenas estruturas, mas o campo receptivo restrito das convoluções dificulta a captura de contexto global e de dependências de longo alcance \cite{ma2026cihm}. Os \textit{Vision Transformers} (ViT) \cite{dosovitskiy2020image} abordam esse problema pela autoatenção sobre sequências de \textit{patches} e são estudados em imagens médicas \cite{shamshad2023transformers}, mas a autoatenção tem custo computacional quadrático em relação ao tamanho da imagem \cite{ma2026cihm}, e os \textit{transformers} tradicionais têm dificuldade em representar o contexto local \cite{garbaz2025gsac}. As arquiteturas híbridas combinam a captura de padrões locais das CNNs com a modelagem global dos \textit{transformers}, em geral com blocos convolucionais que extraem informação localizada e mecanismos de atenção que integram o contexto global, o que é relevante em patologia computacional, em que a interpretação depende de detalhes morfológicos finos e de padrões em escala de tecido \cite{oliveira2025hybrid}.
+As CNNs extraem padrões locais, como bordas, texturas e pequenas estruturas, mas o campo receptivo restrito das convoluções dificulta a captura de contexto global e de dependências de longo alcance \cite{ma2026cihm}. Os ViT \cite{dosovitskiy2020image} abordam esse problema pela autoatenção sobre sequências de \textit{patches}, mas a autoatenção tem custo computacional quadrático em relação ao tamanho da imagem \cite{ma2026cihm}, e os \textit{transformers} tradicionais têm dificuldade em representar o contexto local \cite{garbaz2025gsac}. As arquiteturas híbridas combinam a captura de padrões locais das CNNs com a modelagem global dos \textit{transformers}, em geral com blocos convolucionais que extraem informação localizada e mecanismos de atenção que integram o contexto global, o que é relevante em patologia computacional, em que a interpretação depende de detalhes morfológicos finos e de padrões em escala de tecido \cite{oliveira2025hybrid}.
 
-\subsection{Estratégias de integração entre convolução e atenção}
-\label{subsec:hibrida-estrategias}
-
-\citeonline{oliveira2025hybrid} resumem duas taxonomias para a integração de CNNs e \textit{transformers}, atribuídas a Kim et al. e a Khan et al. A primeira separa projetos paralelos, em que CNN e ViT operam de forma independente e têm suas saídas fundidas, de projetos sequenciais, em que as \textit{features} de um módulo alimentam o outro. A segunda distingue a integração em camadas iniciais, em camadas laterais, sequencial, paralela, em bloco, hierárquica, baseada em atenção e por reforço de canais. Os próprios autores propõem uma taxonomia por tarefa, na qual as arquiteturas de classificação consistem em um codificador de \textit{features}, um estágio de adaptação e um classificador final, organização que corresponde, neste trabalho, ao MobileViT como codificador e ao perceptron multicamadas (MLP) como classificador. No modelo proposto, a MobileViT integra convolução e atenção dentro do próprio extrator visual, e a combinação com a via topológica ocorre fora dele, na concatenação dos \textit{embeddings}. Na revisão de escopo de \citeonline{oliveira2025hybrid} sobre estudos de histopatologia, a maioria dos trabalhos adotou arquiteturas integradas ou sequenciais, e os autores apontam como limitações recorrentes a escassez de validação externa, o uso de bases pequenas e homogêneas, a predominância da validação por \textit{holdout} e o uso restrito de técnicas de explicabilidade. Essas limitações são consideradas na interpretação dos resultados deste trabalho.
-
-\subsection{MobileViT: o extrator adotado}
-\label{subsec:hibrida-mobilevit}
-
-O extrator visual adotado é a MobileViT, proposta por \citeonline{mehta2022mobilevit} para combinar operações convolucionais e autoatenção em uma arquitetura de baixo custo computacional, adequada a bases com 58 a 528 imagens. Em cada bloco MobileViT, uma convolução $n\times n$ seguida de uma convolução pontual $1\times1$ produz uma representação local da entrada. Essa representação é organizada em \textit{patches}, processada por um \textit{Transformer} e reorganizada no formato do mapa de características. O resultado é combinado com a representação local e processado por outra convolução, que integra as informações obtidas pelos dois tipos de operação \cite{ding2023himvit}. Os mapas resultantes incorporam informação local e global sem depender exclusivamente da autoatenção sobre todos os pixels \cite{mehta2022mobilevit,ding2023himvit}.
-
-A MobileViT e suas variantes foram aplicadas em diferentes tarefas médicas, como classificação de lesões de pele, microscopia multiespectral de tecido, câncer oral e ultrassom de mama \cite{ding2023himvit,wang2026msi,kabir2025semobilevit,zou2023dualinput}. Esses estudos mostram que a arquitetura já foi aplicada a imagens médicas, mas não permitem antecipar seu desempenho nas bases avaliadas neste trabalho.
-
-\subsection{Evidências comparativas e \textit{embedding} visual}
-\label{subsec:hibrida-evidencias}
-
-Arquiteturas de ramos paralelos também são empregadas. No CIHM, a camada CiMC combina em paralelo um ramo de modelo de espaço de estados (Mamba), que captura dependências de longo alcance com complexidade linear, e um bloco convolucional, que extrai detalhes locais \cite{ma2026cihm}, e o GSAC-UFormer integra em paralelo convolução em grupos e autoatenção adaptada por CNN \cite{garbaz2025gsac}. Estudos comparativos indicam que o desempenho depende da adequação da arquitetura ao domínio e que há um compromisso entre acurácia e custo computacional \cite{sharma2025mammography}. Acurácias próximas de 100\% em bases com poucas centenas de imagens \cite{kabir2025semobilevit,kabir2026trigwonet} são tomadas neste trabalho como evidência de viabilidade e não como desempenho esperado, pois a ausência de validação externa limita a generalização dos resultados \cite{oliveira2025hybrid}.
-
-Para obter o \textit{embedding} visual, a MobileViT-S processa a imagem redimensionada para $256 \times 256$ pixels, com a normalização da ImageNet, e a agregação global do mapa de características produz um vetor $z_{\mathrm{vis}} \in \mathbb{R}^{640}$. A cabeça de classificação original é removida, e o vetor é utilizado como entrada visual da fusão. Os pesos pré-treinados são ajustados por \textit{fine-tuning} para adaptar a representação à classificação histopatológica.
+A MobileViT, proposta por \citeonline{mehta2022mobilevit}, combina operações convolucionais e autoatenção em uma arquitetura de baixo custo computacional. Em cada bloco MobileViT, uma convolução $n\times n$ seguida de uma convolução pontual $1\times1$ produz uma representação local da entrada. Essa representação é organizada em \textit{patches}, processada por um \textit{Transformer} e reorganizada no formato do mapa de características. O resultado é combinado com a representação local e processado por outra convolução, que integra as informações obtidas pelos dois tipos de operação \cite{ding2023himvit}. Os mapas resultantes incorporam informação local e global sem depender exclusivamente da autoatenção sobre todos os pixels \cite{mehta2022mobilevit,ding2023himvit}. Para obter um vetor de características da imagem, a cabeça de classificação é removida e os mapas do último bloco são agregados por um agrupamento médio global (\textit{Global Average Pooling}).
 
 \section{Fusão por Concatenação de \textit{Embeddings} e MLP}
-\label{sec:fusao-tardia}
+\label{sec:fusao-fundamentacao}
 
-A arquitetura proposta produz dois vetores antes da classificação: o \textit{embedding} topológico $z_{\mathrm{top}}$, gerado pela BiLSTM (Seção~\ref{sec:rnn-topologicas}), e o \textit{embedding} visual $z_{\mathrm{vis}}$, extraído pela MobileViT (Seção~\ref{sec:rede-hibrida}). A literatura de aprendizado multimodal distingue estratégias que combinam as representações antes da classificação daquelas que combinam as decisões de modelos independentes \cite{baltrusaitis2019multimodal,ramachandram2017deep}. Na fusão em nível de características, os vetores são unidos antes de um classificador compartilhado. Na fusão em nível de decisão, cada via produz uma saída de classificação e os escores são combinados por regras como soma, produto, máximo ou voto majoritário \cite{kittler1998combining}. A arquitetura deste trabalho utiliza a primeira estratégia, em que as características das duas vias são concatenadas e fornecidas a um único MLP.
+A literatura de aprendizado multimodal distingue estratégias que combinam as representações antes da classificação daquelas que combinam as decisões de modelos independentes \cite{baltrusaitis2019multimodal,ramachandram2017deep}. Na fusão em nível de características, os vetores são unidos antes de um classificador compartilhado. Na fusão em nível de decisão, cada fonte produz uma saída de classificação e os escores são combinados por regras como soma, produto, máximo ou voto majoritário \cite{kittler1998combining}.
 
-Como a expressão \textit{fusão tardia} é utilizada na literatura tanto para a concatenação de características \cite{nawaz2025ard} quanto para a combinação de decisões \cite{yousaf2024twostream}, este trabalho adota a denominação fusão por concatenação de \textit{embeddings}. O modelo é treinado de ponta a ponta, de modo que as duas vias são ajustadas em conjunto, e a separação entre elas se limita à extração das representações, que possuem naturezas distintas, antes da camada de decisão.
+A expressão \textit{fusão tardia} é utilizada na literatura tanto para a concatenação de características \cite{nawaz2025ard} quanto para a combinação de decisões \cite{yousaf2024twostream}. Para evitar a ambiguidade, a combinação em nível de características por concatenação é denominada, neste texto, fusão por concatenação de \textit{embeddings}. Quando o modelo é treinado de ponta a ponta, as fontes são ajustadas em conjunto, e a separação entre elas se limita à extração das representações, que possuem naturezas distintas, antes da camada de decisão.
 
-\subsection{Evidências sobre estratégias de fusão em redes de dupla via}
-\label{subsec:fusao-evidencias}
+As arquiteturas de dupla via (\textit{two-stream}) processam fontes distintas de informação por ramos independentes e combinam as representações resultantes \cite{yousaf2024twostream,wang2023stnet}. A combinação de descritores calculados explicitamente com características profundas foi aplicada em imagens histopatológicas de próstata \cite{huang2022fusing}.
 
-Os trabalhos que compararam formas de combinar duas vias não apontam uma estratégia superior em todos os cenários. Em uma rede com EfficientNet-B7 e BiLSTM, \citeonline{yousaf2024twostream} compararam fusão precoce, concatenação de características e média de escores, e a fusão precoce apresentou o pior desempenho, enquanto a concatenação e a média de escores obtiveram resultados próximos. Essa arquitetura, com extrator convolucional pré-treinado, recorrência e concatenação seguida de camadas totalmente conectadas, é a mais próxima da proposta, embora as sequências sejam de quadros de vídeo. \citeonline{nawaz2025ard} justificam a concatenação pela limitação de dados, pois métodos como \textit{bilinear pooling} e redes de autoatenção exigem camadas adicionais com muitos parâmetros e podem levar a sobreajuste, e o melhor resultado foi obtido com extratores congelados, embora as faixas de variação entre as partições se sobreponham. \citeonline{peng2025tfsdfn} concatenaram estatísticas calculadas do sinal com \textit{features} aprendidas em diagnóstico de falhas com poucas amostras, em uma organização análoga à proposta, pois os descritores topológicos também são calculados e não aprendidos pela rede. Em imagens médicas, \citeonline{wang2023stnet} concatenaram \textit{features} de dois fluxos, de forma e de textura, seguidas de seleção por atenção de canal, com ganho sobre a rede de fluxo único. Em imagens de próstata, a concatenação de descritores clássicos de textura com características profundas superou o uso isolado de cada tipo \cite{huang2022fusing}. Alternativas com interação entre as vias durante a extração, por atenção cruzada ou bidirecional, trouxeram ganhos pequenos sobre a concatenação em segmentação \cite{sheng2026gtunet} e foram aplicadas a mapas densos dentro do codificador \cite{yang2026daprnet,chen2025chrysanthemum}, o que difere da fusão de vetores globais.
-
-\subsection{Concatenação, classificador MLP e ressalvas}
-\label{subsec:fusao-mlp}
-
-Dados os \textit{embeddings} $z_{\mathrm{top}} \in \mathbb{R}^{d_t}$ e $z_{\mathrm{vis}} \in \mathbb{R}^{d_v}$, a concatenação forma o vetor conjunto
+Dados os \textit{embeddings} $z_{\mathrm{a}} \in \mathbb{R}^{d_a}$ e $z_{\mathrm{b}} \in \mathbb{R}^{d_b}$ de duas vias, a concatenação forma o vetor conjunto
 \begin{equation}
-z = \left[\, z_{\mathrm{top}} \,\Vert\, z_{\mathrm{vis}} \,\right] \in \mathbb{R}^{d_t + d_v},
+z = \left[\, z_{\mathrm{a}} \,\Vert\, z_{\mathrm{b}} \,\right] \in \mathbb{R}^{d_a + d_b}.
 \label{eq:fusao-concat}
 \end{equation}
-que contém, lado a lado, a informação sobre a evolução topológica e sobre o aspecto visual da imagem. Os dois vetores têm origens e escalas diferentes. O estado oculto da LSTM é limitado ao intervalo $(-1, 1)$ pela tangente hiperbólica (Equação~\ref{eq:lstm-h}), e as ativações finais da rede visual não têm essa restrição, de modo que cada vetor passa por uma normalização de camada (\textit{LayerNorm}) antes da concatenação. Como a dimensão do vetor visual ($d_v = 640$) pode superar a do vetor topológico, o vetor de maior dimensão tende a predominar na primeira camada do classificador, o que motiva projetar as duas vias para a mesma dimensão.
+Os vetores de vias distintas têm origens, escalas e dimensões diferentes. Quando uma via produz valores limitados, como o estado oculto da LSTM, restrito ao intervalo $(-1, 1)$ pela tangente hiperbólica, e a outra produz ativações sem essa restrição, as características de maior magnitude tendem a predominar na primeira camada do classificador. O mesmo ocorre com o vetor de maior dimensão. Duas medidas contornam o problema: projetar os vetores para a mesma dimensão por uma camada linear e normalizá-los por \textit{Layer Normalization} (LN), que, para um vetor $z \in \mathbb{R}^{d}$, é dada por
+\begin{equation}
+\operatorname{LN}(z) = \gamma \odot \frac{z - \mu}{\sqrt{\sigma^2 + \varepsilon}} + \beta,
+\qquad
+\mu = \frac{1}{d}\sum_{k=1}^{d} z_k,
+\qquad
+\sigma^2 = \frac{1}{d}\sum_{k=1}^{d} (z_k - \mu)^2,
+\label{eq:ln}
+\end{equation}
+em que $\gamma$ e $\beta$ são parâmetros aprendidos e $\varepsilon$ é uma constante pequena.
+% TODO: citar Ba et al. (2016) para a Layer Normalization.
 
-O perceptron multicamadas é uma rede \textit{feedforward} em que cada camada aplica uma transformação afim seguida de uma não linearidade, treinada por retropropagação do erro \cite{rumelhart1986learning}, e redes desse tipo, com ao menos uma camada oculta, são aproximadores universais de funções sob condições gerais \cite{hornik1989multilayer}. Com uma camada oculta, o classificador é dado por
+O perceptron multicamadas (MLP) é uma rede \textit{feedforward} em que cada camada aplica uma transformação afim seguida de uma não linearidade, treinada por retropropagação do erro \cite{rumelhart1986learning}, e redes desse tipo, com ao menos uma camada oculta, são aproximadores universais de funções sob condições gerais \cite{hornik1989multilayer}. Com uma camada oculta, o classificador é dado por
 \begin{align}
 h &= \mathrm{ReLU}\!\left(W_1 z + b_1\right), \label{eq:mlp-oculta}\\
 \hat{y} &= \mathrm{softmax}\!\left(W_2 h + b_2\right), \label{eq:mlp-saida}
 \end{align}
-em que $\hat{y}$ é o vetor de probabilidades sobre as classes e os pesos são ajustados pela minimização da entropia cruzada, $\mathcal{L} = -\sum_{c} y_c \log \hat{y}_c$. O número de parâmetros da primeira camada é proporcional ao produto de $d_t + d_v$ pela dimensão da camada oculta, o que exige atenção em conjuntos com dezenas a poucas centenas de imagens. A literatura consultada adota cabeças de tamanhos diversos, de uma única camada \cite{nawaz2025ard} a duas camadas totalmente conectadas, a primeira com 1024 unidades \cite{yousaf2024twostream}. O \textit{dropout}, que desativa aleatoriamente unidades durante o treinamento, é uma técnica de regularização contra o sobreajuste \cite{srivastava2014dropout}, e é aplicado na camada oculta.
-
-Os estudos disponíveis não estabelecem uma estratégia de combinação superior em todos os cenários, e os resultados dependem do domínio e do protocolo experimental. Até onde foi possível verificar na literatura consultada, os trabalhos citados não avaliam a combinação de um vetor recorrente formado por descritores topológicos multiescala com um vetor visual extraído pela MobileViT. A eficácia dessa combinação é verificada experimentalmente por comparações com cada via isolada, com a concatenação do vetor visual a descritores clássicos (GLCM, LBP e HOG) processada pelo mesmo MLP, como em \citeonline{huang2022fusing}, e com a fusão de escores utilizada por \citeonline{yousaf2024twostream} e \citeonline{nawaz2025ard}. O protocolo de validação e as métricas são descritos no capítulo de metodologia.
+em que $\hat{y}$ é o vetor de probabilidades sobre as classes e os pesos são ajustados pela minimização da entropia cruzada, $\mathcal{L} = -\sum_{c} y_c \log \hat{y}_c$. O número de parâmetros da primeira camada é proporcional ao produto de $d_a + d_b$ pela dimensão da camada oculta, o que exige atenção em conjuntos com dezenas a poucas centenas de imagens. O \textit{dropout}, que desativa aleatoriamente unidades durante o treinamento, é uma técnica de regularização contra o sobreajuste \cite{srivastava2014dropout}, aplicável à camada oculta.

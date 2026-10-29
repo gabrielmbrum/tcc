@@ -1,0 +1,15 @@
+TY  - JOUR
+AU  - Hussaini, Hamza
+AU  - Bano, Shahana
+AU  - Elyan, Eyad
+AU  - Moreno-Garcia, Carlos Francisco
+PY  - 2026
+DA  - 2026/09/03
+TI  - A Clinically Grounded Review of Medical Image Classification: Quantitative Insights into CNNs, Vision Transformers, and Hybrid CNN-ViT Models
+JO  - Journal of Imaging Informatics in Medicine
+AB  - Medical image classification has advanced substantially with convolutional neural networks (CNNs), Vision Transformers (ViTs), and hybrid CNN–ViT architectures, yet clinical translation remains limited by dataset dependency, inconsistent evaluation practices, and insufficient external validation. This review provides a clinically grounded comparative synthesis of these model families across diverse medical imaging modalities. A structured literature review was conducted across PubMed, IEEE Xplore, Scopus, and Web of Science for studies published between 2016 and 2025. Following predefined eligibility criteria, 81 studies were included in the qualitative review, of which 74 contributed to a dataset-aware descriptive quantitative aggregation. The quantitative synthesis was therefore restricted to descriptive aggregation; a formal meta-analysis was not performed because of substantial methodological heterogeneity and insufficient reporting of study-level variance information across the included studies. CNN-based models demonstrated the most consistent performance, achieving the highest weighted accuracy (0.934) and weighted recall (0.901). ViT-based models achieved competitive weighted accuracy (0.906) and recall (0.893), particularly for OCT and X-ray imaging, but appeared more sensitive to dataset scale and quality. Hybrid CNN–ViT models achieved a weighted accuracy of 0.814 and weighted recall of 0.698, with the greatest performance variability. Only 10 of the 81 reviewed studies (12.3%) reported independent external validation, while calibration and other clinically relevant evaluation measures were inconsistently reported. CNNs provide a robust baseline for medical image classification, whereas ViT- and hybrid-based architectures offer complementary strengths under appropriate data and training conditions. However, limited external validation and inconsistent reporting indicate that strong retrospective performance should not be interpreted as evidence of clinical readiness. Future research should prioritise externally validated, interpretable, and clinically deployable AI systems supported by standardised evaluation practices.
+SN  - 2948-2933
+UR  - https://doi.org/10.1007/s10278-026-02249-8
+DO  - 10.1007/s10278-026-02249-8
+ID  - Hussaini2026
+ER  - 

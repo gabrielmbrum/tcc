@@ -14,22 +14,24 @@ A avaliação foi conduzida em cinco \textit{datasets} de imagens histopatológi
 \caption{Resumo dos \textit{datasets} utilizados.}
 \label{tab:datasets}
 \small
-\begin{tabular}{llccl}
+\begin{tabular}{llccll}
 \toprule
-\textbf{\textit{Dataset}} & \textbf{Tarefa (classes)} & \textbf{Imagens} & \textbf{Classes} & \textbf{Imagens por classe} \\
+\textbf{\textit{Dataset}} & \textbf{Tarefa (classes)} & \textbf{Imagens} & \textbf{Classes} & \textbf{Imagens por classe} & \textbf{Resolução original} \\
 \midrule
-UCSB & Mama (benigno / maligno)          & 58  & 2 & 32 / 26 \\
-CR   & Colorretal (benigno / maligno)    & 165 & 2 & 74 / 91 \\
-LA   & Idade (1, 6, 16 e 24 meses)       & 528 & 4 & 100 / 115 / 162 / 151 \\
-LG   & Sexo (macho / fêmea)              & 265 & 2 & 150 / 115 \\
-NHL  & Linfoma (CLL / FL / MCL)          & 374 & 3 & 113 / 139 / 122 \\
+UCSB & Mama (benigno / maligno)          & 58  & 2 & 32 / 26 & $896 \times 768$ \\
+CR   & Colorretal (benigno / maligno)    & 165 & 2 & 74 / 91 & $775 \times 522$ (14 exceções) \\
+LA   & Idade (1, 6, 16 e 24 meses)       & 528 & 4 & 100 / 115 / 162 / 151 & $417 \times 312$ \\
+LG   & Sexo (macho / fêmea)              & 265 & 2 & 150 / 115 & $417 \times 312$ \\
+NHL  & Linfoma (CLL / FL / MCL)          & 374 & 3 & 113 / 139 / 122 & $1388 \times 1040$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Todas as imagens originais foram redimensionadas para $256 \times 256$ pixels por interpolação de área, e a imagem resultante, em inteiros de 8 bits, foi a entrada comum das duas vias. A via topológica utilizou essa imagem sem alteração de intensidades, pois as arestas das redes complexas dependem da comparação de intensidades inteiras, incluindo os empates. A via visual converteu a imagem para o intervalo $[0,1]$ e aplicou a normalização da ImageNet, com médias por canal de $0{,}485$, $0{,}456$ e $0{,}406$ e desvios padrão de $0{,}229$, $0{,}224$ e $0{,}225$. O redimensionamento altera a textura em nível de pixel e, nos conjuntos com proporção diferente de $1{:}1$, como o CR, introduz distorção de proporção. Esse efeito é considerado na interpretação dos resultados.
+% TODO: o log de dimensões cobriu apenas UCSB/Benign, LA/1, LG/1 e NHL/MCL. Rodar nas demais classes e confirmar a uniformidade antes de manter a tabela.
 
-O \textit{dataset} UCSB \cite{UCSB} é composto por 58 imagens RGB de tecido de câncer de mama (Figura~\ref{fig:dataset-ucsb}), sendo 32 benignas e 26 malignas, e possui o menor número de amostras entre os conjuntos avaliados.
+As imagens foram mantidas em inteiros de 8 bits por canal e alimentaram as duas vias em resoluções distintas. A via topológica utilizou a imagem na resolução original de cada \textit{dataset} (Tabela~\ref{tab:datasets}), sem redimensionamento e sem alteração de intensidades, pois as arestas das redes complexas dependem da comparação de intensidades inteiras, incluindo os empates, e a interpolação suavizaria essas diferenças. A via visual utilizou uma versão de $256 \times 256$ pixels, escala em que a MobileViT-S foi pré-treinada, o que também uniformiza as dimensões dos lotes. Essa versão foi obtida pelo redimensionamento do lado menor para 256 pixels, por interpolação de área e com a proporção preservada, seguido de um recorte central de $256 \times 256$ pixels. Em seguida, a imagem foi convertida para o intervalo $[0,1]$ e normalizada pela ImageNet, com médias por canal de $0{,}485$, $0{,}456$ e $0{,}406$ e desvios padrão de $0{,}229$, $0{,}224$ e $0{,}225$. Esse procedimento evita a distorção de proporção, mas o recorte central descarta as bordas das imagens que não são quadradas.
+
+Como consequência, as duas vias descrevem a mesma imagem em escalas e regiões diferentes: a via topológica, a imagem inteira em resolução nativa, e a via visual, o recorte central reduzido. Dentro de cada \textit{dataset} a resolução é praticamente uniforme, de modo que a escala é consistente entre as amostras. Entre \textit{datasets}, porém, um mesmo raio em pixels cobre frações diferentes da cena, e as comparações entre bases devem considerar esse fator. O efeito da resolução sobre a via topológica foi avaliado em uma análise de sensibilidade (Seção~\ref{sec:experimentos}). O \textit{dataset} UCSB \cite{UCSB} é composto por 58 imagens RGB de tecido de câncer de mama (Figura~\ref{fig:dataset-ucsb}), sendo 32 benignas e 26 malignas, e possui o menor número de amostras entre os conjuntos avaliados.
 
 \begin{figure}[htbp]
     \centering
@@ -60,7 +62,7 @@ O \textit{dataset} UCSB \cite{UCSB} é composto por 58 imagens RGB de tecido de 
     \label{fig:dataset-ucsb}
 \end{figure}
 
-O \textit{dataset} CR \cite{CR} contém 165 imagens RGB de tecido colorretal, obtidas a partir de 16 seções histológicas representativas de câncer colorretal nos estágios T3 e T4. O conjunto é levemente desbalanceado, com 74 imagens de tecido benigno e 91 de tecido maligno, e as aquisições originais têm resoluções de $567 \times 430$ a $775 \times 522$ pixels (Figura~\ref{fig:dataset-cr}).
+O \textit{dataset} CR \cite{CR} contém 165 imagens RGB de tecido colorretal, obtidas a partir de 16 seções histológicas representativas de câncer colorretal nos estágios T3 e T4. O conjunto é levemente desbalanceado, com 74 imagens de tecido benigno e 91 de tecido maligno, e a resolução original é de $775 \times 522$ pixels em 151 imagens, enquanto 14 imagens (7 por classe) têm resoluções menores, de $567 \times 430$ a $589 \times 453$ pixels, com proporção diferente das demais (Figura~\ref{fig:dataset-cr}).
 
 \begin{figure}[htbp]
     \centering
@@ -182,33 +184,34 @@ O \textit{dataset} NHL \cite{iicbu2008} contém 374 imagens RGB de linfoma não 
 
 A arquitetura proposta, ilustrada na Figura~\ref{fig:pipeline_tcc}, é uma rede de dupla via (\textit{Two-Stream Network}) para a classificação de imagens histopatológicas. A via topológica representa a imagem por medidas de redes complexas processadas por uma rede recorrente, e a via visual extrai características diretamente da imagem RGB por uma arquitetura híbrida baseada em convoluções e atenção. As duas vias são independentes durante a extração. Os \textit{embeddings} resultantes são projetados para a mesma dimensão, concatenados e classificados por um perceptron multicamadas (\textit{Multilayer Perceptron}, MLP), e todos os parâmetros são ajustados em conjunto no treinamento (Seção~\ref{sec:protocolo}).
 
-Arquiteturas de dupla via foram empregadas na literatura para separar fontes de informação em aprendizado conjunto \cite{yousaf2024twostream,wang2023stnet}, e a combinação de descritores calculados explicitamente com características profundas foi aplicada em imagens histopatológicas de próstata \cite{huang2022fusing}. Na arquitetura proposta, a via topológica descreve as relações entre pixels em raios de conexão crescentes, e a via visual aprende representações a partir dos pixels da imagem.
+Na arquitetura proposta, a via topológica descreve as relações entre pixels em raios de conexão crescentes, e a via visual aprende representações a partir dos pixels da imagem. O fundamento das arquiteturas de dupla via e da combinação das representações está na Seção~\ref{sec:fusao-fundamentacao}.
 
 O processamento ocorre em quatro etapas. A primeira extrai as características topológicas por redes complexas e as codifica por uma BiLSTM. A segunda extrai as características visuais pela MobileViT-S. A terceira projeta, normaliza e concatena os dois \textit{embeddings}. A quarta classifica o vetor concatenado por um MLP.
 
 \subsection{Via topológica}
 \label{subsec:ext-tex}
 
-A primeira via descreve a textura da imagem por medidas topológicas de redes complexas (Seção~\ref{sec:redes-complexas}). Cada imagem foi convertida em uma rede direcionada e ponderada, na qual cada pixel é um vértice e as arestas ligam pixels cuja distância é de no máximo $r_{\max}$. O peso de cada aresta é a diferença absoluta de intensidade entre os pixels, e a direção vai do pixel de menor intensidade para o de maior intensidade \cite{BACKES2013168,ribas2020fusion,ribas2024colorspectral}. Para as imagens RGB foi adotada a configuração \textit{full}, que estabelece conexões intracanal e intercanais \cite{Scabini_2020,CNT}. A rede foi construída sobre a imagem redimensionada de 8 bits, sem normalização.
+A primeira via descreve a textura da imagem por medidas topológicas de redes complexas (Seção~\ref{sec:redes-complexas}). Cada imagem foi convertida em uma rede direcionada e ponderada, na qual cada pixel é um vértice e as arestas ligam pixels cuja distância é de no máximo $r_{\max}$. O peso de cada aresta é a diferença absoluta de intensidade entre os pixels, e a direção vai do pixel de menor intensidade para o de maior intensidade \cite{Scabini_2020,BACKES2013168,ribas2020fusion,ribas2024colorspectral}. Para as imagens RGB foi adotada a configuração \textit{full}, que estabelece conexões intracanal e intercanais \cite{Scabini_2020}. A rede foi construída sobre a imagem original de 8 bits, na resolução nativa de cada \textit{dataset}, sem redimensionamento e sem normalização. As medidas por raio são médias e desvios padrão sobre os vértices, de modo que imagens de tamanhos diferentes geram sequências com a mesma dimensão. Por serem determinísticas, as medidas foram calculadas uma única vez por imagem e reutilizadas em todas as partições e sementes.
 
-Para cada vértice foram calculados o grau de saída, o grau de entrada, a força de saída e a força de entrada, acumulados até cada raio $r \in \{1, 2, \ldots, r_{\max}\}$. Em cada raio, a média global e o desvio padrão global das quatro medidas foram calculados para cada um dos três canais, o que produz 24 características por raio \cite{ribas2024colorspectral}. A imagem é descrita pela sequência
+Para cada vértice foram calculados o grau de saída, a força de saída e a força de entrada, acumulados até cada raio $r \in \{1, 2, \ldots, r_{\max}\}$, conjunto de medidas adotado por \citeonline{ribas2024colorspectral}. O grau de entrada não foi utilizado. Em cada raio, a média global e o desvio padrão global das três medidas foram calculados para cada um dos três canais, o que produz 18 características por raio. A imagem é descrita pela sequência
 
 \begin{equation}
 X_{\mathrm{top}} =
-[x_1,x_2,\ldots,x_{10}],
+[x_1,x_2,\ldots,x_{15}],
 \label{eq:met-sequencia-topologica}
 \end{equation}
 
-em que cada passo $x_r \in \mathbb{R}^{24}$ corresponde ao raio $r$, e a sequência completa contém 240 valores.
+em que cada passo $x_r \in \mathbb{R}^{18}$ corresponde ao raio $r$, e a sequência completa contém 270 valores. As medidas por raio seguem a SSN \cite{Scabini_2020}, e a sequência é processada por uma rede recorrente, e não pela rede neural aleatorizada (RaNN) de \citeonline{ribas2024colorspectral}, cujos pesos de saída formam o descritor.
 
-O raio máximo foi fixado em $r_{\max}=10$. Esse valor foi escolhido de forma heurística, a partir da entropia de Shannon e da entropia amostral das medidas topológicas, que atingiram o platô ou o pico próximo a $r=10$ nas cinco bases (Seção~\ref{subsec:cn-medidas}). Como a entropia das medidas não é um critério de classificação, a sensibilidade ao valor de $r_{\max}$ foi verificada na via topológica isolada, com $r_{\max} \in \{4, 7, 10, 15\}$ (Seção~\ref{sec:experimentos}).
+% TODO: conferir/adicionar a chave bibliográfica do CNT na citação do intervalo de raios abaixo.
+O raio de conexão variou de 1 a 15, de modo que $r_{\max}=15$, intervalo analisado na literatura de redes complexas aplicadas à textura \cite{Scabini_2020,ribas2024colorspectral}. A sensibilidade ao valor de $r_{\max}$ foi verificada na via topológica isolada, com $r_{\max} \in \{4, 7, 10, 15\}$ (Seção~\ref{sec:experimentos}). Como o raio é medido em pixels, $r_{\max}=15$ cobre uma fração maior da imagem nos conjuntos de menor resolução (LA e LG) e menor nos de maior resolução (NHL), o que altera a escala espacial descrita pelas medidas.
 
-As medidas são acumuladas e crescem de forma monotônica com $r$, atingindo a ordem de centenas em $r=10$, o que pode saturar as portas da rede recorrente. Cada uma das 240 coordenadas de $X_{\mathrm{top}}$ foi padronizada pela média e pelo desvio padrão do conjunto de treino de cada partição da validação cruzada, e os mesmos parâmetros foram aplicados às imagens de validação e de teste. Uma representação alternativa, formada pelas diferenças entre raios consecutivos, $\Delta x_r = x_r - x_{r-1}$ com $\Delta x_1 = x_1$, remove a monotonicidade das medidas acumuladas e foi avaliada nas ablações (Seção~\ref{sec:experimentos}).
+As medidas são acumuladas e crescem de forma monotônica com $r$, e assumem magnitudes elevadas nos raios maiores, o que pode saturar as portas da rede recorrente. Cada uma das 270 coordenadas de $X_{\mathrm{top}}$ foi padronizada pela média e pelo desvio padrão do conjunto de treino de cada partição da validação cruzada, e os mesmos parâmetros foram aplicados às imagens de validação e de teste. Uma representação alternativa, formada pelas diferenças entre raios consecutivos, $\Delta x_r = x_r - x_{r-1}$ com $\Delta x_1 = x_1$, remove a monotonicidade das medidas acumuladas e foi avaliada nas ablações (Seção~\ref{sec:experimentos}).
 
-A sequência padronizada foi processada por uma rede \textit{Long Short-Term Memory} bidirecional (BiLSTM) \cite{hochreiter1997long,schuster1997bidirectional}, com uma camada e 64 unidades ocultas por direção, o que resulta em cerca de 46 mil parâmetros. Essa dimensão reduzida foi adotada para limitar o risco de sobreajuste nos conjuntos menores, nos quais o treino contém cerca de 52 imagens (UCSB). A rede opera no formato \textit{many-to-one}, e o \textit{embedding} topológico é a concatenação do estado final da leitura direta, do raio 1 ao 10, com o estado final da leitura inversa:
+A sequência padronizada foi processada por uma rede \textit{Long Short-Term Memory} bidirecional (BiLSTM) \cite{hochreiter1997long,schuster1997bidirectional}, com uma camada e 64 unidades ocultas por direção, o que resulta em cerca de 43 mil parâmetros. Essa dimensão reduzida foi adotada para limitar o risco de sobreajuste nos conjuntos menores, nos quais o treino contém cerca de 47 imagens (UCSB), após a separação do conjunto de validação. A rede opera no formato \textit{many-to-one}, e o \textit{embedding} topológico é a concatenação do estado final da leitura direta, do raio 1 ao 15, com o estado final da leitura inversa:
 
 \begin{equation}
-z_{\mathrm{top}} = \left[\overrightarrow{h}_{10}\,\Vert\,\overleftarrow{h}_{1}\right] \in \mathbb{R}^{128}.
+z_{\mathrm{top}} = \left[\overrightarrow{h}_{15}\,\Vert\,\overleftarrow{h}_{1}\right] \in \mathbb{R}^{128}.
 \label{eq:met-embedding-topologico}
 \end{equation}
 
@@ -217,7 +220,7 @@ A leitura direta acumula, a cada passo, a informação dos raios menores nos rai
 \subsection{Via visual}
 \label{subsec:ext-hibrido}
 
-A via visual extrai atributos diretamente da imagem RGB por meio da MobileViT, uma arquitetura híbrida que combina convoluções, que capturam detalhes celulares, e blocos \textit{transformer}, que modelam o contexto do tecido em escala maior \cite{mehta2022mobilevit,oliveira2025hybrid}. A variante MobileViT-S (\textit{Small}) foi adotada por seu custo computacional reduzido \cite{mehta2022mobilevit}, adequado a bases de 58 a 528 imagens. O modelo recebeu a imagem de $256 \times 256$ pixels normalizada pela ImageNet, e a camada densa de classificação do topo da rede foi removida.
+A via visual extrai atributos diretamente da imagem RGB por meio da MobileViT, uma arquitetura híbrida que combina convoluções, que capturam detalhes celulares, e blocos \textit{transformer}, que modelam o contexto do tecido em escala maior \cite{mehta2022mobilevit,oliveira2025hybrid}. A variante MobileViT-S (\textit{Small}) foi adotada por seu custo computacional reduzido \cite{mehta2022mobilevit}, adequado a bases de 58 a 528 imagens. O modelo recebeu a versão de $256 \times 256$ pixels da imagem (Seção~\ref{sec:datasets}), normalizada pela ImageNet, e a camada densa de classificação do topo da rede foi removida.
 
 As ativações do último bloco convolucional foram agregadas por uma camada de agrupamento médio global (\textit{Global Average Pooling}), que reduz cada mapa de características a um valor. Sendo $I$ a imagem processada e $f_{\mathrm{vis}}(\cdot)$ o codificador visual, o mapeamento é dado por
 
@@ -231,7 +234,7 @@ em que $z_{\mathrm{vis}} \in \mathbb{R}^{640}$ é o \textit{embedding} visual. A
 \subsection{Fusão por concatenação de \textit{embeddings}}
 \label{sec:fusao-embeddings}
 
-Os \textit{embeddings} das duas vias foram combinados em nível de características, antes do classificador. A denominação fusão por concatenação de \textit{embeddings} foi adotada porque o termo fusão tardia é empregado na literatura tanto para a combinação de características quanto para a combinação de decisões \cite{baltrusaitis2019multimodal}. Como o modelo é treinado de ponta a ponta, as duas vias são ajustadas em conjunto, e a separação entre elas se limita à extração das representações.
+Os \textit{embeddings} das duas vias foram combinados em nível de características, antes do classificador, na estratégia denominada fusão por concatenação de \textit{embeddings} (Seção~\ref{sec:fusao-fundamentacao}). Como o modelo é treinado de ponta a ponta, as duas vias são ajustadas em conjunto, e a separação entre elas se limita à extração das representações.
 
 Os dois vetores têm escalas e dimensões distintas. Os valores de $z_{\mathrm{top}}$ são limitados ao intervalo $(-1, 1)$ pela tangente hiperbólica da célula de memória, enquanto $z_{\mathrm{vis}}$ resulta de ativações sem essa limitação, e a diferença de escala pode fazer as características de maior magnitude predominarem na primeira camada do classificador. O vetor visual, com 640 dimensões, também supera o topológico, com 128. Por esse motivo, $z_{\mathrm{vis}}$ foi projetado para 128 dimensões por uma camada linear, e cada vetor foi normalizado por \textit{Layer Normalization} (LN) antes da concatenação:
 
@@ -264,6 +267,7 @@ em que a função de ativação linear retificada (\textit{ReLU}) introduz a nã
 
 A arquitetura foi treinada de ponta a ponta (\textit{end-to-end}). Os parâmetros da MobileViT-S, da projeção, da BiLSTM e do MLP foram atualizados em conjunto pela minimização da entropia cruzada, com o otimizador AdamW. A MobileViT-S, inicializada com pesos pré-treinados, foi ajustada com taxa de aprendizado de $1 \times 10^{-5}$, e os módulos inicializados aleatoriamente (BiLSTM, projeção e MLP) utilizaram taxa de $1 \times 10^{-4}$. O decaimento de pesos foi de \textbf{[XX]}, o tamanho do lote foi de \textbf{[XX]}, o agendador da taxa de aprendizado foi \textbf{[XX]} e o número máximo de épocas foi de \textbf{[XX]}. \textbf{[XX: informar se foi aplicado aumento de dados. Se sim, listar as transformações e confirmar que foram aplicadas apenas ao treino.]}
 
+% TODO: se houver aumento de dados na via visual, usar apenas inversões e rotações de 90 graus, que preservam as medidas topológicas globais calculadas sobre a imagem original.
 % TODO: conferir se as taxas de aprendizado (1e-5 backbone, 1e-4 cabeças) correspondem ao que foi executado.
 
 \subsection{Validação}
@@ -281,12 +285,12 @@ O desempenho da classificação foi quantificado pela acurácia, pelo F1-\textit
 \subsection{Limitações do protocolo}
 \label{subsec:limitacoes}
 
-O protocolo apresenta limitações que são consideradas na interpretação dos resultados. No UCSB, cada conjunto de teste contém cerca de 6 imagens e o conjunto de validação, cerca de 5, de modo que as métricas por partição são discretas e o desvio padrão tende a ser elevado. As partições foram formadas por imagem. O CR reúne imagens de 16 seções histológicas, e os conjuntos LA e LG provêm de um número limitado de animais. Como identificadores de lâmina ou de animal não foram utilizados, imagens da mesma origem podem aparecer no treino e no teste, o que pode superestimar o desempenho. Por fim, o NHL não foi avaliado com a exclusão de laboratórios inteiros, e a distorção de proporção do CR causada pelo redimensionamento não foi investigada.
+O protocolo apresenta limitações que são consideradas na interpretação dos resultados. No UCSB, cada conjunto de teste contém cerca de 6 imagens e o conjunto de validação, cerca de 5, de modo que as métricas por partição são discretas e o desvio padrão tende a ser elevado. As partições foram formadas por imagem. O CR reúne imagens de 16 seções histológicas, e os conjuntos LA e LG provêm de um número limitado de animais. Como identificadores de lâmina ou de animal não foram utilizados, imagens da mesma origem podem aparecer no treino e no teste, o que pode superestimar o desempenho. O NHL não foi avaliado com a exclusão de laboratórios inteiros. Por fim, a via visual recebe um recorte central reduzido, que descarta as bordas das imagens não quadradas, e a via topológica recebe a imagem inteira, de modo que as duas vias não observam exatamente a mesma região. O raio de $15$ pixels também cobre frações distintas da cena em cada \textit{dataset}, e as 14 imagens do CR com resolução diferente da modal podem ter escala distinta das demais.
 
 \section{Comparações e ablações}
 \label{sec:experimentos}
 
-O desempenho da arquitetura proposta foi comparado com os métodos de referência por meio do mesmo protocolo e das mesmas partições (Seção~\ref{sec:protocolo}). As comparações foram organizadas em dois grupos.
+O desempenho da arquitetura proposta foi comparado com os métodos de referência por meio do mesmo protocolo e das mesmas partições (Seção~\ref{sec:protocolo}). As comparações foram organizadas em três grupos.
 
 O primeiro grupo avalia se a combinação das duas vias supera cada via e as alternativas clássicas, e inclui:
 
@@ -298,20 +302,22 @@ O primeiro grupo avalia se a combinação das duas vias supera cada via e as alt
     \item a fusão de escores, calculada como a média das probabilidades das duas vias treinadas isoladamente \cite{yousaf2024twostream,nawaz2025ard}.
 \end{itemize}
 
-Nas comparações com descritores clássicos, cada vetor foi padronizado com estatísticas do treino, projetado para 128 dimensões e normalizado por LN, de forma análoga a $z_{\mathrm{top}}$. Os parâmetros de GLCM, LBP e HOG foram \textbf{[XX]}.
+Nas comparações com descritores clássicos, cada vetor foi padronizado com estatísticas do treino, projetado para 128 dimensões e normalizado por LN, de forma análoga a $z_{\mathrm{top}}$. Os descritores clássicos foram calculados sobre a imagem na resolução original, a mesma da via topológica, e seus parâmetros foram \textbf{[XX]}.
 
 O segundo grupo avalia a via topológica isolada, a fim de verificar se a recorrência contribui para o resultado. Foram comparadas as seguintes estratégias de codificação da sequência $X_{\mathrm{top}}$:
 
 \begin{itemize}
     \item a BiLSTM e a LSTM unidirecional, que verifica a contribuição da leitura inversa,
     \item a GRU \cite{cho2014learning},
-    \item um MLP sobre o vetor achatado de 240 valores,
+    \item um MLP sobre o vetor achatado de 270 valores,
     \item uma CNN unidimensional sobre a sequência.
 \end{itemize}
 
 Cada estratégia foi avaliada com as medidas acumuladas e com as diferenças entre raios consecutivos, e a melhor delas foi avaliada com $r_{\max} \in \{4, 7, 10, 15\}$. Se o MLP sobre o vetor achatado apresentar desempenho equivalente ao da BiLSTM, esse resultado será reportado e a contribuição da recorrência não será sustentada.
 
+O terceiro grupo avalia a sensibilidade à resolução, escolha de entrada decisiva para a via topológica. A via topológica isolada foi calculada também sobre a imagem redimensionada para $256 \times 256$ pixels por interpolação de área, e o desempenho foi comparado ao da resolução original nas mesmas partições. No CR, o resultado principal foi obtido com as 165 imagens, e uma análise adicional restrita às 151 imagens de resolução $775 \times 522$ verificou se as 14 imagens de outra resolução afetam a conclusão. O critério dessa análise (manter apenas a resolução modal) foi definido antes da avaliação dos resultados.
+
 \section{Configuração de ambiente}
 \label{sec:env}
 
-Os experimentos foram implementados em Python com a biblioteca PyTorch (versão \textbf{[XX]}). A MobileViT-S e seus pesos pré-treinados foram obtidos de \textbf{[XX: biblioteca ou repositório]}. As redes complexas foram construídas por uma implementação em C++, com custo de \textbf{[XX]} segundos por imagem de $256 \times 256$ pixels com $r_{\max}=10$. Os descritores GLCM, LBP e HOG foram calculados com \textbf{[XX]}. O treinamento e a inferência foram executados em uma GPU \textbf{[XX]}, com tempo médio de \textbf{[XX]} por avaliação. As sementes aleatórias foram \textbf{[XX]}.
+Os experimentos foram implementados em Python com a biblioteca PyTorch (versão \textbf{[XX]}). A MobileViT-S e seus pesos pré-treinados foram obtidos de \textbf{[XX: biblioteca ou repositório]}. As redes complexas foram construídas por uma implementação em C++, com custo de \textbf{[XX]} segundos por imagem na resolução original de cada \textit{dataset} com $r_{\max}=15$. Na versão de $256 \times 256$ pixels usada na análise de sensibilidade, o custo medido no UCSB foi de 4,83 segundos por imagem (280 segundos para 58 imagens e 15 raios). Os descritores GLCM, LBP e HOG foram calculados com \textbf{[XX]}. O treinamento e a inferência foram executados em uma GPU \textbf{[XX]}, com tempo médio de \textbf{[XX]} por avaliação. As sementes aleatórias foram \textbf{[XX]}.
