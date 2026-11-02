@@ -5,22 +5,23 @@
 
 Em reconhecimento de padrões, uma \textit{feature} é uma medida numérica que representa uma propriedade da imagem, como textura, forma, bordas ou cor. A extração de \textit{features} transforma os pixels em uma representação que pode ser utilizada por um classificador \cite{ramossoto2025miafex}. Em imagens médicas, essas medidas descrevem propriedades como a forma, o tamanho, a textura e a intensidade das estruturas observadas \cite{dehbozorgi2025}. A representação pode ser definida por regras matemáticas ou aprendida a partir dos dados, e essa distinção é relevante em bases médicas pequenas, nas quais a disponibilidade de imagens rotuladas é limitada por custos de aquisição, privacidade e necessidade de especialistas \cite{litjens2017survey}.
 
-Em histopatologia, o tecido é fixado, cortado, corado, em geral pela hematoxilina e eosina (H\&E), e digitalizado. As diferenças de protocolo de coloração e de iluminação entre laboratórios alteram a cor e o contraste da imagem para um mesmo tipo de tecido, e a textura formada pelo arranjo de núcleos, citoplasma e matriz extracelular é uma das principais fontes de informação para o diagnóstico.
+Em histopatologia, o tecido é fixado, cortado, corado, em geral pela H\&E, e digitalizado. As diferenças de protocolo de coloração e de iluminação entre laboratórios alteram a cor e o contraste da imagem para um mesmo tipo de tecido, e a textura formada pelo arranjo de núcleos, citoplasma e matriz extracelular é uma das principais fontes de informação para o diagnóstico.
 % TODO: incluir referência de patologia computacional / variação de coloração H&E neste parágrafo.
 
 \subsection{Descritores clássicos}
 \label{subsec:features-classicas}
 
-Os descritores clássicos (\textit{handcrafted}) são calculados por regras matemáticas definidas previamente, sem ajuste a partir dos dados. Entre os métodos empregados em imagens médicas estão as estatísticas de primeira ordem, a matriz de coocorrência de níveis de cinza (GLCM), os padrões binários locais (LBP), o histograma de gradientes orientados (HOG), os filtros de Gabor e o SIFT \cite{ramossoto2025miafex,ahmed2023review,dehbozorgi2025}. As subseções seguintes definem GLCM, LBP e HOG.
+Os descritores clássicos (\textit{handcrafted}) são calculados por regras matemáticas definidas previamente, sem ajuste a partir dos dados. Entre os métodos empregados em imagens médicas estão as estatísticas de primeira ordem, a GLCM, o LBP, o HOG, os filtros de Gabor e o SIFT \cite{ramossoto2025miafex,ahmed2023review,dehbozorgi2025}. As subseções seguintes definem GLCM, LBP e HOG.
 
 \subsubsection{Matriz de coocorrência de níveis de cinza}
 
 A GLCM \cite{haralick1973textural} registra a frequência com que pares de pixels de tons $i$ e $j$ ocorrem separados por um deslocamento definido por uma distância $d$ e um ângulo $\theta$ (0°, 45°, 90° ou 135°). Para uma imagem $I$ com $N_g$ níveis de cinza, a matriz e sua versão normalizada são
 
 \begin{equation}
-P_{d,\theta}(i,j) = \left|\left\{(\mathbf{p},\mathbf{q}) : I(\mathbf{p}) = i,\; I(\mathbf{q}) = j,\; \mathbf{q} = \mathbf{p} + d\,(\cos\theta, \sin\theta)\right\}\right|,
-\qquad
-p(i,j) = \frac{P_{d,\theta}(i,j)}{\sum_{k,l} P_{d,\theta}(k,l)}.
+\begin{aligned}
+P_{d,\theta}(i,j) &= \left|\left\{(\mathbf{p},\mathbf{q}) : I(\mathbf{p}) = i,\; I(\mathbf{q}) = j,\; \mathbf{q} = \mathbf{p} + d\,(\cos\theta, \sin\theta)\right\}\right|, \\[6pt]
+p(i,j) &= \frac{P_{d,\theta}(i,j)}{\sum_{k,l} P_{d,\theta}(k,l)}.
+\end{aligned}
 \label{eq:glcm}
 \end{equation}
 
@@ -115,7 +116,7 @@ em que $\varepsilon$ é uma constante pequena, e os blocos sobrepostos concatena
 \subsection{Extração por aprendizado profundo}
 \label{subsec:features-profundas}
 
-Os descritores \textit{handcrafted} capturam relações locais entre pixels, em escalas e vizinhanças definidas previamente. As redes neurais convolucionais (CNNs), em contraste, aprendem filtros que vão de bordas e texturas nas primeiras camadas até padrões semânticos nas camadas finais, e são amplamente utilizadas em análise de imagens médicas \cite{litjens2017survey}. Os \textit{Vision Transformers} (ViT) representam a imagem como uma sequência de \textit{patches} e utilizam autoatenção para modelar relações entre regiões \cite{dosovitskiy2020image,shamshad2023transformers}.
+Os descritores \textit{handcrafted} capturam relações locais entre pixels, em escalas e vizinhanças definidas previamente. As CNNs, em contraste, aprendem filtros que vão de bordas e texturas nas primeiras camadas até padrões semânticos nas camadas finais, e são amplamente utilizadas em análise de imagens médicas \cite{litjens2017survey}. Os ViT representam a imagem como uma sequência de \textit{patches} e utilizam autoatenção para modelar relações entre regiões \cite{dosovitskiy2020image,shamshad2023transformers}.
 
 Em domínios com poucos dados, a transferência de aprendizado (\textit{transfer learning}) permite empregar uma rede pré-treinada em uma base grande, como a ImageNet, como ponto de partida. Na extração de \textit{features}, a ativação de uma camada intermediária ou final é utilizada como vetor de características. No ajuste fino (\textit{fine-tuning}), os pesos pré-treinados servem de inicialização e são atualizados no conjunto-alvo, em geral com taxa de aprendizado menor que a dos módulos inicializados aleatoriamente. Modelos com muitos parâmetros ajustados em poucas imagens estão sujeitos ao sobreajuste, o que torna a regularização e o aumento de dados relevantes. O aumento de dados gera amostras adicionais por transformações que preservam o rótulo, como inversões e rotações.
 % TODO: referências de ImageNet (Deng et al., 2009), de transferência de aprendizado e de aumento de dados.
@@ -125,19 +126,19 @@ A variação de tamanho e de aparência das estruturas do tecido motiva descrito
 \section{Redes Complexas}
 \label{sec:redes-complexas}
 
-A teoria de Redes Complexas (CN, do inglês \textit{Complex Networks}) é uma abstração para modelar sistemas naturais cujos elementos interagem de maneira não trivial \cite{BOCCALETTI2006175}. Essas redes foram empregadas para modelar os pixels de uma imagem e suas relações de vizinhança, e descritores baseados em topologia quantificam propriedades de textura a partir dessa modelagem \cite{BACKES2013168, ribas2020fusion, ribas2024colorspectral}. A \textit{Spatio-Spectral Network} (SSN), proposta por \citeonline{Scabini_2020} para a análise de textura colorida, é a modelagem adotada e é descrita a seguir.
+A teoria de CN é uma abstração para modelar sistemas naturais cujos elementos interagem de maneira não trivial \cite{BOCCALETTI2006175}. Essas redes foram empregadas para modelar os pixels de uma imagem e suas relações de vizinhança, e descritores baseados em topologia quantificam propriedades de textura a partir dessa modelagem \cite{BACKES2013168, ribas2020fusion, ribas2024colorspectral}. A SSN, proposta por \citeonline{Scabini_2020} para a análise de textura colorida, é a modelagem adotada e é descrita a seguir.
 
 \subsection{Modelagem da imagem como rede direcionada}
 \label{subsec:cn-modelagem}
 
 Na SSN \cite{Scabini_2020}, cada imagem é representada como uma CN direcionada e ponderada $G = (V, E)$, na qual cada pixel é modelado como um vértice e as conexões entre pixels são estabelecidas dentro de um raio máximo $r_{max}$. Para um pixel $i = (x_i, y_i)$ em um canal de cor $c$ da imagem $I$, é definido um vértice $v_i^{(c)} \in V$. Uma aresta direcionada é criada entre os vértices $v_i^{(c)}$ e $v_j^{(c_w)}$, em que $c$ e $c_w$ são os canais de cor do primeiro e do segundo pixel, quando a distância euclidiana quadrática entre os pixels satisfaz a Equação~\ref{eq:cn-aresta}:
 \begin{equation}
-\rho_{ij}^2 = (x_i - x_j)^2 + (y_i - y_j)^2, \qquad 0 < \rho_{ij}^2 \leq r_{max}^2,
+\rho_{ij}^2 = (x_i - x_j)^2 + (y_i - y_j)^2, \qquad 0 \leq \rho_{ij}^2 \leq r_{max}^2,
 \label{eq:cn-aresta}
 \end{equation}
-em que $x$ e $y$ são as coordenadas dos pixels e $\rho_{ij}$ é a distância euclidiana entre eles. A condição $\rho_{ij}^2 > 0$ exclui laços, isto é, a conexão de um pixel consigo mesmo. Cada aresta é associada a um raio discreto $r \in \{1, 2, \ldots, r_{max}\}$, definido como o menor inteiro que satisfaz $(r-1)^2 < \rho_{ij}^2 \leq r^2$, o que permite acumular as medidas da rede progressivamente sobre vizinhanças cada vez maiores.
+em que $x$ e $y$ são as coordenadas dos pixels e $\rho_{ij}$ é a distância euclidiana entre eles. A condição $\rho_{ij}^2 = 0$ conecta os vértices dos diferentes canais de cor de um mesmo pixel, o que só ocorre quando $c \neq c_w$ \cite{ribas2024colorspectral}. Não há laços, pois um vértice nunca se conecta a si mesmo. Cada aresta é associada a um raio discreto $r \in \{1, 2, \ldots, r_{max}\}$, definido como o menor inteiro $r \geq 1$ que satisfaz $\rho_{ij}^2 \leq r^2$, de modo que as arestas com $\rho_{ij} = 0$ pertencem ao raio 1. Isso permite acumular as medidas da rede progressivamente sobre vizinhanças cada vez maiores.
 
-O peso atribuído a cada aresta é a diferença absoluta de intensidade entre os pixels conectados, conforme a Equação~\ref{eq:cn-peso}:
+A diferença absoluta de intensidade entre os pixels conectados, dada pela Equação~\ref{eq:cn-peso}, determina a direção da aresta e compõe o seu peso (Seção~\ref{subsec:cn-medidas}):
 \begin{equation}
 w_{ij} = \left| I(x_i, y_i, c) - I(x_j, y_j, c_w) \right|.
 \label{eq:cn-peso}
@@ -152,21 +153,17 @@ O grau (\textit{degree}) e a força (\textit{force}) são calculados para cada v
 d_{out}(v_i, r) = \sum_{k=1}^{r} n_{out}(v_i, k),
 \label{eq:cn-grau}
 \end{equation}
-em que $n_{out}(v_i, k)$ é o número de arestas de saída de $v_i$ cujo raio discreto vale $k$. A força incorpora as diferenças de intensidade e a proximidade entre os pixels, o que a torna sensível aos gradientes locais de textura. Para uma rede construída com raio $r$, cada aresta $(v_i, v_j)$ recebe um peso de força que combina a diferença de intensidade normalizada com a distância normalizada, conforme a Equação~\ref{eq:cn-forca-peso}:
+em que $n_{out}(v_i, k)$ é o número de arestas de saída de $v_i$ cujo raio discreto vale $k$. A força incorpora as diferenças de intensidade e a distância entre os pixels, o que a torna sensível aos gradientes locais de textura. Para uma rede construída com raio $r$, cada aresta $(v_i, v_j)$ recebe o peso proposto por \citeonline{ribas2024colorspectral}, que equilibra a diferença de intensidade e a distância euclidiana entre os pixels, conforme a Equação~\ref{eq:cn-forca-peso}:
 \begin{equation}
-\omega_{ij}^{(r)} =
-\begin{cases}
-\dfrac{w_{ij}}{2L}, & r = 1,\\[8pt]
-\dfrac{1}{2}\left[\dfrac{w_{ij}}{L} + \dfrac{\rho_{ij}^2-1}{r^2-1}\right], & r \geq 2,
-\end{cases}
+\omega_{ij}^{(r)} = \frac{\left(w_{ij} + 1\right)\left(\rho_{ij} + 1\right) - 1}{(L + 1)(r + 1) - 1},
 \label{eq:cn-forca-peso}
 \end{equation}
-em que $L = 255$ é o nível máximo de intensidade para imagens de 8 bits e $w_{ij}$ é o peso dado pela Equação~\ref{eq:cn-peso}. A força de saída acumulada é dada pela Equação~\ref{eq:cn-forca}:
+em que $L = 255$ é o nível máximo de intensidade para imagens de 8 bits, $w_{ij}$ é a diferença de intensidade dada pela Equação~\ref{eq:cn-peso} e $\rho_{ij}$ é a distância euclidiana entre os pixels. A força de saída acumulada é dada pela Equação~\ref{eq:cn-forca}:
 \begin{equation}
 \text{force}_{out}(v_i, r) = \sum_{v_j \in \mathcal{N}_{out}^{(r)}(v_i)} \omega_{ij}^{(r)},
 \label{eq:cn-forca}
 \end{equation}
-em que $\mathcal{N}_{out}^{(r)}(v_i)$ é o conjunto de vértices conectados a $v_i$ por arestas de saída com $\rho_{ij}^2 \leq r^2$, e $\text{force}_{in}$ é definida de forma análoga sobre as arestas de entrada. O fator $r^2 - 1$ na Equação~\ref{eq:cn-forca-peso} é o valor máximo de $\rho_{ij}^2 - 1$ dentro de uma vizinhança de raio $r$, o que mantém o termo de distância no intervalo $[0, 1]$. Para $r = 1$, a única distância quadrática possível é $\rho_{ij}^2 = 1$, de modo que o termo de distância é nulo e o fator $r^2 - 1$ anularia o denominador, e nesse caso o peso é reduzido à componente de intensidade. As medidas por vértice utilizadas são o grau de saída, a força de saída e a força de entrada \cite{ribas2024colorspectral}.
+em que $\mathcal{N}_{out}^{(r)}(v_i)$ é o conjunto de vértices conectados a $v_i$ por arestas de saída com $\rho_{ij}^2 \leq r^2$, e $\text{force}_{in}$ é definida de forma análoga sobre as arestas de entrada. O denominador da Equação~\ref{eq:cn-forca-peso} é o maior valor possível do numerador em uma vizinhança de raio $r$, obtido com diferença de intensidade $L$ e distância $r$, de modo que $\omega_{ij}^{(r)} \in [0, 1]$, com o valor nulo nas arestas de distância nula entre pixels de mesma intensidade. As medidas por vértice utilizadas são o grau de saída, a força de saída e a força de entrada \cite{ribas2024colorspectral}.
 
 Para estender as medidas aos três canais de cor das imagens RGB, as formulações anteriores podem ser aplicadas em três configurações de rede \cite{Scabini_2020}: \textit{within-channel}, com $c = c_w$, \textit{between-channel}, com $c \neq c_w$, e \textit{full}, que inclui simultaneamente conexões intracanal e intercanal. Como os pesos e as direções das arestas dependem da comparação de intensidades inteiras, inclusive dos empates, a rede é construída sobre a imagem em inteiros de 8 bits, e o redimensionamento altera a textura em nível de pixel.
 
@@ -175,7 +172,7 @@ O raio máximo $r_{max}$ determina a escala espacial descrita pelas medidas. Nos
 \section{RNN na Extração de \textit{Features}}
 \label{sec:rnn-topologicas}
 
-Uma rede neural recorrente (RNN, do inglês \textit{Recurrent Neural Network}) processa dados organizados em sequência. Como \citeonline{ribas2024colorspectral} utilizam a sigla RNN para a rede neural aleatorizada (\textit{Randomized Neural Network}), neste texto a sigla RNN designa exclusivamente a rede recorrente, e a rede aleatorizada é abreviada por RaNN.
+As RNNs processam dados organizados em sequência, atualizando um estado interno a cada elemento lido, de modo que a informação dos elementos anteriores é preservada ao longo do processamento. Essa propriedade permite utilizá-las como extratoras de \textit{features}: o estado obtido ao final da sequência resume seu conteúdo em um vetor de dimensão fixa, que pode ser empregado por um classificador. Nesta seção é apresentada a descrição da textura pela evolução das medidas topológicas ao longo dos raios, e os fundamentos das RNNs utilizadas para codificar essa evolução.
 
 \subsection{Evolução topológica ao longo dos raios}
 \label{subsec:rnn-evolucao}
@@ -226,7 +223,7 @@ Dados os \textit{embeddings} $z_{\mathrm{a}} \in \mathbb{R}^{d_a}$ e $z_{\mathrm
 z = \left[\, z_{\mathrm{a}} \,\Vert\, z_{\mathrm{b}} \,\right] \in \mathbb{R}^{d_a + d_b}.
 \label{eq:fusao-concat}
 \end{equation}
-Os vetores de vias distintas têm origens, escalas e dimensões diferentes. Quando uma via produz valores limitados, como o estado oculto da LSTM, restrito ao intervalo $(-1, 1)$ pela tangente hiperbólica, e a outra produz ativações sem essa restrição, as características de maior magnitude tendem a predominar na primeira camada do classificador. O mesmo ocorre com o vetor de maior dimensão. Duas medidas contornam o problema: projetar os vetores para a mesma dimensão por uma camada linear e normalizá-los por \textit{Layer Normalization} (LN), que, para um vetor $z \in \mathbb{R}^{d}$, é dada por
+Os vetores de vias distintas têm origens, escalas e dimensões diferentes. Quando uma via produz valores limitados, como o estado oculto da LSTM, restrito ao intervalo $(-1, 1)$ pela tangente hiperbólica, e a outra produz ativações sem essa restrição, as características de maior magnitude tendem a predominar na primeira camada do classificador. O mesmo ocorre com o vetor de maior dimensão. Duas medidas contornam o problema: projetar os vetores para a mesma dimensão por uma camada linear e normalizá-los por LN, que, para um vetor $z \in \mathbb{R}^{d}$, é dada por
 \begin{equation}
 \operatorname{LN}(z) = \gamma \odot \frac{z - \mu}{\sqrt{\sigma^2 + \varepsilon}} + \beta,
 \qquad
@@ -238,7 +235,7 @@ Os vetores de vias distintas têm origens, escalas e dimensões diferentes. Quan
 em que $\gamma$ e $\beta$ são parâmetros aprendidos e $\varepsilon$ é uma constante pequena.
 % TODO: citar Ba et al. (2016) para a Layer Normalization.
 
-O perceptron multicamadas (MLP) é uma rede \textit{feedforward} em que cada camada aplica uma transformação afim seguida de uma não linearidade, treinada por retropropagação do erro \cite{rumelhart1986learning}, e redes desse tipo, com ao menos uma camada oculta, são aproximadores universais de funções sob condições gerais \cite{hornik1989multilayer}. Com uma camada oculta, o classificador é dado por
+O MLP é uma rede \textit{feedforward} em que cada camada aplica uma transformação afim seguida de uma não linearidade, treinada por retropropagação do erro \cite{rumelhart1986learning}, e redes desse tipo, com ao menos uma camada oculta, são aproximadores universais de funções sob condições gerais \cite{hornik1989multilayer}. Com uma camada oculta, o classificador é dado por
 \begin{align}
 h &= \mathrm{ReLU}\!\left(W_1 z + b_1\right), \label{eq:mlp-oculta}\\
 \hat{y} &= \mathrm{softmax}\!\left(W_2 h + b_2\right), \label{eq:mlp-saida}

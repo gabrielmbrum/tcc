@@ -1,0 +1,155 @@
+% Requer no preâmbulo: \usepackage{tikz} e \usetikzlibrary{positioning, arrows.meta}
+% Este arquivo contém duas figuras: o fluxo do modelo (fig:pipeline_tcc) e o protocolo experimental (fig:protocolo_tcc).
+
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{0.95\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        retangulo/.style={
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {
+            thick, ->, >={Stealth[length=2.5mm]}
+        },
+        box_delimitador/.style = {
+            rectangle, rounded corners=8pt, draw=black!70, fill=black!2, line width=0.8pt
+        },
+        sub_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=black!70, fill=blue!5, line width=0.7pt, font=\small, text width=7.2cm
+        },
+        embed_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=black!70, fill=blue!15, line width=0.7pt, font=\small\bfseries, text width=7.2cm
+        },
+        img_node/.style = {
+            rectangle, draw=black!70, fill=white, line width=0.6pt,
+            inner sep=4pt, align=center, font=\small
+        },
+        rotulo/.style = {font=\scriptsize, fill=white, inner sep=1.5pt}
+    ]
+
+        % 1. Entrada
+        \node (input) [retangulo, minimum width=4cm] at (0,0) {1. Entrada de Dados};
+        \node (input_img) [img_node, below=0.3cm of input] {Imagem histopatológica RGB (8 bits)};
+
+        % 2. Caixas das vias
+        \draw [box_delimitador] (-8.6,-2.2) rectangle (-0.3,-15.0);
+        \draw [box_delimitador] (0.3,-2.2) rectangle (8.6,-15.0);
+        \node [retangulo] at (0,-2.2) {2. Extração (Dupla Via)};
+        \node [font=\bfseries\small] at (-4.45,-3.1) {Via Topológica};
+        \node [font=\bfseries\small] at (4.45,-3.1) {Via Visual};
+
+        \draw [arrow] (input_img.south) -- ++(0,-0.35cm) -| node[rotulo, pos=0.18] {resolução original} (-6.9,-2.2);
+        \draw [arrow] (input_img.south) -- ++(0,-0.35cm) -| node[rotulo, pos=0.18] {$256 \times 256$} (6.9,-2.2);
+
+        % --- Via topológica ---
+        \node (t1) [sub_block] at (-4.45,-4.7) {Rede complexa direcionada e ponderada (SSN, configuração \textit{full})\\raio $r = 1, 2, \ldots, 15$};
+        \node (t2) [sub_block, below=0.6cm of t1] {Grau de saída, força de saída e força de entrada\\média e desvio padrão por canal e por raio\\$X_{\mathrm{top}} \in \mathbb{R}^{15 \times 18}$};
+        \node (t3) [sub_block, below=0.6cm of t2] {Padronização com estatísticas do treino\\medidas acumuladas ou diferenças entre raios};
+        \node (t4) [sub_block, below=0.6cm of t3] {BiLSTM (alternativa: MLP sobre o vetor achatado)};
+        \node (t5) [embed_block, below=0.6cm of t4] {\textit{Embedding} topológico\\$z_{\mathrm{top}} \in \mathbb{R}^{128}$};
+        \draw [arrow] (t1) -- (t2);
+        \draw [arrow] (t2) -- (t3);
+        \draw [arrow] (t3) -- (t4);
+        \draw [arrow] (t4) -- (t5);
+
+        % --- Via visual ---
+        \node (v1) [sub_block] at (4.45,-4.7) {Pré-processamento\\lado menor para 256, recorte central $256 \times 256$ e normalização ImageNet};
+        \node (v2) [sub_block, below=0.6cm of v1] {MobileViT-S\\pré-treinada na ImageNet, com \textit{fine-tuning}};
+        \node (v3) [sub_block, below=0.6cm of v2] {Agrupamento médio global\\$z_{\mathrm{vis}} \in \mathbb{R}^{640}$};
+        \node (v4) [sub_block, below=0.6cm of v3] {Projeção linear para 128 dimensões};
+        \node (v5) [embed_block, below=0.6cm of v4] {\textit{Embedding} visual\\$\tilde{z}_{\mathrm{vis}} \in \mathbb{R}^{128}$};
+        \draw [arrow] (v1) -- (v2);
+        \draw [arrow] (v2) -- (v3);
+        \draw [arrow] (v3) -- (v4);
+        \draw [arrow] (v4) -- (v5);
+
+        % 3. Fusão
+        \node (fusao) [retangulo, text width=9.5cm, font=\small, fill=blue!10] at (0,-16.8)
+            {\textbf{3. Fusão por Concatenação de \textit{Embeddings}}\\[2pt]
+             \normalfont $z_{\mathrm{fus}} = \left[\operatorname{LN}(z_{\mathrm{top}}) \,\Vert\, \operatorname{LN}(\tilde{z}_{\mathrm{vis}})\right] \in \mathbb{R}^{256}$};
+        \draw [arrow] (t5.south) -- ++(0,-0.4cm) -| ([xshift=-2.2cm]fusao.north);
+        \draw [arrow] (v5.south) -- ++(0,-0.4cm) -| ([xshift=2.2cm]fusao.north);
+
+        % 4. Classificador
+        \node (classif) [retangulo, text width=9.5cm, font=\small] at (0,-18.8)
+            {\textbf{4. Classificador Final (MLP)}\\[2pt]
+             \normalfont Camada oculta de 128 neurônios, ReLU, \textit{dropout} 0,5, saída \textit{softmax}};
+        \node (output) [retangulo, fill=green!15, draw=green!60!black, text width=9.5cm, font=\small] at (0,-20.7)
+            {\textbf{Métricas}\\[2pt]
+             \normalfont acurácia, F1-\textit{score} macro e AUC-ROC no conjunto de teste};
+        \draw [arrow] (fusao.south) -- (classif.north);
+        \draw [arrow] (classif.south) -- (output.north);
+
+    \end{tikzpicture}%
+    }
+    \caption{Arquitetura proposta de dupla via. A via topológica converte a imagem em redes complexas de raios crescentes, e a sequência de medidas é codificada por uma BiLSTM. A via visual extrai o \textit{embedding} da imagem redimensionada com a MobileViT-S. Os \textit{embeddings} normalizados são concatenados e classificados por um MLP, e todos os parâmetros são ajustados em conjunto.}
+    \label{fig:pipeline_tcc}
+\end{figure}
+
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{0.95\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        retangulo/.style={
+            rectangle, rounded corners=3pt, inner sep=6pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {
+            thick, ->, >={Stealth[length=2.5mm]}
+        },
+        sub_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=black!70, fill=blue!5, line width=0.7pt, font=\small, text width=7.4cm
+        },
+        reservado/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=black!70, fill=orange!15, line width=0.7pt, font=\small, text width=7.4cm
+        },
+        final_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=green!60!black, fill=green!15, line width=0.7pt, font=\small, text width=7.4cm
+        },
+        rotulo/.style = {font=\scriptsize, fill=white, inner sep=1.5pt}
+    ]
+
+        % Dados e separação
+        \node (dados) [retangulo, text width=8cm] at (0,0) {Cinco \textit{datasets} (UCSB, CR, LA, LG e NHL)};
+        \node (div) [sub_block, text width=8cm, below=0.6cm of dados] {Separação estratificada, semente 42};
+        \draw [arrow] (dados) -- (div);
+
+        \node (dev) [sub_block] at (-4.3,-4.2) {80\% \textbf{Desenvolvimento}};
+        \node (hold) [reservado] at (4.3,-4.2) {20\% \textbf{Teste (\textit{holdout})}\\isolado até a avaliação final};
+        \draw [arrow] (div.south) -- ++(0,-0.3cm) -| (dev.north);
+        \draw [arrow] (div.south) -- ++(0,-0.3cm) -| (hold.north);
+
+        % Ablações (esquerda)
+        \node (ext) [sub_block, below=0.8cm of dev] {\textbf{Ablações:} validação cruzada externa\\5 partições $\times$ 3 repetições (15 partições)};
+        \node (int) [sub_block, below=0.6cm of ext] {Validação cruzada interna de 3 partições\\12 configurações por codificador\\seleção pela entropia cruzada};
+        \node (abl) [sub_block, below=0.6cm of int] {Ajuste com número fixo de épocas\\avaliação única na partição externa};
+        \node (grupos) [sub_block, below=0.6cm of abl] {Via topológica: codificadores, representação, $r_{\max}$ e resolução\\Via visual: arquiteturas e \textit{fine-tuning} ou congelamento\\Teste t pareado corrigido e correção de Holm};
+        \draw [arrow] (dev) -- (ext);
+        \draw [arrow] (ext) -- (int);
+        \draw [arrow] (int) -- (abl);
+        \draw [arrow] (abl) -- (grupos);
+
+        % Modelo final (direita)
+        \node (cv) [sub_block, below=0.8cm of hold] {\textbf{Modelo de dupla via:} seleção de hiperparâmetros por validação cruzada de 5 partições nos 80\%};
+        \node (treino) [sub_block, below=0.6cm of cv] {Treino final com os 80\% e número de épocas definido na validação};
+        \node (aval) [final_block, below=0.6cm of treino] {Avaliação única no conjunto de teste\\acurácia, F1-\textit{score} macro e AUC-ROC};
+        \draw [arrow] (hold.south) -- (cv.north);
+        \draw [arrow] (cv) -- (treino);
+        \draw [arrow] (treino) -- (aval);
+
+        % Comparações do modelo final
+        \node (comp) [sub_block, below=0.6cm of aval] {Comparação com cada via isolada, GLCM, LBP e HOG (isolados e com MobileViT-S) e fusão de escores};
+        \draw [arrow] (aval) -- (comp);
+
+
+    \end{tikzpicture}%
+    }
+    \caption{Protocolo experimental. As ablações utilizam apenas os 80\% de desenvolvimento, em validação cruzada aninhada, e o conjunto de teste de 20\% permanece isolado até a avaliação final do modelo de dupla via.}
+    \label{fig:protocolo_tcc}
+\end{figure}
