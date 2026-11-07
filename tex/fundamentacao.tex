@@ -8,12 +8,9 @@ Em reconhecimento de padrões, uma \textit{feature} é uma medida numérica que 
 Em histopatologia, o tecido é fixado, cortado, corado, em geral pela H\&E, e digitalizado. As diferenças de protocolo de coloração e de iluminação entre laboratórios alteram a cor e o contraste da imagem para um mesmo tipo de tecido, e a textura formada pelo arranjo de núcleos, citoplasma e matriz extracelular é uma das principais fontes de informação para o diagnóstico.
 % TODO: incluir referência de patologia computacional / variação de coloração H&E neste parágrafo.
 
-\subsection{Descritores clássicos}
-\label{subsec:features-classicas}
-
 Os descritores clássicos (\textit{handcrafted}) são calculados por regras matemáticas definidas previamente, sem ajuste a partir dos dados. Entre os métodos empregados em imagens médicas estão as estatísticas de primeira ordem, a GLCM, o LBP, o HOG, os filtros de Gabor e o SIFT \cite{ramossoto2025miafex,ahmed2023review,dehbozorgi2025}. As subseções seguintes definem GLCM, LBP e HOG.
 
-\subsubsection{Matriz de coocorrência de níveis de cinza}
+\subsection{Matriz de coocorrência de níveis de cinza}
 
 A GLCM \cite{haralick1973textural} registra a frequência com que pares de pixels de tons $i$ e $j$ ocorrem separados por um deslocamento definido por uma distância $d$ e um ângulo $\theta$ (0°, 45°, 90° ou 135°). Para uma imagem $I$ com $N_g$ níveis de cinza, a matriz e sua versão normalizada são
 
@@ -38,7 +35,7 @@ A partir de $p(i,j)$ são calculadas medidas de textura, como o contraste, a ene
 
 em que $\mu_i$, $\mu_j$, $\sigma_i$ e $\sigma_j$ são as médias e os desvios padrão das distribuições marginais de $p$. A matriz depende da escolha do vetor de deslocamento e da variação regional do fundo de intensidade da imagem \cite{he1989texture}.
 
-\subsubsection{Padrões binários locais}
+\subsection{Padrões binários locais}
 
 O LBP \cite{ojala1996comparative} descreve a textura pela relação entre cada pixel e sua vizinhança, e tem origem no espectro de textura de \citeonline{he1989texture}, que codifica cada vizinho em três valores. No LBP a codificação é binária. Sendo $g_c$ a intensidade do pixel central e $g_p$, com $p = 0, \ldots, P-1$, a intensidade de cada um de seus $P$ vizinhos, o código do pixel é
 
@@ -87,7 +84,7 @@ P + 1, & \text{caso contrário},
 
 cujo histograma tem $P + 2$ posições. A combinação de operadores com diferentes pares $(P, R)$ forma o descritor multirresolução.
 
-\subsubsection{Histograma de gradientes orientados}
+\subsection{Histograma de gradientes orientados}
 
 O HOG \cite{dalal2005histograms} descreve a imagem pela distribuição local das direções de gradiente. Os gradientes horizontal e vertical, $G_x$ e $G_y$, são obtidos por filtros de derivada, e a magnitude e a orientação de cada pixel são
 

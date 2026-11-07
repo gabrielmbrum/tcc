@@ -1,87 +1,8 @@
 % Encoding: UTF-8
 
-@article{litjens2017survey,
-	title = {A survey on deep learning in medical image analysis},
-	author = {Litjens, Geert and Kooi, Thijs and Bejnordi, Babak Ehteshami
-	          and Setio, Arnaud AA and Ciompi, Francesco and Ghafoorian,
-	          Mohsen and Van Der Laak, Jeroen AWM and Van Ginneken, Bram and
-	          S{\'a}nchez, Clara I},
-	journal = {Medical image analysis},
-	volume = {42},
-	pages = {60--88},
-	year = {2017},
-	publisher = {Elsevier},
-}
-
-@article{shorten2019survey,
-	title = {A survey on image data augmentation for deep learning},
-	author = {Shorten, Connor and Khoshgoftaar, Taghi M},
-	journal = {Journal of big data},
-	volume = {6},
-	number = {1},
-	pages = {1--48},
-	year = {2019},
-	publisher = {Springer},
-}
-
-@article{perez2017effectiveness,
-	title = {The effectiveness of data augmentation in image classification
-	         using deep learning},
-	author = {Perez, Luis and Wang, Jason},
-	journal = {arXiv preprint arXiv:1712.04621},
-	year = {2017},
-}
-
-@article{euler1736solutio,
-	title = {Solutio problematis ad geometriam situs pertinentis},
-	author = {Euler, Leonhard},
-	journal = {Commentarii academiae scientiarum imperialis Petropolitanae},
-	volume = {8},
-	pages = {128--140},
-	year = {1736},
-}
-
-@article{BOCCALETTI2006175,
-	title = {Complex networks: Structure and dynamics},
-	journal = {Physics Reports},
-	volume = {424},
-	number = {4},
-	pages = {175-308},
-	year = {2006},
-	issn = {0370-1573},
-	doi = {https://doi.org/10.1016/j.physrep.2005.10.009},
-	author = {S. Boccaletti and V. Latora and Y. Moreno and M. Chavez and
-	          D.-U. Hwang},
-}
-
-@article{BACKES2013168,
-	title = {Texture analysis and classification: A complex network-based
-	         approach},
-	journal = {Information Sciences},
-	volume = {219},
-	pages = {168-180},
-	year = {2013},
-	issn = {0020-0255},
-	doi = {https://doi.org/10.1016/j.ins.2012.07.003},
-	author = {André Ricardo Backes and Dalcimar Casanova and Odemir Martinez
-	          Bruno},
-}
-
-@article{ribas2020fusion,
-	title = {Fusion of complex networks and randomized neural networks for
-	         texture analysis},
-	journal = {Pattern Recognition},
-	volume = {103},
-	pages = {107189},
-	year = {2020},
-	issn = {0031-3203},
-	doi = {https://doi.org/10.1016/j.patcog.2019.107189},
-	author = {Lucas C. Ribas and Jarbas Joaci de Mesquita {Sá Junior} and
-	          Leonardo F. S. Scabini and Odemir M. Bruno},
-	keywords = {Randomized neural networks, Complex networks, Texture
-	            analysis, Feature extraction},
-}
-
+% ==========================================
+% 1. RNN
+% ==========================================
 @article{hochreiter1997long,
 	title = {Long short-term memory},
 	author = {Hochreiter, Sepp and Schmidhuber, J{\"u}rgen},
@@ -103,24 +24,191 @@
 	year = {2014},
 }
 
-@article{simonyan2014two,
-	title = {Two-stream convolutional networks for action recognition in
-	         videos},
-	author = {Simonyan, Karen and Zisserman, Andrew},
-	journal = {Advances in neural information processing systems},
-	volume = {27},
-	year = {2014},
+@article{elman1990finding,
+	author = {Elman, Jeffrey L.},
+	title = {Finding structure in time},
+	journal = {Cognitive Science},
+	year = {1990},
+	volume = {14},
+	number = {2},
+	pages = {179--211},
+	doi = {10.1207/s15516709cog1402_1},
 }
 
-@article{dai2021coatnet,
-	title = {CoAtNet: Marrying convolution and attention for all data sizes},
-	author = {Dai, Zihang and Liu, Hanxiao and Le, Quoc V and Tan, Mingxing},
-	journal = {Advances in neural information processing systems},
-	volume = {34},
-	pages = {3965--3977},
-	year = {2021},
+@article{bengio1994learning,
+	author = {Bengio, Yoshua and Simard, Patrice and Frasconi, Paolo},
+	title = {Learning long-term dependencies with gradient descent is
+	         difficult},
+	journal = {IEEE Transactions on Neural Networks},
+	year = {1994},
+	volume = {5},
+	number = {2},
+	pages = {157--166},
+	doi = {10.1109/72.279181},
 }
 
+@article{gers2000learning,
+	author = {Gers, Felix A. and Schmidhuber, J{\"u}rgen and Cummins, Fred},
+	title = {Learning to forget: Continual prediction with {LSTM}},
+	journal = {Neural Computation},
+	year = {2000},
+	volume = {12},
+	number = {10},
+	pages = {2451--2471},
+	doi = {10.1162/089976600300015015},
+}
+
+@article{schuster1997bidirectional,
+	author = {Schuster, Mike and Paliwal, Kuldip K.},
+	title = {Bidirectional recurrent neural networks},
+	journal = {IEEE Transactions on Signal Processing},
+	year = {1997},
+	volume = {45},
+	number = {11},
+	pages = {2673--2681},
+	doi = {10.1109/78.650093},
+}
+
+@article{graves2005framewise,
+	author = {Graves, Alex and Schmidhuber, J{\"u}rgen},
+	title = {Framewise phoneme classification with bidirectional {LSTM} and
+	         other neural network architectures},
+	journal = {Neural Networks},
+	year = {2005},
+	volume = {18},
+	number = {5--6},
+	pages = {602--610},
+	doi = {10.1016/j.neunet.2005.06.042},
+}
+
+@article{greff2017lstm,
+	author = {Greff, Klaus and Srivastava, Rupesh K. and Koutn{\'\i}k, Jan
+	          and Steunebrink, Bas R. and Schmidhuber, J{\"u}rgen},
+	title = {{LSTM}: A search space odyssey},
+	journal = {IEEE Transactions on Neural Networks and Learning Systems},
+	year = {2017},
+	volume = {28},
+	number = {10},
+	pages = {2222--2232},
+	doi = {10.1109/TNNLS.2016.2582924},
+}
+
+@inproceedings{zhi2019slstm,
+	author = {Zhi, Ruicong and Wan, Ming},
+	title = {Dynamic facial expression feature learning based on sparse {RNN
+	         }},
+	booktitle = {2019 IEEE 8th Joint International Information Technology
+	             and Artificial Intelligence Conference (ITAIC)},
+	year = {2019},
+	pages = {1373--1377},
+}
+
+@inproceedings{akanksha2022leukemia,
+	author = {Akanksha, M. N. Venkata and Bachu, Srinivas and Kumar, M.
+	          Aravind and Kumar, Naluguru Udaya},
+	title = {Implementation of potential leukemia detection using recurrent
+	         neural networks with blood cell counting},
+	booktitle = {2022 First International Conference on Electrical,
+	             Electronics, Information and Communication Technologies
+	             (ICEEICT)},
+	year = {2022},
+	doi = {10.1109/ICEEICT53079.2022.9768569},
+}
+
+@article{lin2022mslstm,
+	author = {Lin, Ruiguan and Yu, Yaowei and Wang, Huawei and Che,
+	          Changchang and Ni, Xiaomei},
+	title = {Remaining useful life prediction in prognostics using
+	         multi-scale sequence and long short-term memory network},
+	journal = {Journal of Computational Science},
+	year = {2022},
+	volume = {57},
+	pages = {101508},
+	doi = {10.1016/j.jocs.2021.101508},
+}
+
+% ==========================================
+% 2. CNN
+% ==========================================
+@article{litjens2017survey,
+	title = {A survey on deep learning in medical image analysis},
+	author = {Litjens, Geert and Kooi, Thijs and Bejnordi, Babak Ehteshami
+	          and Setio, Arnaud AA and Ciompi, Francesco and Ghafoorian,
+	          Mohsen and Van Der Laak, Jeroen AWM and Van Ginneken, Bram and
+	          S{\'a}nchez, Clara I},
+	journal = {Medical image analysis},
+	volume = {42},
+	pages = {60--88},
+	year = {2017},
+	publisher = {Elsevier},
+}
+
+@article{lecun2015deep,
+	author = {LeCun, Yann and Bengio, Yoshua and Hinton, Geoffrey},
+	title = {Deep learning},
+	journal = {Nature},
+	year = {2015},
+	volume = {521},
+	number = {7553},
+	pages = {436--444},
+	doi = {10.1038/nature14539},
+}
+
+@article{esteva2017dermatologist,
+	title = {Dermatologist-level classification of skin cancer with deep
+	         neural networks},
+	author = {Esteva, Andre and Kuprel, Brett and Novoa, Roberto A and Ko,
+	          Justin and Swetter, Susan M and Blau, Helen M and Thrun,
+	          Sebastian},
+	journal = {Nature},
+	volume = {542},
+	number = {7639},
+	pages = {115--118},
+	year = {2017},
+	publisher = {Nature Publishing Group},
+	doi = {10.1038/nature21056},
+}
+
+@article{bejnordi2017diagnostic,
+	title = {Diagnostic assessment of deep learning algorithms for detection
+	         of lymph node metastases in women with breast cancer},
+	author = {Bejnordi, Babak Ehteshami and Veta, Mitko and Johannes van
+	          Diest, Paul and van Ginneken, Bram and Karssemeijer, Nico and
+	          Litjens, Geert and van der Laak, Jeroen AWM and others},
+	journal = {Jama},
+	volume = {318},
+	number = {22},
+	pages = {2199--2210},
+	year = {2017},
+	publisher = {American Medical Association},
+}
+
+@inproceedings{alexnetMed,
+	author = "Xu, Tao and Zhang, Han and Huang, Xiaolei and Zhang, Shaoting
+	          and Metaxas, Dimitris N.",
+	title = "Multimodal Deep Learning for Cervical Dysplasia Diagnosis",
+	booktitle = "Medical Image Computing and Computer-Assisted Intervention
+	             -- MICCAI 2016",
+	year = "2016",
+	publisher = "Springer International Publishing",
+	pages = "115--123",
+}
+
+@article{texmed2,
+	AUTHOR = {Almasri, Marwah Mohammad and Alajlan, Abrar Mohammed},
+	TITLE = {Artificial Intelligence-Based Multimodal Medical Image Fusion
+	         Using Hybrid S2 Optimal CNN},
+	JOURNAL = {Electronics},
+	VOLUME = {11},
+	YEAR = {2022},
+	NUMBER = {14},
+	ARTICLE-NUMBER = {2124},
+	DOI = {10.3390/electronics11142124},
+}
+
+% ==========================================
+% 3. ViT (Vision Transformer)
+% ==========================================
 @article{dosovitskiy2020image,
 	title = {An image is worth 16x16 words: Transformers for image
 	         recognition at scale},
@@ -144,70 +232,495 @@
 	publisher = {Elsevier},
 }
 
-@inproceedings{kohavi1995study,
-	title = {A study of cross-validation and bootstrap for accuracy
-	         estimation and model selection},
-	author = {Kohavi, Ron and others},
-	booktitle = {International joint conference on artificial intelligence},
-	volume = {14},
-	number = {2},
-	pages = {1137--1145},
-	year = {1995},
-	address = {Montreal, Canada},
+@article{khan2022transformers,
+	author = {Khan, Salman and Naseer, Muzammal and Hayat, Munawar and Zamir
+	          , Syed Waqas and Khan, Fahad Shahbaz and Shah, Mubarak},
+	title = {Transformers in vision: A survey},
+	journal = {ACM Computing Surveys},
+	year = {2022},
+	volume = {54},
+	number = {10s},
+	pages = {1--41},
+	doi = {10.1145/3505244},
 }
 
-@article{CNT,
-	title = {CNT: An image transform based on complex networks for enhanced
-	         texture characterization},
-	journal = {Physica A: Statistical Mechanics and its Applications},
-	volume = {701},
-	pages = {132044},
+@article{sheng2026gtunet,
+	author = {Sheng, Mengjun and He, Shanshan and Shi, Zhiyu},
+	title = {{GTUNet}: a {GNN} and transformer enhanced {U-Net} for coronary
+	         artery segmentation},
+	journal = {Signal, Image and Video Processing},
 	year = {2026},
-	doi = {https://doi.org/10.1016/j.physa.2026.132044},
-	author = {Ana Beatriz S. Zerati and Luan B. Guerra and Fabiana R. {de
-	          G{\'o}es} and Leandro Alves Neves and Lucas C. Ribas},
+	volume = {20},
+	number = {10},
+	pages = {532},
+	doi = {10.1007/s11760-026-05600-2},
 }
 
-@article{Scabini_2020,
-	title = {Spatio-spectral networks for color-texture analysis},
-	volume = {515},
-	doi = {10.1016/j.ins.2019.11.042},
-	journal = {Information Sciences},
-	author = {Scabini, Leonardo F.S. and Ribas, Lucas C. and Bruno, Odemir
-	          M.},
-	year = {2020},
-	pages = {64--79},
+% ==========================================
+% 4. CNN-ViT (Híbridos)
+% ==========================================
+@article{dai2021coatnet,
+	title = {CoAtNet: Marrying convolution and attention for all data sizes},
+	author = {Dai, Zihang and Liu, Hanxiao and Le, Quoc V and Tan, Mingxing},
+	journal = {Advances in neural information processing systems},
+	volume = {34},
+	pages = {3965--3977},
+	year = {2021},
 }
 
-@article{ribas2024colorspectral,
-	title = {Color-texture classification based on spatio-spectral complex
-	         network representations},
-	author = {Ribas, Lucas C. and Scabini, Leonardo F.S. and Condori, Rayner
-	          H.M. and Bruno, Odemir M.},
-	journal = {Physica A: Statistical Mechanics and its Applications},
-	volume = {635},
-	pages = {129518},
+@article{oliveira2025hybrid,
+	author = {de Oliveira, Domingos Lucas Latorre and Tosta, Tha{\'i}na
+	          Aparecida Azevedo and Neves, Leandro Alves and do Nascimento,
+	          Marcelo Zanchetta},
+	title = {Hybrid {CNN-Transformer} models in histopathology image
+	         analysis: A scoping review},
+	journal = {IEEE Access},
+	year = {2025},
+	volume = {13},
+	pages = {212887--212919},
+	doi = {10.1109/ACCESS.2025.3644767},
+}
+
+@article{ding2023himvit,
+	author = {Ding, Yuhan and Yi, Zhenglin and Li, Mengjuan and Long,
+	          Jianhong and Lei, Shaorong and Guo, Yu and Fan, Pengju and Zuo,
+	          Chenchen and Wang, Yongjie},
+	title = {{HI-MViT}: A lightweight model for explainable skin disease
+	         classification based on modified {MobileViT}},
+	journal = {Digital Health},
+	year = {2023},
+	volume = {9},
+	pages = {1--30},
+	doi = {10.1177/20552076231207197},
+}
+
+@article{kabir2025semobilevit,
+	author = {Kabir, Md Firoz and Ahmad, Md Yousuf and Uddin, Roise and
+	          Cordero, Martin and Kant, Shashi},
+	title = {Accurate and lightweight oral cancer detection using {
+	         SE-MobileViT} on clinically validated image dataset},
+	journal = {Discover Artificial Intelligence},
+	year = {2025},
+	volume = {5},
+	number = {173},
+	doi = {10.1007/s44163-025-00442-2},
+}
+
+@inproceedings{mehta2022mobilevit,
+	author = {Mehta, Sachin and Rastegari, Mohammad},
+	title = {{MobileViT}: Light-weight, general-purpose, and mobile-friendly
+	         vision transformer},
+	booktitle = {International Conference on Learning Representations (ICLR)
+	             },
+	year = {2022},
+}
+
+@article{sharma2025mammography,
+	author = {Sharma, Shubhi and Singh, Yeshwant and Choudhury, Tanupriya},
+	title = {Advanced deep learning architectures for enhanced mammography
+	         classification: A comparative study of {CNNs} and {ViT}},
+	journal = {Discover Artificial Intelligence},
+	year = {2025},
+	volume = {5},
+	number = {187},
+	doi = {10.1007/s44163-025-00426-2},
+}
+
+@article{clinicalReview,
+	author = {Hussaini, Hamza and Bano, Shahana and Elyan, Eyad and
+	          Moreno-Garcia, Carlos Francisco},
+	title = {A Clinically Grounded Review of Medical Image Classification:
+	         Quantitative Insights into CNNs, Vision Transformers, and Hybrid
+	         CNN-ViT Models},
+	journal = {Journal of Imaging Informatics in Medicine},
+	year = {2026},
+	doi = {10.1007/s10278-026-02249-8},
+}
+
+@article{garbaz2025gsac,
+	author = {Garbaz, Anass and Oukdach, Yassine and Charfi, Said and El
+	          Ansari, Mohamed and Koutti, Lahcen and Salihoun, Mouna},
+	title = {{GSAC-UFormer}: Groupwise self-attention convolutional
+	         transformer-based {UNet} for medical image segmentation},
+	journal = {Cognitive Computation},
+	year = {2025},
+	volume = {17},
+	number = {69},
+	doi = {10.1007/s12559-025-10425-1},
+}
+
+@article{ma2026cihm,
+	author = {Ma, Yize and Liu, Yu and Cheng, Juan and Zhan, Haolin and Qi,
+	          Guanqiu and Zhang, Xiaopei and Zhu, Zhiqin},
+	title = {{CIHM}: Context-insight hybrid {Mamba} for efficient medical
+	         image segmentation},
+	journal = {Visual Intelligence},
+	year = {2026},
+	volume = {4},
+	number = {12},
+	doi = {10.1007/s44267-026-00113-5},
+}
+
+% ==========================================
+% 5. Two Stream Network / Dual Branch / Fusion
+% ==========================================
+@article{simonyan2014two,
+	title = {Two-stream convolutional networks for action recognition in
+	         videos},
+	author = {Simonyan, Karen and Zisserman, Andrew},
+	journal = {Advances in neural information processing systems},
+	volume = {27},
+	year = {2014},
+}
+
+@article{zaidkilani2025dualstream,
+	author = {Zaidkilani, Nadeem and Garcia, Miguel Angel and Puig, Domenec},
+	title = {Dual-Stream {CoAtNet} models for accurate breast ultrasound
+	         image segmentation},
+	journal = {Neural Computing and Applications},
 	year = {2024},
-	doi = {10.1016/j.physa.2024.129518},
+	volume = {36},
+	pages = {16427--16443},
+	doi = {10.1007/s00521-024-09963-w},
 }
 
-@article{SCABINI2026,
-	title = {Complex networks for modeling texture and spectral features of
-	         hyperspectral images for environmental analysis},
-	journal = {Computers in Biology and Medicine},
-	volume = {204},
-	pages = {111504},
+@article{zou2023dualinput,
+	author = {Zou, Xiao and Zhai, Jintao and Qian, Shengyou and Li, Ang and
+	          Tian, Feng and Cao, Xiaofei and Wang, Runmin},
+	title = {Improved breast ultrasound tumor classification using
+	         dual-input {CNN} with {GAP}-guided attention loss},
+	journal = {Mathematical Biosciences and Engineering},
+	year = {2023},
+	volume = {20},
+	number = {8},
+	pages = {15244--15264},
+	doi = {10.3934/mbe.2023682},
+}
+
+@article{yousaf2024twostream,
+	author = {Yousaf, Kanwal and Nawaz, Tabassam and Habib, Adnan},
+	title = {Using two-stream {EfficientNet-BiLSTM} network for multiclass
+	         classification of disturbing {YouTube} videos},
+	journal = {Multimedia Tools and Applications},
+	year = {2024},
+	volume = {83},
+	number = {12},
+	pages = {36519--36546},
+	doi = {10.1007/s11042-023-15774-3},
+}
+
+@article{peng2025tfsdfn,
+	author = {Peng, Haotian and Wang, Wei and Gao, Jie and Wang, Yu and Du,
+	          Jinsong},
+	title = {A lightweight triple-stream network with multisensor fusion for
+	         enhanced few-shot learning fault diagnosis},
+	journal = {IEEE Transactions on Reliability},
+	year = {2025},
+	volume = {74},
+	number = {3},
+	pages = {4062--4075},
+	doi = {10.1109/TR.2025.3540500},
+}
+
+@article{wang2023stnet,
+	author = {Wang, Xijing and Han, Hongcheng and Xu, Mengrui and Li,
+	          Shengpeng and Zhang, Dong and Du, Shaoyi and Xu, Meifeng},
+	title = {{STNet}: Shape and texture joint learning through two-stream
+	         network for knowledge-guided image recognition},
+	journal = {Frontiers in Neuroscience},
+	year = {2023},
+	volume = {17},
+	pages = {1212049},
+	doi = {10.3389/fnins.2023.1212049},
+}
+
+@article{yang2026daprnet,
+	author = {Yang, Xin and Hou, Runhan and Deng, Liwei and Wang, Jing and
+	          Huang, Sijuan},
+	title = {{DAPR-Net}: Symmetric dual-stream pyramid architecture for
+	         non-rigid brain {MRI} registration},
+	journal = {Biomedical Signal Processing and Control},
 	year = {2026},
-	doi = {https://doi.org/10.1016/j.compbiomed.2026.111504},
-	author = {Leonardo Scabini and Kallil M. Zielinski and Marilia Fernandes
-	          and Ricardo T. Fares and Lucas C. Ribas and Rosana M. Kolb and
-	          Odemir M. Bruno},
+	volume = {122},
+	pages = {110495},
+	doi = {10.1016/j.bspc.2026.110495},
 }
 
-% ------------------------------------------------------------
-% Artigos sobre extração de features (seção de Fundamentação Teórica)
-% ------------------------------------------------------------
+@article{kang2024mmdb,
+	author = {Kang, Yan and Zhang, Huadong and Wang, Xinchao and Yang, Yun
+	          and Jia, Qi},
+	title = {{MMDB}: Multimodal dual-branch model for multi-functional
+	         bioactive peptide prediction},
+	journal = {Analytical Biochemistry},
+	year = {2024},
+	volume = {690},
+	pages = {115491},
+	doi = {10.1016/j.ab.2024.115491},
+}
 
+@article{nawaz2025ard,
+	author = {Nawaz, Wajahat and Albert, Kevin and Jouvet, Philippe and
+	          Noumeir, Rita},
+	title = {Acute respiratory distress identification via multi-modality
+	         using deep learning},
+	journal = {Applied Sciences},
+	year = {2025},
+	volume = {15},
+	number = {3},
+	pages = {1512},
+	doi = {10.3390/app15031512},
+}
+
+@article{chen2025chrysanthemum,
+	author = {Chen, Yifan and Yang, Xichen and Yan, Hui and Liu, Jia and
+	          Jiang, Jian and Mao, Zhongyuan and Wang, Tianshu},
+	title = {Bidirectional feature fusion via cross-attention transformer
+	         for chrysanthemum classification},
+	journal = {Pattern Analysis and Applications},
+	year = {2025},
+	volume = {28},
+	pages = {41},
+	doi = {10.1007/s10044-025-01419-8},
+}
+
+@article{zeng2025mssfn,
+	author = {Zeng, Hongfu and Li, Xinyu and Xu, Haipeng and Yu, Keyi and Hu
+	          , Huihua and Wu, Peishu and Zeng, Nianyin},
+	title = {{MSSFN}: A multi-scale sequence fusion network for {CT}-based
+	         diagnosis of pulmonary complications},
+	journal = {Neurocomputing},
+	year = {2025},
+	volume = {634},
+	pages = {129878},
+	doi = {10.1016/j.neucom.2025.129878},
+}
+
+@article{moldovanu2026hybrid,
+	author = {Moldovanu, Simona and Cocu, Adina and Stefanescu, Diana and
+	          Anghel, C{\u{a}}t{\u{a}}lin},
+	title = {Hybrid decision-level fusion of {CNN}-based deep and
+	         handcrafted features for colon cancer classification},
+	journal = {Journal of Imaging},
+	year = {2026},
+	volume = {12},
+	number = {8},
+	pages = {368},
+	doi = {10.3390/jimaging12080368},
+}
+
+@article{khan2024oral,
+	author = {Khan, Saif Ur Rehman and Asif, Sohaib},
+	title = {Oral cancer detection using feature-level fusion and novel
+	         self-attention mechanisms},
+	journal = {Biomedical Signal Processing and Control},
+	year = {2024},
+	volume = {95},
+	pages = {106437},
+	doi = {10.1016/j.bspc.2024.106437},
+}
+
+@article{khan2024hybridnet,
+	author = {Khan, Saif Ur Rehman and Zhao, Ming and Asif, Sohaib and Chen,
+	          Xuehan},
+	title = {{Hybrid-NET}: A fusion of {DenseNet169} and advanced machine
+	         learning classifiers for enhanced brain tumor diagnosis},
+	journal = {International Journal of Imaging Systems and Technology},
+	year = {2024},
+	volume = {34},
+	number = {1},
+	pages = {e22975},
+	doi = {10.1002/ima.22975},
+}
+
+@article{mathiyalagi2026hclstm,
+	author = {Mathiyalagi, Lavanya and Ravi, R.},
+	title = {Revolutionizing lung cancer detection using hybrid {CNN-LSTM} (
+	         {HCLSTM}) for accurate diagnosis and enhanced nodule
+	         classification},
+	journal = {Biomedical Signal Processing and Control},
+	year = {2026},
+	volume = {111},
+	pages = {108369},
+	doi = {10.1016/j.bspc.2025.108369},
+}
+
+@article{priyadarshini2026cnnbilstm,
+	author = {Priyadarshini, Ishaani},
+	title = {A firefly algorithm-optimized {CNN--BiLSTM} model for automated
+	         detection of bone cancer and marrow cell abnormalities},
+	journal = {Computers, Materials \& Continua},
+	year = {2026},
+	volume = {86},
+	number = {3},
+	pages = {64},
+	doi = {10.32604/cmc.2025.072343},
+}
+
+@article{baltrusaitis2019multimodal,
+	author = {Baltru{\v{s}}aitis, Tadas and Ahuja, Chaitanya and Morency,
+	          Louis-Philippe},
+	title = {Multimodal machine learning: A survey and taxonomy},
+	journal = {IEEE Transactions on Pattern Analysis and Machine
+	           Intelligence},
+	year = {2019},
+	volume = {41},
+	number = {2},
+	pages = {423--443},
+	doi = {10.1109/TPAMI.2018.2798607},
+}
+
+@article{ramachandram2017deep,
+	author = {Ramachandram, Dhanesh and Taylor, Graham W.},
+	title = {Deep multimodal learning: A survey on recent advances and
+	         trends},
+	journal = {IEEE Signal Processing Magazine},
+	year = {2017},
+	volume = {34},
+	number = {6},
+	pages = {96--108},
+	doi = {10.1109/MSP.2017.2738401},
+}
+
+% ==========================================
+% 6. Histopatologia
+% ==========================================
+@article{CR,
+	title = {Gland segmentation in colon histology images: The glas
+	         challenge contest},
+	journal = {Medical Image Analysis},
+	volume = {35},
+	pages = {489-502},
+	year = {2017},
+	author = {Korsuk Sirinukunwattana and Josien P.W. Pluim and Hao Chen and
+	          Xiaojuan Qi and Pheng-Ann Heng and Yun Bo Guo and Li Yang Wang
+	          and Bogdan J. Matuszewski and Elia Bruni and Urko Sanchez and
+	          Anton Böhm and Olaf Ronneberger and Bassem Ben Cheikh and
+	          Daniel Racoceanu and Philipp Kainz and Michael Pfeiffer and
+	          Martin Urschler and David R.J. Snead and Nasir M. Rajpoot},
+	doi = {https://doi.org/10.1016/j.media.2016.08.008},
+}
+
+@article{autoHistImg,
+	title = {Automated classification of histopathology images using
+	         transfer learning},
+	journal = {Artificial Intelligence in Medicine},
+	volume = {101},
+	pages = {101743},
+	year = {2019},
+	author = {Muhammed Talo},
+	doi = {https://doi.org/10.1016/j.artmed.2019.101743},
+}
+
+@article{histImgColorectal,
+	title = {Histopathology image analysis for colorectal cancer using deep
+	         learning techniques: A comprehensive survey},
+	journal = {Engineering Applications of Artificial Intelligence},
+	volume = {172},
+	pages = {114262},
+	year = {2026},
+	author = {Sanjeev Kumar and Pramod Kumar Mishra},
+	doi = {https://doi.org/10.1016/j.engappai.2026.114262},
+}
+
+@article{texmed1,
+	AUTHOR = {Shorfuzzaman, Mohammad and Iftikhar, Abdullah and Najam,
+	          Shaheryar and Almotiri, Jasem and Aljulayfi, Abdullah Fawaz and
+	          AlHammadi, Dina Abdulaziz and Jalal, Ahmad},
+	TITLE = {AI-Driven Tumor Characterization and Histological Subtype
+	         Classification in Lung Cancer Using CT Imaging},
+	JOURNAL = {Diagnostics},
+	VOLUME = {16},
+	YEAR = {2026},
+	NUMBER = {17},
+	ARTICLE-NUMBER = {2805},
+}
+
+@article{brussee2025graph,
+	author = {Brussee, Siemen and Buzzanca, Giorgio and Schrader, Anne M. R.
+	          and Kers, Jesper},
+	title = {Graph neural networks in histopathology: Emerging trends and
+	         future directions},
+	journal = {Medical Image Analysis},
+	year = {2025},
+	volume = {101},
+	pages = {103444},
+	doi = {10.1016/j.media.2024.103444},
+}
+
+@article{kushwah2026evcnet,
+	author = {Kushwah, Shivpratap Singh and Punn, Narinder Singh and
+	          Bhattacharya, Mahua},
+	title = {{EVC-Net}: A hybrid deep learning network for breast cancer
+	         classification from histopathological images},
+	journal = {ACM Transactions on Intelligent Systems and Technology},
+	year = {2026},
+	volume = {17},
+	number = {4},
+	pages = {87},
+	doi = {10.1145/3800952},
+}
+
+@article{huang2022fusing,
+	author = {Huang, Xinrui and Li, Zhaotong and Zhang, Minghui and Gao,
+	          Song},
+	title = {Fusing hand-crafted and deep-learning features in a
+	         convolutional neural network model to identify prostate cancer
+	         in pathology images},
+	journal = {Frontiers in Oncology},
+	year = {2022},
+	volume = {12},
+	pages = {994950},
+	doi = {10.3389/fonc.2022.994950},
+}
+
+@article{li2025fusion,
+	author = {Li, Jiaxing},
+	title = {Fusion feature-based hybrid methods for diagnosing oral
+	         squamous cell carcinoma in histopathological images},
+	journal = {Frontiers in Oncology},
+	year = {2025},
+	volume = {15},
+	pages = {1551876},
+	doi = {10.3389/fonc.2025.1551876},
+}
+
+@article{shalini2026saclstm,
+	author = {Shalini, T. Grace and Rathnamala, S.},
+	title = {An optimal {CSBO}-based detection and classification of breast
+	         cancer using deep {SAC-LSTM} design from histopathological image
+	         },
+	journal = {International Journal of Data Science and Analytics},
+	year = {2026},
+	volume = {22},
+	pages = {227},
+	doi = {10.1007/s41060-026-01202-w},
+}
+
+% ==========================================
+% 7. Data Augmentation
+% ==========================================
+@article{shorten2019survey,
+	title = {A survey on image data augmentation for deep learning},
+	author = {Shorten, Connor and Khoshgoftaar, Taghi M},
+	journal = {Journal of big data},
+	volume = {6},
+	number = {1},
+	pages = {1--48},
+	year = {2019},
+	publisher = {Springer},
+}
+
+@article{perez2017effectiveness,
+	title = {The effectiveness of data augmentation in image classification
+	         using deep learning},
+	author = {Perez, Luis and Wang, Jason},
+	journal = {arXiv preprint arXiv:1712.04621},
+	year = {2017},
+}
+
+% ==========================================
+% 8. Feature Extraction
+% ==========================================
 @article{dehbozorgi2025,
 	author = {Dehbozorgi, Pegah and Ryabchykov, Oleg and Bocklitz, Thomas W.
 	          },
@@ -270,16 +783,6 @@
 	doi = {10.1109/ACCESS.2020.2967845},
 }
 
-@inproceedings{zhi2019slstm,
-	author = {Zhi, Ruicong and Wan, Ming},
-	title = {Dynamic facial expression feature learning based on sparse {RNN
-	         }},
-	booktitle = {2019 IEEE 8th Joint International Information Technology
-	             and Artificial Intelligence Conference (ITAIC)},
-	year = {2019},
-	pages = {1373--1377},
-}
-
 @inproceedings{ye2021arrhythmia,
 	author = {Ye, Minxiang and Stankovic, Vladimir and Stankovic, Lina and
 	          Lulic, Srdjan and Anderla, Andras and Sladojevic, Srdjan},
@@ -326,10 +829,16 @@
 	doi = {10.1109/AIARS63200.2024.00142},
 }
 
-% ------------------------------------------------------------
-% Métodos comparativos: GLCM, LBP (com o espectro de textura como
-% precursor) e HOG
-% ------------------------------------------------------------
+@article{xu2025vmdib,
+	author = {Xu, Jing and Wei, Yan and Zeng, Pan},
+	title = {{VMD}-based iterative {Boruta} feature extraction and {
+	         CNNA-BiLSTM} for short-term load forecasting},
+	journal = {Electric Power Systems Research},
+	year = {2025},
+	volume = {238},
+	pages = {111172},
+	doi = {10.1016/j.epsr.2024.111172},
+}
 
 @article{ojala1996comparative,
 	author = {Ojala, Timo and Pietik{\"a}inen, Matti and Harwood, David},
@@ -402,229 +911,116 @@
 	publisher = {Pergamon Press},
 }
 
-% ------------------------------------------------------------
-% Redes híbridas para extração de features visuais
-% ------------------------------------------------------------
-
-@article{oliveira2025hybrid,
-	author = {de Oliveira, Domingos Lucas Latorre and Tosta, Tha{\'i}na
-	          Aparecida Azevedo and Neves, Leandro Alves and do Nascimento,
-	          Marcelo Zanchetta},
-	title = {Hybrid {CNN-Transformer} models in histopathology image
-	         analysis: A scoping review},
-	journal = {IEEE Access},
-	year = {2025},
-	volume = {13},
-	pages = {212887--212919},
-	doi = {10.1109/ACCESS.2025.3644767},
+% ==========================================
+% 9. Complex Networks
+% ==========================================
+@article{euler1736solutio,
+	title = {Solutio problematis ad geometriam situs pertinentis},
+	author = {Euler, Leonhard},
+	journal = {Commentarii academiae scientiarum imperialis Petropolitanae},
+	volume = {8},
+	pages = {128--140},
+	year = {1736},
 }
 
-@article{zaidkilani2025dualstream,
-	author = {Zaidkilani, Nadeem and Garcia, Miguel Angel and Puig, Domenec},
-	title = {Dual-Stream {CoAtNet} models for accurate breast ultrasound
-	         image segmentation},
-	journal = {Neural Computing and Applications},
+@article{BOCCALETTI2006175,
+	title = {Complex networks: Structure and dynamics},
+	journal = {Physics Reports},
+	volume = {424},
+	number = {4},
+	pages = {175-308},
+	year = {2006},
+	author = {S. Boccaletti and V. Latora and Y. Moreno and M. Chavez and
+	          D.-U. Hwang},
+}
+
+@article{BACKES2013168,
+	title = {Texture analysis and classification: A complex network-based
+	         approach},
+	journal = {Information Sciences},
+	volume = {219},
+	pages = {168-180},
+	year = {2013},
+	issn = {0020-0255},
+	doi = {https://doi.org/10.1016/j.ins.2012.07.003},
+	author = {André Ricardo Backes and Dalcimar Casanova and Odemir Martinez
+	          Bruno},
+}
+
+@article{ribas2020fusion,
+	title = {Fusion of complex networks and randomized neural networks for
+	         texture analysis},
+	journal = {Pattern Recognition},
+	volume = {103},
+	pages = {107189},
+	year = {2020},
+	issn = {0031-3203},
+	doi = {https://doi.org/10.1016/j.patcog.2019.107189},
+	author = {Lucas C. Ribas and Jarbas Joaci de Mesquita {Sá Junior} and
+	          Leonardo F. S. Scabini and Odemir M. Bruno},
+}
+
+@article{CNT,
+	title = {CNT: An image transform based on complex networks for enhanced
+	         texture characterization},
+	journal = {Physica A: Statistical Mechanics and its Applications},
+	volume = {701},
+	pages = {132044},
+	year = {2026},
+	doi = {https://doi.org/10.1016/j.physa.2026.132044},
+	author = {Ana Beatriz S. Zerati and Luan B. Guerra and Fabiana R. {de G{
+	          \'o}es} and Leandro Alves Neves and Lucas C. Ribas},
+}
+
+@article{Scabini_2020,
+	title = {Spatio-spectral networks for color-texture analysis},
+	volume = {515},
+	doi = {10.1016/j.ins.2019.11.042},
+	journal = {Information Sciences},
+	author = {Scabini, Leonardo F.S. and Ribas, Lucas C. and Bruno, Odemir
+	          M.},
+	year = {2020},
+	pages = {64--79},
+}
+
+@article{ribas2024colorspectral,
+	title = {Color-texture classification based on spatio-spectral complex
+	         network representations},
+	author = {Ribas, Lucas C. and Scabini, Leonardo F.S. and Condori, Rayner
+	          H.M. and Bruno, Odemir M.},
+	journal = {Physica A: Statistical Mechanics and its Applications},
+	volume = {635},
+	pages = {129518},
 	year = {2024},
-	volume = {36},
-	pages = {16427--16443},
-	doi = {10.1007/s00521-024-09963-w},
+	doi = {10.1016/j.physa.2024.129518},
 }
 
-@article{ding2023himvit,
-	author = {Ding, Yuhan and Yi, Zhenglin and Li, Mengjuan and Long,
-	          Jianhong and Lei, Shaorong and Guo, Yu and Fan, Pengju and Zuo,
-	          Chenchen and Wang, Yongjie},
-	title = {{HI-MViT}: A lightweight model for explainable skin disease
-	         classification based on modified {MobileViT}},
-	journal = {Digital Health},
-	year = {2023},
-	volume = {9},
-	pages = {1--30},
-	doi = {10.1177/20552076231207197},
-}
-
-@article{kabir2025semobilevit,
-	author = {Kabir, Md Firoz and Ahmad, Md Yousuf and Uddin, Roise and
-	          Cordero, Martin and Kant, Shashi},
-	title = {Accurate and lightweight oral cancer detection using {
-	         SE-MobileViT} on clinically validated image dataset},
-	journal = {Discover Artificial Intelligence},
-	year = {2025},
-	volume = {5},
-	number = {173},
-	doi = {10.1007/s44163-025-00442-2},
-}
-
-@article{zou2023dualinput,
-	author = {Zou, Xiao and Zhai, Jintao and Qian, Shengyou and Li, Ang and
-	          Tian, Feng and Cao, Xiaofei and Wang, Runmin},
-	title = {Improved breast ultrasound tumor classification using
-	         dual-input {CNN} with {GAP}-guided attention loss},
-	journal = {Mathematical Biosciences and Engineering},
-	year = {2023},
-	volume = {20},
-	number = {8},
-	pages = {15244--15264},
-	doi = {10.3934/mbe.2023682},
-}
-
-@article{wang2026msi,
-	author = {Wang, Cheng and Ge, Qian-Qian and Wu, Ru-Juan and Jian, Hao-Pu
-	          and Chu, Hao and Yang, Jia-Yi and Chen, Qi and Zhao, Xiao-Qing
-	          and Xiang, Hua-Zhong and Zhang, Da-wei},
-	title = {Research on tissue section negative detection algorithm based
-	         on multispectral microscopic imaging},
-	journal = {Journal of Innovative Optical Health Sciences},
+@article{SCABINI2026,
+	title = {Complex networks for modeling texture and spectral features of
+	         hyperspectral images for environmental analysis},
+	journal = {Computers in Biology and Medicine},
+	volume = {204},
+	pages = {111504},
 	year = {2026},
-	volume = {19},
-	number = {2},
-	pages = {2550035},
-	doi = {10.1142/S179354582550035X},
+	doi = {https://doi.org/10.1016/j.compbiomed.2026.111504},
+	author = {Leonardo Scabini and Kallil M. Zielinski and Marilia Fernandes
+	          and Ricardo T. Fares and Lucas C. Ribas and Rosana M. Kolb and
+	          Odemir M. Bruno},
 }
 
-@article{ma2026cihm,
-	author = {Ma, Yize and Liu, Yu and Cheng, Juan and Zhan, Haolin and Qi,
-	          Guanqiu and Zhang, Xiaopei and Zhu, Zhiqin},
-	title = {{CIHM}: Context-insight hybrid {Mamba} for efficient medical
-	         image segmentation},
-	journal = {Visual Intelligence},
-	year = {2026},
-	volume = {4},
-	number = {12},
-	doi = {10.1007/s44267-026-00113-5},
-}
-
-@article{garbaz2025gsac,
-	author = {Garbaz, Anass and Oukdach, Yassine and Charfi, Said and El
-	          Ansari, Mohamed and Koutti, Lahcen and Salihoun, Mouna},
-	title = {{GSAC-UFormer}: Groupwise self-attention convolutional
-	         transformer-based {UNet} for medical image segmentation},
-	journal = {Cognitive Computation},
-	year = {2025},
-	volume = {17},
-	number = {69},
-	doi = {10.1007/s12559-025-10425-1},
-}
-
-@article{kabir2026trigwonet,
-	author = {Kabir, Md Firoz and Uddin, Roise and Rahat, S. K. Rakib Ul
-	          Islam and Arafat, Yasin and Sobur, Abdus and Wata, Chala},
-	title = {{TriGWONet}: A lightweight multibranch convolutional neural
-	         network using gray wolf optimization for accurate oral cancer
-	         image classification},
-	journal = {Discover Artificial Intelligence},
-	year = {2026},
-	volume = {6},
-	number = {91},
-	doi = {10.1007/s44163-025-00776-x},
-}
-
-@article{sharma2025mammography,
-	author = {Sharma, Shubhi and Singh, Yeshwant and Choudhury, Tanupriya},
-	title = {Advanced deep learning architectures for enhanced mammography
-	         classification: A comparative study of {CNNs} and {ViT}},
-	journal = {Discover Artificial Intelligence},
-	year = {2025},
-	volume = {5},
-	number = {187},
-	doi = {10.1007/s44163-025-00426-2},
-}
-
-@inproceedings{mehta2022mobilevit,
-	author = {Mehta, Sachin and Rastegari, Mohammad},
-	title = {{MobileViT}: Light-weight, general-purpose, and mobile-friendly
-	         vision transformer},
-	booktitle = {International Conference on Learning Representations (ICLR)
-	             },
-	year = {2022},
-	note = {arXiv:2110.02178},
-}
-
-% ------------------- Seção 3: RNN em features topológicas -------------------
-
-% --- Fundamentos de redes recorrentes ---
-
-@article{elman1990finding,
-	author = {Elman, Jeffrey L.},
-	title = {Finding structure in time},
-	journal = {Cognitive Science},
-	year = {1990},
+% ==========================================
+% 10. Outros (Fundamentos, Classificação, Datasets)
+% ==========================================
+@inproceedings{kohavi1995study,
+	title = {A study of cross-validation and bootstrap for accuracy
+	         estimation and model selection},
+	author = {Kohavi, Ron and others},
+	booktitle = {International joint conference on artificial intelligence},
 	volume = {14},
 	number = {2},
-	pages = {179--211},
-	doi = {10.1207/s15516709cog1402_1},
+	pages = {1137--1145},
+	year = {1995},
 }
-
-@article{bengio1994learning,
-	author = {Bengio, Yoshua and Simard, Patrice and Frasconi, Paolo},
-	title = {Learning long-term dependencies with gradient descent is
-	         difficult},
-	journal = {IEEE Transactions on Neural Networks},
-	year = {1994},
-	volume = {5},
-	number = {2},
-	pages = {157--166},
-	doi = {10.1109/72.279181},
-}
-
-@article{gers2000learning,
-	author = {Gers, Felix A. and Schmidhuber, J{\"u}rgen and Cummins, Fred},
-	title = {Learning to forget: Continual prediction with {LSTM}},
-	journal = {Neural Computation},
-	year = {2000},
-	volume = {12},
-	number = {10},
-	pages = {2451--2471},
-	doi = {10.1162/089976600300015015},
-}
-
-@article{schuster1997bidirectional,
-	author = {Schuster, Mike and Paliwal, Kuldip K.},
-	title = {Bidirectional recurrent neural networks},
-	journal = {IEEE Transactions on Signal Processing},
-	year = {1997},
-	volume = {45},
-	number = {11},
-	pages = {2673--2681},
-	doi = {10.1109/78.650093},
-}
-
-@article{graves2005framewise,
-	author = {Graves, Alex and Schmidhuber, J{\"u}rgen},
-	title = {Framewise phoneme classification with bidirectional {LSTM} and
-	         other neural network architectures},
-	journal = {Neural Networks},
-	year = {2005},
-	volume = {18},
-	number = {5--6},
-	pages = {602--610},
-	doi = {10.1016/j.neunet.2005.06.042},
-}
-
-@article{greff2017lstm,
-	author = {Greff, Klaus and Srivastava, Rupesh K. and Koutn{\'\i}k, Jan
-	          and Steunebrink, Bas R. and Schmidhuber, J{\"u}rgen},
-	title = {{LSTM}: A search space odyssey},
-	journal = {IEEE Transactions on Neural Networks and Learning Systems},
-	year = {2017},
-	volume = {28},
-	number = {10},
-	pages = {2222--2232},
-	doi = {10.1109/TNNLS.2016.2582924},
-}
-
-@article{lecun2015deep,
-	author = {LeCun, Yann and Bengio, Yoshua and Hinton, Geoffrey},
-	title = {Deep learning},
-	journal = {Nature},
-	year = {2015},
-	volume = {521},
-	number = {7553},
-	pages = {436--444},
-	doi = {10.1038/nature14539},
-}
-
-% --- Alternativas à recorrência ---
 
 @article{fawaz2019deep,
 	author = {Ismail Fawaz, Hassan and Forestier, Germain and Weber,
@@ -635,145 +1031,6 @@
 	volume = {33},
 	number = {4},
 	pages = {917--963},
-	doi = {10.1007/s10618-019-00619-1},
-}
-
-@article{khan2022transformers,
-	author = {Khan, Salman and Naseer, Muzammal and Hayat, Munawar and Zamir
-	          , Syed Waqas and Khan, Fahad Shahbaz and Shah, Mubarak},
-	title = {Transformers in vision: A survey},
-	journal = {ACM Computing Surveys},
-	year = {2022},
-	volume = {54},
-	number = {10s},
-	pages = {1--41},
-	doi = {10.1145/3505244},
-}
-
-% --- Redes recorrentes sobre features de imagens e sequências (artigos enviados) ---
-
-@article{shalini2026saclstm,
-	author = {Shalini, T. Grace and Rathnamala, S.},
-	title = {An optimal {CSBO}-based detection and classification of breast
-	         cancer using deep {SAC-LSTM} design from histopathological image
-	         },
-	journal = {International Journal of Data Science and Analytics},
-	year = {2026},
-	volume = {22},
-	pages = {227},
-	doi = {10.1007/s41060-026-01202-w},
-}
-
-@article{zeng2025mssfn,
-	author = {Zeng, Hongfu and Li, Xinyu and Xu, Haipeng and Yu, Keyi and Hu
-	          , Huihua and Wu, Peishu and Zeng, Nianyin},
-	title = {{MSSFN}: A multi-scale sequence fusion network for {CT}-based
-	         diagnosis of pulmonary complications},
-	journal = {Neurocomputing},
-	year = {2025},
-	volume = {634},
-	pages = {129878},
-	doi = {10.1016/j.neucom.2025.129878},
-}
-
-@article{mathiyalagi2026hclstm,
-	author = {Mathiyalagi, Lavanya and Ravi, R.},
-	title = {Revolutionizing lung cancer detection using hybrid {CNN-LSTM} (
-	         {HCLSTM}) for accurate diagnosis and enhanced nodule
-	         classification},
-	journal = {Biomedical Signal Processing and Control},
-	year = {2026},
-	volume = {111},
-	pages = {108369},
-	doi = {10.1016/j.bspc.2025.108369},
-}
-
-@article{priyadarshini2026cnnbilstm,
-	author = {Priyadarshini, Ishaani},
-	title = {A firefly algorithm-optimized {CNN--BiLSTM} model for automated
-	         detection of bone cancer and marrow cell abnormalities},
-	journal = {Computers, Materials \& Continua},
-	year = {2026},
-	volume = {86},
-	number = {3},
-	pages = {64},
-	doi = {10.32604/cmc.2025.072343},
-}
-
-@inproceedings{akanksha2022leukemia,
-	author = {Akanksha, M. N. Venkata and Bachu, Srinivas and Kumar, M.
-	          Aravind and Kumar, Naluguru Udaya},
-	title = {Implementation of potential leukemia detection using recurrent
-	         neural networks with blood cell counting},
-	booktitle = {2022 First International Conference on Electrical,
-	             Electronics, Information and Communication Technologies
-	             (ICEEICT)},
-	year = {2022},
-	doi = {10.1109/ICEEICT53079.2022.9768569},
-}
-
-@article{lin2022mslstm,
-	author = {Lin, Ruiguan and Yu, Yaowei and Wang, Huawei and Che,
-	          Changchang and Ni, Xiaomei},
-	title = {Remaining useful life prediction in prognostics using
-	         multi-scale sequence and long short-term memory network},
-	journal = {Journal of Computational Science},
-	year = {2022},
-	volume = {57},
-	pages = {101508},
-	doi = {10.1016/j.jocs.2021.101508},
-}
-
-@article{kang2024mmdb,
-	author = {Kang, Yan and Zhang, Huadong and Wang, Xinchao and Yang, Yun
-	          and Jia, Qi},
-	title = {{MMDB}: Multimodal dual-branch model for multi-functional
-	         bioactive peptide prediction},
-	journal = {Analytical Biochemistry},
-	year = {2024},
-	volume = {690},
-	pages = {115491},
-	doi = {10.1016/j.ab.2024.115491},
-}
-
-@article{xu2025vmdib,
-	author = {Xu, Jing and Wei, Yan and Zeng, Pan},
-	title = {{VMD}-based iterative {Boruta} feature extraction and {
-	         CNNA-BiLSTM} for short-term load forecasting},
-	journal = {Electric Power Systems Research},
-	year = {2025},
-	volume = {238},
-	pages = {111172},
-	doi = {10.1016/j.epsr.2024.111172},
-}
-
-% ------------------- Seção 5: Fusão por concatenação de embeddings e MLP -------------------
-
-% --- Fusão multimodal e fundamentos de MLP ---
-
-@article{baltrusaitis2019multimodal,
-	author = {Baltru{\v{s}}aitis, Tadas and Ahuja, Chaitanya and Morency,
-	          Louis-Philippe},
-	title = {Multimodal machine learning: A survey and taxonomy},
-	journal = {IEEE Transactions on Pattern Analysis and Machine
-	           Intelligence},
-	year = {2019},
-	volume = {41},
-	number = {2},
-	pages = {423--443},
-	doi = {10.1109/TPAMI.2018.2798607},
-}
-
-@article{ramachandram2017deep,
-	author = {Ramachandram, Dhanesh and Taylor, Graham W.},
-	title = {Deep multimodal learning: A survey on recent advances and
-	         trends},
-	journal = {IEEE Signal Processing Magazine},
-	year = {2017},
-	volume = {34},
-	number = {6},
-	pages = {96--108},
-	doi = {10.1109/MSP.2017.2738401},
 }
 
 @article{kittler1998combining,
@@ -786,7 +1043,6 @@
 	volume = {20},
 	number = {3},
 	pages = {226--239},
-	doi = {10.1109/34.667881},
 }
 
 @article{rumelhart1986learning,
@@ -798,7 +1054,6 @@
 	volume = {323},
 	number = {6088},
 	pages = {533--536},
-	doi = {10.1038/323533a0},
 }
 
 @article{hornik1989multilayer,
@@ -809,7 +1064,6 @@
 	volume = {2},
 	number = {5},
 	pages = {359--366},
-	doi = {10.1016/0893-6080(89)90020-8},
 }
 
 @article{srivastava2014dropout,
@@ -824,92 +1078,29 @@
 	pages = {1929--1958},
 }
 
-% --- Redes de dupla via e estratégias de fusão (artigos enviados) ---
-
-@article{yousaf2024twostream,
-	author = {Yousaf, Kanwal and Nawaz, Tabassam and Habib, Adnan},
-	title = {Using two-stream {EfficientNet-BiLSTM} network for multiclass
-	         classification of disturbing {YouTube} videos},
-	journal = {Multimedia Tools and Applications},
-	year = {2024},
-	volume = {83},
-	number = {12},
-	pages = {36519--36546},
-	doi = {10.1007/s11042-023-15774-3},
-}
-
-@article{nawaz2025ard,
-	author = {Nawaz, Wajahat and Albert, Kevin and Jouvet, Philippe and
-	          Noumeir, Rita},
-	title = {Acute respiratory distress identification via multi-modality
-	         using deep learning},
-	journal = {Applied Sciences},
-	year = {2025},
-	volume = {15},
-	number = {3},
-	pages = {1512},
-	doi = {10.3390/app15031512},
-}
-
-@article{peng2025tfsdfn,
-	author = {Peng, Haotian and Wang, Wei and Gao, Jie and Wang, Yu and Du,
-	          Jinsong},
-	title = {A lightweight triple-stream network with multisensor fusion for
-	         enhanced few-shot learning fault diagnosis},
-	journal = {IEEE Transactions on Reliability},
-	year = {2025},
-	volume = {74},
-	number = {3},
-	pages = {4062--4075},
-	doi = {10.1109/TR.2025.3540500},
-}
-
-@article{wang2023stnet,
-	author = {Wang, Xijing and Han, Hongcheng and Xu, Mengrui and Li,
-	          Shengpeng and Zhang, Dong and Du, Shaoyi and Xu, Meifeng},
-	title = {{STNet}: Shape and texture joint learning through two-stream
-	         network for knowledge-guided image recognition},
-	journal = {Frontiers in Neuroscience},
-	year = {2023},
-	volume = {17},
-	pages = {1212049},
-	doi = {10.3389/fnins.2023.1212049},
-}
-
-@article{chen2025chrysanthemum,
-	author = {Chen, Yifan and Yang, Xichen and Yan, Hui and Liu, Jia and
-	          Jiang, Jian and Mao, Zhongyuan and Wang, Tianshu},
-	title = {Bidirectional feature fusion via cross-attention transformer
-	         for chrysanthemum classification},
-	journal = {Pattern Analysis and Applications},
-	year = {2025},
-	volume = {28},
-	pages = {41},
-	doi = {10.1007/s10044-025-01419-8},
-}
-
-@article{sheng2026gtunet,
-	author = {Sheng, Mengjun and He, Shanshan and Shi, Zhiyu},
-	title = {{GTUNet}: a {GNN} and transformer enhanced {U-Net} for coronary
-	         artery segmentation},
-	journal = {Signal, Image and Video Processing},
+@article{wang2026msi,
+	author = {Wang, Cheng and Ge, Qian-Qian and Wu, Ru-Juan and Jian, Hao-Pu
+	          and Chu, Hao and Yang, Jia-Yi and Chen, Qi and Zhao, Xiao-Qing
+	          and Xiang, Hua-Zhong and Zhang, Da-wei},
+	title = {Research on tissue section negative detection algorithm based
+	         on multispectral microscopic imaging},
+	journal = {Journal of Innovative Optical Health Sciences},
 	year = {2026},
-	volume = {20},
-	number = {10},
-	pages = {532},
-	doi = {10.1007/s11760-026-05600-2},
+	volume = {19},
+	number = {2},
+	pages = {2550035},
 }
 
-@article{yang2026daprnet,
-	author = {Yang, Xin and Hou, Runhan and Deng, Liwei and Wang, Jing and
-	          Huang, Sijuan},
-	title = {{DAPR-Net}: Symmetric dual-stream pyramid architecture for
-	         non-rigid brain {MRI} registration},
-	journal = {Biomedical Signal Processing and Control},
+@article{kabir2026trigwonet,
+	author = {Kabir, Md Firoz and Uddin, Roise and Rahat, S. K. Rakib Ul
+	          Islam and Arafat, Yasin and Sobur, Abdus and Wata, Chala},
+	title = {{TriGWONet}: A lightweight multibranch convolutional neural
+	         network using gray wolf optimization for accurate oral cancer
+	         image classification},
+	journal = {Discover Artificial Intelligence},
 	year = {2026},
-	volume = {122},
-	pages = {110495},
-	doi = {10.1016/j.bspc.2026.110495},
+	volume = {6},
+	number = {91},
 }
 
 @article{iicbu2008,
@@ -922,7 +1113,6 @@
 	number = {9},
 	pages = {943--947},
 	year = {2008},
-	publisher = {Springer},
 }
 
 @inproceedings{UCSB,
@@ -932,356 +1122,5 @@
 	             },
 	title = {Evaluation and benchmark for biological image segmentation},
 	year = {2008},
-	volume = {},
-	number = {},
 	pages = {1816-1819},
-	keywords = {Image segmentation;Cells (biology);Image analysis;Image
-	            databases;Retina;Image processing;Benchmark
-	            testing;Microscopy;Photoreceptors;Computer
-	            vision;Standardized dataset;biological images;segmentation
-	            evaluation;ground truth;subcell;cell;tissue},
-	doi = {10.1109/ICIP.2008.4712130},
-}
-
-@article{CR,
-	title = {Gland segmentation in colon histology images: The glas
-	         challenge contest},
-	journal = {Medical Image Analysis},
-	volume = {35},
-	pages = {489-502},
-	year = {2017},
-	issn = {1361-8415},
-	doi = {https://doi.org/10.1016/j.media.2016.08.008},
-	url = {
-	       https://www.sciencedirect.com/science/article/pii/S1361841516301542
-	       },
-	author = {Korsuk Sirinukunwattana and Josien P.W. Pluim and Hao Chen and
-	          Xiaojuan Qi and Pheng-Ann Heng and Yun Bo Guo and Li Yang Wang
-	          and Bogdan J. Matuszewski and Elia Bruni and Urko Sanchez and
-	          Anton Böhm and Olaf Ronneberger and Bassem Ben Cheikh and
-	          Daniel Racoceanu and Philipp Kainz and Michael Pfeiffer and
-	          Martin Urschler and David R.J. Snead and Nasir M. Rajpoot},
-	keywords = {Histology image analysis, Segmentation, Colon cancer,
-	            Intestinal gland, Digital pathology},
-	abstract = {Colorectal adenocarcinoma originating in intestinal
-	            glandular structures is the most common form of colon cancer.
-	            In clinical practice, the morphology of intestinal glands,
-	            including architectural appearance and glandular formation,
-	            is used by pathologists to inform prognosis and plan the
-	            treatment of individual patients. However, achieving good
-	            inter-observer as well as intra-observer reproducibility of
-	            cancer grading is still a major challenge in modern
-	            pathology. An automated approach which quantifies the
-	            morphology of glands is a solution to the problem. This paper
-	            provides an overview to the Gland Segmentation in Colon
-	            Histology Images Challenge Contest (GlaS) held at
-	            MICCAI’2015. Details of the challenge, including organization
-	            , dataset and evaluation criteria, are presented, along with
-	            the method descriptions and evaluation results from the top
-	            performing methods.},
-}
-
-
-@article{autoHistImg,
-	title = {Automated classification of histopathology images using
-	         transfer learning},
-	journal = {Artificial Intelligence in Medicine},
-	volume = {101},
-	pages = {101743},
-	year = {2019},
-	issn = {0933-3657},
-	doi = {https://doi.org/10.1016/j.artmed.2019.101743},
-	url = {
-	       https://www.sciencedirect.com/science/article/pii/S0933365719307110
-	       },
-	author = {Muhammed Talo},
-	keywords = {Medical image classification, Histopathology, Deep learning,
-	            Transfer learning, CNN},
-	abstract = {Early and accurate diagnosis of diseases can often save
-	            lives. Diagnosis of diseases from tissue samples is done
-	            manually by pathologists. Diagnostics process is usually time
-	            consuming and expensive. Hence, automated analysis of tissue
-	            samples from histopathology images has critical importance
-	            for early diagnosis and treatment. The computer aided systems
-	            can improve the quality of diagnoses and give pathologists a
-	            second opinion for critical cases. In this study, a deep
-	            learning based transfer learning approach has been proposed
-	            to classify histopathology images automatically. Two
-	            well-known and current pre-trained convolutional neural
-	            network (CNN) models, ResNet-50 and DenseNet-161, have been
-	            trained and tested using color and grayscale images. The
-	            DenseNet-161 tested on grayscale images and obtained the best
-	            classification accuracy of 97.89%. Additionally, ResNet-50
-	            pre-trained model was tested on the color images of the Kimia
-	            Path24 dataset and achieved the highest classification
-	            accuracy of 98.87%. According to the obtained results, it may
-	            be said that the proposed pre-trained models can be used for
-	            fast and accurate classification of histopathology images and
-	            assist pathologists in their daily clinical tasks.},
-}
-
-@article{histImgColorectal,
-	title = {Histopathology image analysis for colorectal cancer using deep
-	         learning techniques: A comprehensive survey},
-	journal = {Engineering Applications of Artificial Intelligence},
-	volume = {172},
-	pages = {114262},
-	year = {2026},
-	issn = {0952-1976},
-	doi = {https://doi.org/10.1016/j.engappai.2026.114262},
-	url = {
-	       https://www.sciencedirect.com/science/article/pii/S0952197626005439
-	       },
-	author = {Sanjeev Kumar and Pramod Kumar Mishra},
-	keywords = {Colorectal cancer, Classification, Deep learning,
-	            Histopathology images, Machine learning, Post-processing,
-	            Pre-processing, Prediction, Segmentation, Whole slide imaging
-	            },
-	abstract = {Histopathology images are considered the benchmark modality
-	            for the definitive diagnosis of colorectal cancer owing to
-	            their ability to extract rich phenotypic information.
-	            Nowadays, histopathology images are acquired and digitalized
-	            using Whole Slide Image scanners. This shift enables the
-	            integration of machine learning and deep learning into the
-	            pathological workflow and opens a new avenue for
-	            computational pathology. A typical workflow of computational
-	            pathology for colorectal cancer can be formulated as a
-	            three-phase pipeline: pre-processing, analysis, and
-	            post-processing. However, critical examination of the
-	            existing studies has primarily centered on the analysis phase
-	            due to the widespread use of curated datasets. Consequently,
-	            pre-processing and post-processing stages are often
-	            overlooked. This methodological bias leads to a fragmented
-	            research pipeline, limiting the generalizability required to
-	            handle real-world clinical practice. The survey showcases a
-	            three-phase pipeline that unifies approaches across
-	            pre-processing, image analysis, and post-processing methods.
-	            In the first stage, an overview of methods for effectively
-	            preparing histopathological images through pre-processing is
-	            presented. The second phase surveys recent developments in
-	            computational models for tissue classification, segmentation,
-	            detection, and biomarker prediction. Finally, this review
-	            presents techniques used in colorectal cancer histopathology
-	            to enhance network output by post-processing. In addition,
-	            existing open issues and future research directions are
-	            discussed for innovative researchers. By consolidating the
-	            findings of several studies, this review underscores the
-	            pressing need for a unified approach that effectively bridges
-	            the gap between current research and clinical acceptance.},
-}
-
-@article{esteva2017dermatologist,
-	title = {Dermatologist-level classification of skin cancer with deep
-	         neural networks},
-	author = {Esteva, Andre and Kuprel, Brett and Novoa, Roberto A and Ko,
-	          Justin and Swetter, Susan M and Blau, Helen M and Thrun,
-	          Sebastian},
-	journal = {Nature},
-	volume = {542},
-	number = {7639},
-	pages = {115--118},
-	year = {2017},
-	publisher = {Nature Publishing Group},
-	doi = {10.1038/nature21056},
-}
-
-@article{bejnordi2017diagnostic,
-	title = {Diagnostic assessment of deep learning algorithms for detection
-	         of lymph node metastases in women with breast cancer},
-	author = {Bejnordi, Babak Ehteshami and Veta, Mitko and Johannes van
-	          Diest, Paul and van Ginneken, Bram and Karssemeijer, Nico and
-	          Litjens, Geert and van der Laak, Jeroen AWM and others},
-	journal = {Jama},
-	volume = {318},
-	number = {22},
-	pages = {2199--2210},
-	year = {2017},
-	publisher = {American Medical Association},
-}
-
-@inproceedings{alexnetMed,
-	author = "Xu, Tao and Zhang, Han and Huang, Xiaolei and Zhang, Shaoting
-	          and Metaxas, Dimitris N.",
-	editor = "Ourselin, Sebastien and Joskowicz, Leo and Sabuncu, Mert R.
-	          and Unal, Gozde and Wells, William",
-	title = "Multimodal Deep Learning for Cervical Dysplasia Diagnosis",
-	booktitle = "Medical Image Computing and Computer-Assisted Intervention
-	             -- MICCAI 2016",
-	year = "2016",
-	publisher = "Springer International Publishing",
-	address = "Cham",
-	pages = "115--123",
-	abstract = "To improve the diagnostic accuracy of cervical dysplasia, it
-	            is important to fuse multimodal information collected during
-	            a patient's screening visit. However, current multimodal
-	            frameworks suffer from low sensitivity at high specificity
-	            levels, due to their limitations in learning correlations
-	            among highly heterogeneous modalities. In this paper, we
-	            design a deep learning framework for cervical dysplasia
-	            diagnosis by leveraging multimodal information. We first
-	            employ the convolutional neural network (CNN) to convert the
-	            low-level image data into a feature vector fusible with other
-	            non-image modalities. We then jointly learn the non-linear
-	            correlations among all modalities in a deep neural network.
-	            Our multimodal framework is an end-to-end deep network which
-	            can learn better complementary features from the image and
-	            non-image modalities. It automatically gives the final
-	            diagnosis for cervical dysplasia with 87.83 {\%} sensitivity
-	            at 90 {\%} specificity on a large dataset, which
-	            significantly outperforms methods using any single source of
-	            information alone and previous multimodal frameworks.",
-	isbn = "978-3-319-46723-8",
-}
-
-@article{clinicalReview,
-	author = {Hussaini, Hamza and Bano, Shahana and Elyan, Eyad and
-	          Moreno-Garcia, Carlos Francisco},
-	title = {A Clinically Grounded Review of Medical Image Classification:
-	         Quantitative Insights into CNNs, Vision Transformers, and Hybrid
-	         CNN-ViT Models},
-	journal = {Journal of Imaging Informatics in Medicine},
-	year = {2026},
-	doi = {10.1007/s10278-026-02249-8},
-	url = {https://doi.org/10.1007/s10278-026-02249-8},
-	isbn = {2948-2933},
-}
-
-@article{texmed1,
-	AUTHOR = {Shorfuzzaman, Mohammad and Iftikhar, Abdullah and Najam,
-	          Shaheryar and Almotiri, Jasem and Aljulayfi, Abdullah Fawaz and
-	          AlHammadi, Dina Abdulaziz and Jalal, Ahmad},
-	TITLE = {AI-Driven Tumor Characterization and Histological Subtype
-	         Classification in Lung Cancer Using CT Imaging},
-	JOURNAL = {Diagnostics},
-	VOLUME = {16},
-	YEAR = {2026},
-	NUMBER = {17},
-	ARTICLE-NUMBER = {2805},
-	URL = {https://www.mdpi.com/2075-4418/16/17/2805},
-	ISSN = {2075-4418},
-}
-
-
-@article{texmed2,
-	AUTHOR = {Almasri, Marwah Mohammad and Alajlan, Abrar Mohammed},
-	TITLE = {Artificial Intelligence-Based Multimodal Medical Image Fusion
-	         Using Hybrid S2 Optimal CNN},
-	JOURNAL = {Electronics},
-	VOLUME = {11},
-	YEAR = {2022},
-	NUMBER = {14},
-	ARTICLE-NUMBER = {2124},
-	URL = {https://www.mdpi.com/2079-9292/11/14/2124},
-	ISSN = {2079-9292},
-	ABSTRACT = {In medical applications, medical image fusion methods are
-	            capable of fusing the medical images from various
-	            morphologies to obtain a reliable medical diagnosis. A single
-	            modality image cannot provide sufficient information for an
-	            exact diagnosis. Hence, an efficient multimodal medical image
-	            fusion-based artificial intelligence model is proposed in
-	            this paper. Initially, the multimodal medical images are
-	            obtained for an effective fusion process by using a modified
-	            discrete wavelet transform (MDWT) thereby attaining an image
-	            with high visual clarity. Then, the fused images are
-	            classified as malignant or benign using the proposed
-	            convolutional neural network-based hybrid optimization
-	            dynamic algorithm (CNN-HOD). To enhance the weight function
-	            and classification accuracy of the CNN, a hybrid optimization
-	            dynamic algorithm (HOD) is proposed. The HOD is the
-	            integration of the sailfish optimizer algorithm and seagull
-	            optimization algorithm. Here, the seagull optimizer algorithm
-	            replaces the migration operation toobtain the optimal
-	            location. The experimental analysis is carried out and
-	            acquired with standard deviation (58%), average gradient
-	            (88%), and fusion factor (73%) compared with the other
-	            approaches. The experimental results demonstrate that the
-	            proposed approach performs better than other approaches and
-	            offers high-quality fused images for an accurate diagnosis.},
-	DOI = {10.3390/electronics11142124},
-}
-
-@article{brussee2025graph,
-	author = {Brussee, Siemen and Buzzanca, Giorgio and Schrader, Anne M. R.
-	          and Kers, Jesper},
-	title = {Graph neural networks in histopathology: Emerging trends and
-	         future directions},
-	journal = {Medical Image Analysis},
-	year = {2025},
-	volume = {101},
-	pages = {103444},
-	doi = {10.1016/j.media.2024.103444},
-}
-
-@article{kushwah2026evcnet,
-	author = {Kushwah, Shivpratap Singh and Punn, Narinder Singh and
-	          Bhattacharya, Mahua},
-	title = {{EVC-Net}: A hybrid deep learning network for breast cancer
-	         classification from histopathological images},
-	journal = {ACM Transactions on Intelligent Systems and Technology},
-	year = {2026},
-	volume = {17},
-	number = {4},
-	pages = {87},
-	doi = {10.1145/3800952},
-}
-
-@article{huang2022fusing,
-	author = {Huang, Xinrui and Li, Zhaotong and Zhang, Minghui and Gao,
-	          Song},
-	title = {Fusing hand-crafted and deep-learning features in a
-	         convolutional neural network model to identify prostate cancer
-	         in pathology images},
-	journal = {Frontiers in Oncology},
-	year = {2022},
-	volume = {12},
-	pages = {994950},
-	doi = {10.3389/fonc.2022.994950},
-}
-
-@article{li2025fusion,
-	author = {Li, Jiaxing},
-	title = {Fusion feature-based hybrid methods for diagnosing oral
-	         squamous cell carcinoma in histopathological images},
-	journal = {Frontiers in Oncology},
-	year = {2025},
-	volume = {15},
-	pages = {1551876},
-	doi = {10.3389/fonc.2025.1551876},
-}
-
-@article{moldovanu2026hybrid,
-	author = {Moldovanu, Simona and Cocu, Adina and Stefanescu, Diana and
-	          Anghel, C{\u{a}}t{\u{a}}lin},
-	title = {Hybrid decision-level fusion of {CNN}-based deep and
-	         handcrafted features for colon cancer classification},
-	journal = {Journal of Imaging},
-	year = {2026},
-	volume = {12},
-	number = {8},
-	pages = {368},
-	doi = {10.3390/jimaging12080368},
-}
-
-@article{khan2024oral,
-	author = {Khan, Saif Ur Rehman and Asif, Sohaib},
-	title = {Oral cancer detection using feature-level fusion and novel
-	         self-attention mechanisms},
-	journal = {Biomedical Signal Processing and Control},
-	year = {2024},
-	volume = {95},
-	pages = {106437},
-	doi = {10.1016/j.bspc.2024.106437},
-}
-
-@article{khan2024hybridnet,
-	author = {Khan, Saif Ur Rehman and Zhao, Ming and Asif, Sohaib and Chen,
-	          Xuehan},
-	title = {{Hybrid-NET}: A fusion of {DenseNet169} and advanced machine
-	         learning classifiers for enhanced brain tumor diagnosis},
-	journal = {International Journal of Imaging Systems and Technology},
-	year = {2024},
-	volume = {34},
-	number = {1},
-	pages = {e22975},
-	doi = {10.1002/ima.22975},
 }

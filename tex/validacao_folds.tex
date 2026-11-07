@@ -1,0 +1,131 @@
+% Diagrama da separação dos dados e da estimativa de desempenho (holdout, CV externa e CV interna).
+% Requer as bibliotecas TikZ positioning e arrows.meta (as mesmas do pipeline).
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        % Estilos (mesma família do pipeline)
+        recntagle/.style={
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            font=\footnotesize\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {
+            thick, ->, >={Stealth[length=2.5mm]}
+        },
+        box_delimitador/.style = {
+            rectangle, rounded corners=8pt, draw=black!70, fill=black!2, line width=0.8pt
+        },
+        sub_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=4pt, align=center,
+            draw=black!70, fill=blue!5, line width=0.7pt, font=\footnotesize, text width=5.5cm
+        },
+        result_block/.style = {
+            sub_block, fill=green!15, draw=green!60!black, font=\footnotesize\bfseries
+        },
+        head_text/.style = {
+            align=center, font=\footnotesize\bfseries
+        },
+        % Blocos das partições
+        fold/.style = {
+            rectangle, draw=black!70, line width=0.6pt, minimum height=0.8cm,
+            inner sep=1pt, align=center, font=\scriptsize
+        },
+        ftrain/.style = {fold, fill=blue!18},
+        fval/.style   = {fold, fill=green!25},
+        ftest/.style  = {fold, fill=orange!35},
+        fhold/.style  = {fold, fill=black!15}
+    ]
+
+        % ---------------- Painéis (desenhados primeiro, ficam ao fundo)
+        \node [box_delimitador, minimum width=9.0cm, minimum height=15.15cm] at (-4.2,-10.775) {};
+        \node [box_delimitador, minimum width=8.2cm, minimum height=15.15cm] at (4.8,-10.775) {};
+
+        % ---------------- 1. Conjunto completo e divisão prévia
+        \node (all) [recntagle, minimum width=7cm] at (0.3,0)
+            {Conjunto completo de imagens\\[1pt]{\scriptsize\mdseries imagem RGB, rótulo e sequência topológica}};
+        \node (dev) [recntagle, minimum width=9.0cm] at (-4.2,-2.4)
+            {Desenvolvimento (80\%)\\[1pt]{\scriptsize\mdseries estimativa principal: validação cruzada aninhada}};
+        \node (hold) [recntagle, fill=black!15, minimum width=8.2cm] at (4.8,-2.4)
+            {\textit{Holdout} (20\%)\\[1pt]{\scriptsize\mdseries análise confirmatória, avaliada uma única vez}};
+
+        \draw [arrow] (all.south) -- ++(0,-0.5) -| (dev.north);
+        \draw [arrow] (all.south) -- ++(0,-0.5) -| (hold.north)
+            node[pos=0.25, above, font=\scriptsize] {divisão estratificada (semente 42)};
+
+        % ---------------- 2. Estimativa principal: CV aninhada
+        \node (h_ext) [head_text, text width=8.4cm] at (-4.2,-3.9)
+            {Validação cruzada externa: estratificada, 5 partições $\times$ 3 repetições = 15 partições};
+        \draw [arrow] (dev.south) -- (h_ext.north);
+
+        \foreach \x in {-7.25,-5.75,-4.25,-2.75} {
+            \node [ftrain, minimum width=1.5cm] at (\x,-5.0) {Treino};
+        }
+        \node (t5) [ftest, minimum width=1.5cm] at (-1.25,-5.0) {Teste};
+        % chave sob os blocos de treino
+        \draw [thick, black!70] (-8.0,-5.5) -- (-8.0,-5.62) -- (-2.0,-5.62) -- (-2.0,-5.5);
+
+        \node (h_int) [head_text, text width=5.8cm] at (-5.0,-6.9)
+            {Validação cruzada interna: estratificada, 3 partições};
+        \draw [arrow] (-5.0,-5.62) -- (h_int.north)
+            node[midway, right, font=\scriptsize] {treino externo};
+
+        \foreach \x in {-7.0,-5.0} {
+            \node [ftrain, minimum width=2.0cm] at (\x,-7.9) {Treino interno};
+        }
+        \node [fval, minimum width=2.0cm] at (-3.0,-7.9) {Validação};
+
+        \node (D) [sub_block, minimum height=3.1cm] at (-5.0,-10.45)
+            {Para cada uma das 4 configurações ($\mathrm{lr}_{bb} \times \mathrm{lr}_{hd}$), treino com parada antecipada na validação interna. Escolhe-se a de menor entropia cruzada média, e o número de épocas é a média das épocas ótimas (mínimo 3)};
+        \node (E) [sub_block, minimum height=1.7cm] at (-5.0,-13.35)
+            {Ajuste final: treino em todo o treino externo, com número fixo de épocas e sem validação};
+        \node (F) [sub_block, minimum height=1.3cm] at (-5.0,-15.2)
+            {Avaliação única no teste externo: F1 macro, acurácia e AUC-ROC};
+        \node (G) [result_block, minimum height=1.7cm] at (-5.0,-17.05)
+            {Estimativa principal: média e desvio padrão do F1 macro entre as 15 partições};
+
+        \draw [arrow] (-5.0,-8.3) -- (D.north);
+        \draw [arrow] (D.south) -- (E.north);
+        \draw [arrow] (E.south) -- (F.north);
+        \draw [arrow] (F.south) -- (G.north);
+        \draw [arrow] (t5.south) |- (F.east)
+            node[pos=0.25, right, font=\scriptsize, align=left] {teste\\externo};
+
+        % ---------------- 3. Análise confirmatória (holdout)
+        \node (note) [rectangle, rounded corners=3pt, draw=black!70, dashed, fill=black!8, align=center,
+                      text width=5.4cm, inner sep=4pt, font=\footnotesize] at (3.9,-4.7)
+            {Isolado até a avaliação final: não participa da escolha de épocas, hiperparâmetros ou padronização};
+
+        \node (h_all) [head_text, text width=5.8cm] at (3.9,-6.9) {Treino: desenvolvimento inteiro};
+        \node (all80) [ftrain, minimum width=5.8cm] at (3.9,-7.9) {Desenvolvimento (80\% das imagens)};
+
+        \node (R1) [sub_block, minimum height=3.1cm] at (3.9,-10.45)
+            {Repete-se a seleção sobre todo o desenvolvimento: validação cruzada interna de 3 partições, as mesmas 4 configurações e número de épocas igual à média das épocas ótimas (mínimo 3)};
+        \node (R2) [sub_block, minimum height=1.7cm] at (3.9,-13.35)
+            {Ajuste final: treino em todo o desenvolvimento, com número fixo de épocas e sem validação};
+        \node (R3) [sub_block, minimum height=1.3cm] at (3.9,-15.2)
+            {Avaliação única no \textit{holdout} (20\%): F1 macro, acurácia e AUC-ROC};
+        \node (R4) [result_block, minimum height=1.7cm] at (3.9,-17.05)
+            {Resultado confirmatório: um valor por \textit{dataset}, sem medida de dispersão};
+
+        \draw [arrow] (3.9,-8.3) -- (R1.north);
+        \draw [arrow] (R1.south) -- (R2.north);
+        \draw [arrow] (R2.south) -- (R3.north);
+        \draw [arrow] (R3.south) -- (R4.north);
+        \draw [arrow] (7.7,-2.95) -- (7.7,-15.2) -- (R3.east);
+        \node [rotate=90, font=\scriptsize] at (8.05,-8.5) {\textit{holdout} (20\%)};
+
+        % ---------------- Legenda
+        \node [ftrain, minimum width=0.5cm, minimum height=0.3cm] at (-6.6,-19.15) {};
+        \node [anchor=west, font=\scriptsize] at (-6.3,-19.15) {Treino};
+        \node [fval, minimum width=0.5cm, minimum height=0.3cm] at (-4.4,-19.15) {};
+        \node [anchor=west, font=\scriptsize] at (-4.1,-19.15) {Validação interna};
+        \node [ftest, minimum width=0.5cm, minimum height=0.3cm] at (-0.9,-19.15) {};
+        \node [anchor=west, font=\scriptsize] at (-0.6,-19.15) {Teste externo};
+        \node [fhold, minimum width=0.5cm, minimum height=0.3cm] at (2.3,-19.15) {};
+        \node [anchor=west, font=\scriptsize] at (2.6,-19.15) {\textit{Holdout}};
+
+    \end{tikzpicture}%
+    }
+    \caption{Separação dos dados e estimativa do desempenho. Um conjunto de teste (\textit{holdout}) de 20\% é separado antes de qualquer treinamento. Os 80\% restantes (desenvolvimento) são avaliados por validação cruzada aninhada, com 15 partições externas (5 partições repetidas três vezes) e, em cada uma, uma validação cruzada interna de 3 partições para a escolha da configuração e do número de épocas. O mesmo procedimento, aplicado ao desenvolvimento inteiro, gera o modelo avaliado uma única vez no \textit{holdout}.}
+    \label{fig:folds_tcc}
+\end{figure}

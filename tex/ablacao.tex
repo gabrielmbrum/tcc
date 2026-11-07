@@ -1,313 +1,193 @@
 % Colocar dentro de \chapter{Resultados}. Requer booktabs e \citeonline (já usados no texto).
+% Os números das tabelas ainda devem ser preenchidos com a nova execução (comando \pend).
 
-\section{Ablação da via topológica}
-\label{sec:res-ablacao}
+\providecommand{\pend}{\textbf{[a preencher]}}
 
-A ablação da via topológica isolada seguiu o protocolo da Seção~\ref{subsec:protocolo-ablacao}, com validação cruzada aninhada sobre as imagens de desenvolvimento e 15 partições externas por tarefa. As 95 combinações de \textit{dataset}, codificador e representação com $r_{\max}=15$ e resolução original foram concluídas sem falhas. A auditoria dos dados não encontrou duplicatas exatas entre as sequências topológicas, valores não finitos nem colunas constantes nos cinco \textit{datasets}.
+\chapter{Ablação}
+\label{chap:res-ablacao}
 
-\subsection{Desempenho dos codificadores}
-\label{subsec:res-codificadores}
+Neste capítulo são detalhados os experimentos de ablação conduzidos para determinar as arquiteturas e os hiperparâmetros da via topológica e da via visual antes da composição do modelo de dupla via. As duas vias foram avaliadas de forma isolada sobre as mesmas partições de dados, com o propósito de selecionar as melhores configurações sem utilizar o conjunto de teste final reservado.
 
-O F1 macro médio de cada combinação de codificador e representação está na Tabela~\ref{tab:abl-f1}. O classificador de maioria obteve F1 macro entre 0,117 e 0,361 e foi o único método significativamente inferior aos demais. Nas 85 comparações com a BiLSTM e nas 85 comparações com o MLP, as únicas diferenças significativas após a correção de Holm foram as do classificador de maioria, com $p$ ajustado de no máximo 0,02.
+\section{Ablação da Via Topológica}
+\label{sec:via-topologica}
+\label{sec:ablacao-topologica}
+
+A via topológica recebe a sequência de características calculada a partir de redes complexas sobre 15 raios de conexão, denotada por $X_{\mathrm{top}} \in \mathbb{R}^{15 \times 18}$, em que cada passo contém 18 medidas descritoras. Para verificar a capacidade de aprendizado sobre essa sequência e avaliar a contribuição da dependência de ordem entre as escalas, foram selecionados cinco modelos de redes neurais recorrentes e um modelo não recorrente como \textit{baseline}:
+
+\begin{itemize}
+    \item a LSTM padrão \cite{hochreiter1997long,gers2000learning}, modelo com portas de esquecimento, entrada e saída, empregado como referência no processamento de sequências multiescala \cite{lin2022mslstm} e diagnósticos médicos \cite{mathiyalagi2026hclstm},
+    \item a BiLSTM \cite{schuster1997bidirectional,graves2005framewise}, que processa os raios nos sentidos direto e inverso para integrar informação de micro e macrotextura, com precedentes na detecção de alterações celulares neoplásicas \cite{priyadarshini2026cnnbilstm} e em modelos de dupla via \cite{yousaf2024twostream},
+    \item a GRU \cite{cho2014learning}, que unifica as portas e dispensa o estado de célula separado, resultando em menor custo paramétrico para conter o risco de sobreajuste em conjuntos com volume reduzido de imagens,
+    \item a BiGRU \cite{schuster1997bidirectional,cho2014learning}, que combina o fluxo de informação bidirecional entre as escalas à redução paramétrica da unidade GRU,
+    \item a SAC-LSTM (\textit{Self-Attention Coupled LSTM}) \cite{shalini2026saclstm}, modelo desenvolvido para classificação histopatológica de câncer de mama, que adiciona uma camada de autoatenção aos estados da LSTM para ponderar dinamicamente os raios de conexão mais discriminativos,
+    \item o MLP (\textit{Multi-Layer Perceptron}) \cite{huang2022fusing}, rede de alimentação direta que processa as 270 características de forma estática sobre o vetor achatado, avaliada como linha de base de controle para verificar se a modelagem sequencial traz ganho efetivo frente a uma projeção densa sem recorrência.
+\end{itemize}
+
+Todos os seis codificadores produzem um vetor de características com a mesma dimensão oculta, conectado à mesma cabeça de classificação, formada por normalização por camadas, camada linear de 128 neurônios com ativação ReLU, camada de \textit{dropout} e camada linear de saída com projeção para o número de classes de cada tarefa.
+
+\label{subsec:protocolo-ablacao}
+O protocolo experimental foi executado exclusivamente sobre a partição de desenvolvimento de cada conjunto de dados. Inicialmente, as imagens de cada conjunto foram divididas de forma estratificada, com semente 42, na proporção de 80\% para desenvolvimento e 20\% para teste final, permanecendo a partição de teste totalmente reservada e sem qualquer participação no processo de ablação. Sobre os 80\% de desenvolvimento, foi aplicada uma validação cruzada estratificada em cinco partições ($k = 5$). Para cada modelo e para cada combinação de hiperparâmetros, o treinamento foi conduzido em cinco rodadas independentes, nas quais quatro partições foram destinadas ao ajuste dos pesos e uma partição foi utilizada para a validação, alternando a partição de validação a cada rodada. Em cada rodada, as 18 medidas descritoras foram padronizadas por escore padrão calculado exclusivamente sobre as partições de treino, prevenindo vazamento de dados para a validação. As dimensões amostrais das partições e a grade de hiperparâmetros explorada para cada conjunto de dados estão sintetizadas na Tabela~\ref{tab:espaco-busca-top}.
 
 \begin{table}[htb]
 \centering
-\caption{F1 macro (média $\pm$ desvio padrão entre as 15 partições externas) da via topológica isolada, com $r_{\max}=15$ e resolução original. Em negrito, o maior valor médio de cada \textit{dataset}.}
-\label{tab:abl-f1}
+\caption{Dimensões amostrais e espaço de busca de hiperparâmetros estratificado por conjunto de dados na via topológica.}
+\label{tab:espaco-busca-top}
+\label{subsec:res-ajuste}
 \small
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{llccccc}
+\begin{tabular}{lccccccc}
 \toprule
-\textbf{Codificador} & \textbf{Rep.} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\textbf{\textit{Dataset}} & \textbf{Desenv. (80\%)} & \textbf{Treino / Val. (rodada)} & \textbf{Lote ($B$)} & \textbf{Taxa de aprendizado ($\eta$)} & \textbf{Decaimento ($\lambda$)} & \textbf{\textit{Dropout} ($p$)} & \textbf{Dim. oculta ($h$)} \\
 \midrule
-BiLSTM & acumulada & 0,683 $\pm$ 0,157 & 0,936 $\pm$ 0,042 & 0,992 $\pm$ 0,007 & 0,970 $\pm$ 0,023 & 0,905 $\pm$ 0,049 \\
-BiLSTM & diferenças & 0,676 $\pm$ 0,159 & 0,939 $\pm$ 0,034 & 0,993 $\pm$ 0,008 & 0,978 $\pm$ 0,017 & 0,902 $\pm$ 0,044 \\
-LSTM & acumulada & 0,650 $\pm$ 0,199 & 0,891 $\pm$ 0,084 & 0,989 $\pm$ 0,008 & 0,960 $\pm$ 0,031 & 0,896 $\pm$ 0,042 \\
-LSTM & diferenças & 0,649 $\pm$ 0,204 & 0,902 $\pm$ 0,061 & 0,991 $\pm$ 0,009 & 0,962 $\pm$ 0,022 & 0,892 $\pm$ 0,042 \\
-GRU & acumulada & 0,685 $\pm$ 0,136 & 0,894 $\pm$ 0,080 & 0,994 $\pm$ 0,010 & 0,975 $\pm$ 0,021 & 0,901 $\pm$ 0,045 \\
-GRU & diferenças & 0,687 $\pm$ 0,125 & 0,900 $\pm$ 0,069 & 0,985 $\pm$ 0,016 & 0,971 $\pm$ 0,021 & 0,901 $\pm$ 0,044 \\
-MLP & acumulada & 0,692 $\pm$ 0,144 & 0,941 $\pm$ 0,032 & 0,994 $\pm$ 0,009 & 0,979 $\pm$ 0,025 & 0,920 $\pm$ 0,043 \\
-MLP & diferenças & \textbf{0,758} $\pm$ 0,133 & \textbf{0,946} $\pm$ 0,062 & 0,991 $\pm$ 0,012 & 0,983 $\pm$ 0,023 & 0,940 $\pm$ 0,039 \\
-CNN1D & acumulada & 0,665 $\pm$ 0,148 & 0,887 $\pm$ 0,047 & 0,986 $\pm$ 0,011 & 0,971 $\pm$ 0,019 & 0,901 $\pm$ 0,036 \\
-CNN1D & diferenças & 0,687 $\pm$ 0,193 & 0,881 $\pm$ 0,072 & 0,989 $\pm$ 0,010 & 0,965 $\pm$ 0,024 & 0,893 $\pm$ 0,053 \\
-Reg. logística & acumulada & 0,722 $\pm$ 0,126 & 0,879 $\pm$ 0,067 & 0,992 $\pm$ 0,012 & \textbf{0,989} $\pm$ 0,021 & 0,893 $\pm$ 0,046 \\
-Reg. logística & diferenças & 0,660 $\pm$ 0,159 & 0,902 $\pm$ 0,050 & 0,992 $\pm$ 0,013 & \textbf{0,989} $\pm$ 0,017 & 0,905 $\pm$ 0,051 \\
-SVM & acumulada & 0,587 $\pm$ 0,239 & 0,932 $\pm$ 0,051 & 0,997 $\pm$ 0,007 & 0,978 $\pm$ 0,017 & 0,938 $\pm$ 0,031 \\
-SVM & diferenças & 0,596 $\pm$ 0,205 & 0,944 $\pm$ 0,042 & \textbf{0,998} $\pm$ 0,006 & 0,984 $\pm$ 0,017 & \textbf{0,943} $\pm$ 0,030 \\
-Floresta aleatória & acumulada & 0,681 $\pm$ 0,130 & 0,834 $\pm$ 0,082 & 0,958 $\pm$ 0,022 & 0,946 $\pm$ 0,021 & 0,849 $\pm$ 0,049 \\
-Floresta aleatória & diferenças & 0,666 $\pm$ 0,132 & 0,865 $\pm$ 0,065 & 0,962 $\pm$ 0,019 & 0,962 $\pm$ 0,018 & 0,892 $\pm$ 0,045 \\
-kNN & acumulada & 0,602 $\pm$ 0,175 & 0,812 $\pm$ 0,099 & 0,973 $\pm$ 0,015 & 0,968 $\pm$ 0,025 & 0,845 $\pm$ 0,044 \\
-kNN & diferenças & 0,644 $\pm$ 0,157 & 0,785 $\pm$ 0,100 & 0,980 $\pm$ 0,015 & 0,965 $\pm$ 0,027 & 0,887 $\pm$ 0,040 \\
-Maioria & acumulada & 0,352 $\pm$ 0,010 & 0,356 $\pm$ 0,006 & 0,117 $\pm$ 0,002 & 0,361 $\pm$ 0,003 & 0,180 $\pm$ 0,002 \\
+UCSB & 46  & 36 a 37 / 9 a 10   & $\{4, 8, 16\}$   & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
+CR   & 132 & 105 a 106 / 26 a 27 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
+LG   & 212 & 169 a 170 / 42 a 43 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
+NHL  & 299 & 239 a 240 / 59 a 60 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
+LA   & 422 & 337 a 338 / 84 a 85 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-No ranking médio entre \textit{datasets}, o MLP com diferenças entre raios obteve a melhor posição (3,40), seguido do MLP com medidas acumuladas (3,60) e da SVM com diferenças (4,80). A BiLSTM ocupou as posições 6,40 (diferenças) e 6,80 (acumuladas) e foi a melhor entre as redes recorrentes, à frente da GRU (7,40 e 9,20), da CNN unidimensional (10,80 e 11,40) e da LSTM (12,40 e 12,60). A floresta aleatória e o kNN ficaram entre as últimas posições (14,40 a 15,80). Esse ranking é descritivo. A vantagem do MLP sobre os demais métodos em média decorre sobretudo do UCSB, o menor \textit{dataset}, no qual o desvio padrão entre partições é de 0,13 e o MLP com diferenças atingiu 0,758. A SVM e a regressão logística obtiveram os maiores valores médios em LA, LG e NHL, e a diferença entre o MLP e a SVM fora do UCSB foi de no máximo 0,019.
+O processo de treinamento foi conduzido com a função de perda de entropia cruzada, otimizador AdamW e norma de gradiente limitada ao valor 1,0 para conter oscilações numéricas. Em decorrência do tamanho reduzido das representações e dos volumes de dados, o treinamento foi delimitado ao teto de 50 épocas, com parada antecipada regulada por uma tolerância de 10 épocas consecutivas sem decrescimento da perda na partição de validação, restaurando os melhores pesos ao término de cada rodada.
 
-\subsection{Comparações pareadas}
-\label{subsec:res-pareadas}
-
-Contra o MLP, a BiLSTM apresentou F1 médio menor ou igual nos cinco \textit{datasets} com medidas acumuladas, com diferenças entre $-0{,}001$ e $-0{,}014$, e menor em quatro dos cinco com diferenças entre raios, com variação de $-0{,}005$ a $-0{,}082$ (Tabela~\ref{tab:abl-bilstm-mlp}). Em nove das dez combinações de \textit{dataset} e representação, o MLP obteve F1 médio igual ou superior ao da BiLSTM. Nenhuma dessas diferenças foi significativa, e os intervalos de confiança foram largos, com amplitude de até 0,38 no UCSB. A equivalência dentro de $\pm 0{,}02$ foi demonstrada apenas no LA, nas duas representações. O resultado não sustenta, portanto, a contribuição da recorrência, critério declarado na Seção~\ref{sec:experimentos}, mas também não permite afirmar a superioridade do MLP.
-
-\begin{table}[htb]
-\centering
-\caption{Diferença de F1 macro entre a BiLSTM e o MLP (BiLSTM $-$ MLP), com intervalo de confiança de 95\% corrigido. Valores de $p$ ajustados por Holm entre os codificadores. ``eq.'' indica equivalência dentro de $\pm 0{,}02$.}
-\label{tab:abl-bilstm-mlp}
-\footnotesize
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Rep.} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
-\midrule
-acumulada & $-0{,}009$ ($-0{,}161$ a $+0{,}143$) & $-0{,}005$ ($-0{,}048$ a $+0{,}038$) & $-0{,}001$ ($-0{,}013$ a $+0{,}010$) eq. & $-0{,}010$ ($-0{,}028$ a $+0{,}009$) & $-0{,}014$ ($-0{,}063$ a $+0{,}034$) \\
-diferenças & $-0{,}082$ ($-0{,}271$ a $+0{,}107$) & $-0{,}007$ ($-0{,}106$ a $+0{,}092$) & $+0{,}002$ ($-0{,}015$ a $+0{,}019$) eq. & $-0{,}005$ ($-0{,}027$ a $+0{,}017$) & $-0{,}038$ ($-0{,}083$ a $+0{,}006$) \\
-\bottomrule
-\end{tabular}%
-}
-\end{table}
-
-A BiLSTM superou a LSTM unidirecional em média nos cinco \textit{datasets} e nas duas representações, com diferenças de 0,002 a 0,045. Nenhuma foi significativa, e a equivalência apareceu apenas no LA. A leitura inversa tem, portanto, efeito de mesma direção em todas as combinações, mas pequeno em relação à variabilidade entre partições. Contra a GRU, as diferenças tiveram sinais mistos, de $-0{,}042$ a $+0{,}011$ em F1. Nos classificadores clássicos, o MLP ficou acima da floresta aleatória e do kNN nas dez combinações. Antes da correção de Holm, vários intervalos de confiança excluíram o zero, mas os valores de $p$ ajustados ficaram entre 0,08 e 1,00.
-
-\subsection{Representação por medidas acumuladas ou por diferenças}
-\label{subsec:res-representacao}
-
-A comparação entre as representações, no mesmo codificador, não encontrou diferença significativa em nenhuma das 45 combinações de codificador e \textit{dataset}. O MLP teve diferença média de $+0{,}018$ a favor das diferenças entre raios, com a representação por diferenças melhor em quatro dos cinco \textit{datasets}, e o ganho se concentrou no UCSB ($+0{,}066$, intervalo de $-0{,}060$ a $+0{,}191$). Na BiLSTM, a diferença média foi de 0,000, com a representação por diferenças melhor em três \textit{datasets}. A SVM foi o único método com a representação por diferenças melhor nos cinco \textit{datasets}, com diferença média de $+0{,}007$. Como os dados não distinguem as duas representações, ambas foram mantidas nas etapas seguintes.
-
-\subsection{Ajuste de hiperparâmetros}
-\label{subsec:res-ajuste}
-
-A configuração padrão foi selecionada pela busca interna em 7\% (CNN1D) a 17\% (BiLSTM) das partições, valores próximos de 1/12, o esperado se a escolha fosse aleatória entre as 12 configurações. O ganho de F1 do ajuste, medido nas mesmas partições, foi pequeno fora do UCSB e da SVM, com módulo de no máximo 0,022. Na SVM, o ajuste elevou o F1 em 0,054 a 0,089 no CR e no NHL. No UCSB, o ajuste reduziu o F1 em 16 das 18 configurações, com perda de até 0,081 na regressão logística, o que é compatível com seleção ruidosa quando o treino interno tem cerca de 24 imagens. As configurações selecionadas concentraram-se no \textit{dropout} de 0,5 (53\% a 65\% das partições) e, na BiLSTM, na LSTM, na GRU e no MLP, no \textit{embedding} de 128 dimensões, valores máximos do espaço de busca. A BiLSTM selecionou uma camada em 74\% das partições e teve mediana de 60\,034 parâmetros, contra 30\,210 do MLP.
-
-\subsection{Raio máximo de conexão}
-\label{subsec:res-rmax}
-
-Nenhuma diferença entre $r_{\max} \in \{4, 7, 10\}$ e $r_{\max}=15$ foi significativa, mesmo sem ajuste de multiplicidade ($p \geq 0{,}08$), conforme a Tabela~\ref{tab:abl-rmax}. No MLP, o F1 tendeu a aumentar com $r_{\max}$ no UCSB (de 0,695 a 0,758), no CR (de 0,910 a 0,946) e no NHL (de 0,914 a 0,940), e permaneceu praticamente constante no LA e no LG (0,981 a 0,993). Na BiLSTM, não houve tendência monotônica, exceto no CR, em que o F1 passou de 0,895 com $r_{\max}=4$ para 0,939 com $r_{\max}=10$ e $15$ ($p=0{,}08$). O menor valor de $r_{\max}$ foi o único com perda aparente de desempenho, mas a ausência de significância impede concluir que raios maiores sejam necessários.
+\label{subsec:res-codificadores}
+\label{subsec:res-top-selecionadas}
+O desempenho de cada combinação foi computado pela média aritmética do F1 macro obtido nas cinco partições de validação, selecionando a combinação responsável pela maior pontuação média como a configuração de referência de cada arquitetura em cada conjunto de dados. Os desempenhos obtidos pelas configurações selecionadas de cada codificador, acompanhados do respectivo desvio padrão, estão registrados na Tabela~\ref{tab:abl-f1}, enquanto as combinações de hiperparâmetros responsáveis por esses resultados estão discriminadas na Tabela~\ref{tab:abl-top-params}.
 
 \begin{table}[htb]
 \centering
-\caption{F1 macro (média $\pm$ desvio padrão) por raio máximo, na representação por diferenças. Entre parênteses, o valor de $p$ do teste pareado corrigido contra $r_{\max}=15$, sem ajuste de multiplicidade.}
-\label{tab:abl-rmax}
-\scriptsize
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{llccccc}
-\toprule
-\textbf{Codificador} & $\boldsymbol{r_{\max}}$ & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
-\midrule
-BiLSTM & 4 & 0,656 $\pm$ 0,138 (0,81) & 0,895 $\pm$ 0,039 (0,08) & 0,988 $\pm$ 0,010 (0,41) & 0,976 $\pm$ 0,022 (0,91) & 0,896 $\pm$ 0,044 (0,83) \\
-BiLSTM & 7 & 0,698 $\pm$ 0,142 (0,77) & 0,926 $\pm$ 0,039 (0,48) & 0,994 $\pm$ 0,011 (0,88) & 0,970 $\pm$ 0,023 (0,52) & 0,910 $\pm$ 0,049 (0,71) \\
-BiLSTM & 10 & 0,669 $\pm$ 0,190 (0,90) & 0,939 $\pm$ 0,042 (0,99) & 0,989 $\pm$ 0,014 (0,66) & 0,970 $\pm$ 0,023 (0,43) & 0,920 $\pm$ 0,049 (0,52) \\
-BiLSTM & 15 & 0,676 $\pm$ 0,159 & 0,939 $\pm$ 0,034 & 0,993 $\pm$ 0,008 & 0,978 $\pm$ 0,017 & 0,902 $\pm$ 0,044 \\
-\midrule
-MLP & 4 & 0,695 $\pm$ 0,129 (0,38) & 0,910 $\pm$ 0,044 (0,39) & 0,990 $\pm$ 0,017 (0,92) & 0,984 $\pm$ 0,017 (0,92) & 0,914 $\pm$ 0,045 (0,35) \\
-MLP & 7 & 0,704 $\pm$ 0,120 (0,44) & 0,923 $\pm$ 0,038 (0,57) & 0,993 $\pm$ 0,007 (0,74) & 0,982 $\pm$ 0,017 (0,99) & 0,937 $\pm$ 0,036 (0,88) \\
-MLP & 10 & 0,722 $\pm$ 0,163 (0,60) & 0,951 $\pm$ 0,037 (0,87) & 0,992 $\pm$ 0,007 (0,74) & 0,981 $\pm$ 0,019 (0,87) & 0,942 $\pm$ 0,048 (0,96) \\
-MLP & 15 & 0,758 $\pm$ 0,133 & 0,946 $\pm$ 0,062 & 0,991 $\pm$ 0,012 & 0,983 $\pm$ 0,023 & 0,940 $\pm$ 0,039 \\
-\bottomrule
-\end{tabular}%
-}
-\end{table}
-
-\subsection{Resolução da imagem}
-\label{subsec:res-resolucao}
-
-A redução das imagens para $256 \times 256$ pixels não produziu diferença significativa em nenhuma das 10 comparações (BiLSTM e MLP em cinco \textit{datasets}), conforme a Tabela~\ref{tab:abl-res}. A diferença média entre a resolução reduzida e a original foi de $+0{,}002$ na BiLSTM, com a imagem reduzida melhor em três \textit{datasets}, e de $-0{,}019$ no MLP, com a imagem reduzida melhor em um. As maiores quedas ocorreram no MLP, no UCSB ($-0{,}071$) e no NHL ($-0{,}029$), ambas com intervalos de confiança que incluem o zero. A equivalência dentro de $\pm 0{,}02$ foi demonstrada apenas para o MLP no LG. Em conjunto, os resultados são inconclusivos quanto ao efeito da resolução, e a escolha da resolução original para a via topológica se apoia no argumento de que a rede depende de comparações de intensidades inteiras (Seção~\ref{subsec:cn-medidas}), e não em uma diferença demonstrada de desempenho.
-
-\begin{table}[htb]
-\centering
-\caption{F1 macro na resolução original e em $256 \times 256$ pixels (representação por diferenças, $r_{\max}=15$) e diferença $\Delta$ = F1(256) $-$ F1(original) com intervalo de confiança de 95\% corrigido. Valores de $p$ ajustados por Holm entre os \textit{datasets}.}
-\label{tab:abl-res}
-\scriptsize
+\caption{F1 macro (média $\pm$ desvio padrão entre as 5 partições de validação) da via topológica isolada, na melhor combinação de hiperparâmetros de cada modelo. Em negrito, o maior valor médio de cada conjunto de dados.}
+\label{tab:abl-f1}
+\small
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Codificador} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
 \midrule
-BiLSTM & 0,676 $\to$ 0,694 & 0,939 $\to$ 0,946 & 0,993 $\to$ 0,990 & 0,978 $\to$ 0,981 & 0,902 $\to$ 0,885 \\
- & $\Delta=+0{,}018$ ($-0{,}181$ a $+0{,}218$) & $\Delta=+0{,}007$ ($-0{,}033$ a $+0{,}047$) & $\Delta=-0{,}002$ ($-0{,}022$ a $+0{,}017$) & $\Delta=+0{,}003$ ($-0{,}021$ a $+0{,}027$) & $\Delta=-0{,}017$ ($-0{,}070$ a $+0{,}035$) \\
-MLP & 0,758 $\to$ 0,687 & 0,946 $\to$ 0,957 & 0,991 $\to$ 0,987 & 0,983 $\to$ 0,981 & 0,940 $\to$ 0,911 \\
- & $\Delta=-0{,}071$ ($-0{,}182$ a $+0{,}040$) & $\Delta=+0{,}011$ ($-0{,}047$ a $+0{,}068$) & $\Delta=-0{,}004$ ($-0{,}022$ a $+0{,}014$) & $\Delta=-0{,}002$ ($-0{,}019$ a $+0{,}015$) eq. & $\Delta=-0{,}029$ ($-0{,}086$ a $+0{,}028$) \\
+LSTM & \pend & \pend & \pend & \pend & \pend \\
+BiLSTM & \pend & \pend & \pend & \pend & \pend \\
+GRU & \pend & \pend & \pend & \pend & \pend \\
+BiGRU & \pend & \pend & \pend & \pend & \pend \\
+SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
+MLP & \pend & \pend & \pend & \pend & \pend \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-\subsection{Sanidade do protocolo}
-\label{subsec:res-sanidade}
-
-Com os rótulos permutados, o F1 macro da BiLSTM e do MLP ficou entre 0,163 e 0,485, e a acurácia entre 0,287 e 0,561, compatíveis com o acaso dos \textit{datasets} (0,25 a 0,50 para $1/C$), considerando o desbalanceamento de classes. O valor mais alto, 0,561 de acurácia no LG, está próximo da proporção da classe majoritária (150 das 265 imagens, ou 57\%). Essa verificação utilizou uma repetição e 3 configurações e, por isso, tem variabilidade maior do que as demais análises. Ela indica que o protocolo não vaza informação de rótulo entre o treino e o teste de cada partição, mas não detecta vazamento por origem comum das imagens. Os \textit{datasets} CR, LA e LG provêm de um número limitado de seções histológicas e de animais, e imagens da mesma origem podem aparecer no treino e no teste (Seção~\ref{subsec:limitacoes}). Esse fator pode contribuir para os F1 próximos de 0,99 no LA e no LG.
-
-\subsection{Síntese}
-\label{subsec:res-sintese}
-
-A via topológica isolada discriminou as classes muito acima do classificador de maioria nos cinco \textit{datasets}, com F1 macro máximo de 0,758 no UCSB e entre 0,943 e 0,998 nos demais \textit{datasets}. Não houve diferença significativa entre codificadores neurais, entre estes e a SVM ou a regressão logística, entre as representações, entre os valores de $r_{\max}$ nem entre as resoluções. O MLP obteve o melhor ranking médio e a BiLSTM o melhor entre as redes recorrentes, razão pela qual ambos foram mantidos como codificadores topológicos nas etapas seguintes, com as duas representações da sequência. A ausência de vantagem demonstrada da BiLSTM sobre o MLP é reportada como resultado e será considerada na interpretação do modelo de dupla via.
-
-\section{Ablação da via visual}
-\label{sec:res-ablacao-visual}
-
-A ablação da via visual isolada seguiu o protocolo da Seção~\ref{subsec:protocolo-ablacao-visual}, com as mesmas 15 partições externas por tarefa da via topológica, o que permite comparar as duas vias partição a partição. Foram avaliadas sete configurações por \textit{dataset}: três arquiteturas (MobileViT-S, EfficientNet-B0 e DeiT-Tiny) com o \textit{backbone} congelado, as mesmas três com ajuste fino e aumento de dados e, apenas para a MobileViT-S, o ajuste fino sem aumento. As 35 combinações de \textit{dataset} e configuração foram concluídas com 12 configurações de hiperparâmetros por tarefa.
-
-\subsection{Desempenho das configurações visuais}
-\label{subsec:res-vis-desempenho}
-
-O F1 macro médio de cada configuração está na Tabela~\ref{tab:abl-vis-f1}, ao lado das quatro variantes da via topológica que seguem para o modelo de dupla via (Seção~\ref{sec:res-ablacao}), avaliadas nas mesmas partições. As configurações com ajuste fino tiveram F1 macro de 0,726 a 0,912 no UCSB e de 0,854 a 0,990 nos demais \textit{datasets}, e a MobileViT-S ajustada com aumento obteve o melhor ranking médio entre as onze configurações (3,40), seguida da EfficientNet-B0 ajustada (4,00), da via topológica com MLP e diferenças (4,60) e da MobileViT-S ajustada sem aumento (4,80). As configurações com \textit{backbone} congelado ficaram nas últimas posições entre as visuais, com ranking de 8,60 (MobileViT-S) e 9,40 (DeiT-Tiny), e a EfficientNet-B0 congelada, em 5,80, foi a exceção. Esse ranking é descritivo.
+As combinações ótimas de hiperparâmetros responsáveis pelos maiores índices de F1 macro em cada conjunto de dados estão discriminadas na Tabela~\ref{tab:abl-top-params}.
 
 \begin{table}[htb]
 \centering
-\caption{F1 macro (média $\pm$ desvio padrão entre as 15 partições externas) das configurações da via visual e das variantes da via topológica com $r_{\max}=15$ e resolução original (BiLSTM e MLP, medidas acumuladas e diferenças). Em negrito, o maior valor médio de cada \textit{dataset} entre as linhas da tabela.}
+\caption{Melhores combinações de hiperparâmetros obtidas na validação cruzada para cada modelo nos cinco conjuntos de dados.}
+\label{tab:abl-top-params}
+\label{tab:abl-top-sel}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Modelo} & \textbf{Taxa de aprend.} & \textbf{\textit{Weight Decay}} & \textbf{\textit{Dropout}} & \textbf{Dim. oculta} & \textbf{Lote} \\
+\midrule
+UCSB & LSTM & \pend & \pend & \pend & \pend & \pend \\
+UCSB & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
+UCSB & GRU & \pend & \pend & \pend & \pend & \pend \\
+UCSB & BiGRU & \pend & \pend & \pend & \pend & \pend \\
+UCSB & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
+UCSB & MLP & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+CR & LSTM & \pend & \pend & \pend & \pend & \pend \\
+CR & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
+CR & GRU & \pend & \pend & \pend & \pend & \pend \\
+CR & BiGRU & \pend & \pend & \pend & \pend & \pend \\
+CR & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
+CR & MLP & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+LA & LSTM & \pend & \pend & \pend & \pend & \pend \\
+LA & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
+LA & GRU & \pend & \pend & \pend & \pend & \pend \\
+LA & BiGRU & \pend & \pend & \pend & \pend & \pend \\
+LA & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
+LA & MLP & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+LG & LSTM & \pend & \pend & \pend & \pend & \pend \\
+LG & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
+LG & GRU & \pend & \pend & \pend & \pend & \pend \\
+LG & BiGRU & \pend & \pend & \pend & \pend & \pend \\
+LG & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
+LG & MLP & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+NHL & LSTM & \pend & \pend & \pend & \pend & \pend \\
+NHL & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
+NHL & GRU & \pend & \pend & \pend & \pend & \pend \\
+NHL & BiGRU & \pend & \pend & \pend & \pend & \pend \\
+NHL & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
+NHL & MLP & \pend & \pend & \pend & \pend & \pend \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\section{Seleção da via visual}
+\label{sec:ablacao-visual}
+
+A seleção da via visual seguiu o protocolo da Seção~\ref{subsec:protocolo-ablacao-visual}, com as mesmas 5 partições de validação da via topológica, seis \textit{backbones} e 12 combinações de hiperparâmetros por \textit{backbone}. Resultam 30 combinações de \textit{dataset} e \textit{backbone}. \pend{} (confirmar que todas foram concluídas).
+
+\subsection{Desempenho dos \textit{backbones}}
+\label{subsec:res-vis-desempenho}
+
+O F1 macro médio de cada \textit{backbone}, na melhor combinação de hiperparâmetros, está na Tabela~\ref{tab:abl-vis-f1}. \pend{} (descrever o ranking médio, o desempenho por família de arquitetura nas classes híbrida, convolucional e \textit{transformer}, e a variabilidade no UCSB).
+
+\begin{table}[htb]
+\centering
+\caption{F1 macro (média $\pm$ desvio padrão entre as 5 partições de validação) da via visual isolada, com \textit{fine-tuning} e aumento de dados rotacional, na melhor combinação de hiperparâmetros de cada \textit{backbone}. Em negrito, o maior valor médio de cada \textit{dataset}.}
 \label{tab:abl-vis-f1}
 \small
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llccccc}
 \toprule
-\textbf{Via} & \textbf{Configuração} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\textbf{Família} & \textbf{\textit{Backbone}} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
 \midrule
-Visual & DeiT-Tiny, congelado & 0,711 $\pm$ 0,142 & 0,956 $\pm$ 0,020 & 0,863 $\pm$ 0,046 & 0,937 $\pm$ 0,038 & 0,721 $\pm$ 0,081 \\
-Visual & DeiT-Tiny, ajuste fino com aumento & 0,726 $\pm$ 0,185 & 0,985 $\pm$ 0,028 & 0,968 $\pm$ 0,028 & 0,990 $\pm$ 0,012 & 0,854 $\pm$ 0,040 \\
-Visual & EfficientNet-B0, congelado & \textbf{0,917} $\pm$ 0,091 & \textbf{0,987} $\pm$ 0,024 & 0,926 $\pm$ 0,028 & 0,973 $\pm$ 0,022 & 0,756 $\pm$ 0,061 \\
-Visual & EfficientNet-B0, ajuste fino com aumento & 0,912 $\pm$ 0,083 & 0,984 $\pm$ 0,024 & 0,989 $\pm$ 0,010 & 0,989 $\pm$ 0,020 & 0,896 $\pm$ 0,068 \\
-Visual & MobileViT-S, congelado & 0,750 $\pm$ 0,172 & 0,962 $\pm$ 0,036 & 0,926 $\pm$ 0,017 & 0,962 $\pm$ 0,026 & 0,697 $\pm$ 0,054 \\
-Visual & MobileViT-S, ajuste fino com aumento & 0,870 $\pm$ 0,129 & \textbf{0,987} $\pm$ 0,023 & 0,985 $\pm$ 0,015 & 0,983 $\pm$ 0,024 & 0,908 $\pm$ 0,034 \\
-Visual & MobileViT-S, ajuste fino sem aumento & 0,811 $\pm$ 0,155 & 0,980 $\pm$ 0,024 & 0,978 $\pm$ 0,023 & \textbf{0,995} $\pm$ 0,010 & 0,894 $\pm$ 0,037 \\
-\midrule
-Topológica & BiLSTM, acumulada & 0,683 $\pm$ 0,157 & 0,936 $\pm$ 0,042 & 0,992 $\pm$ 0,007 & 0,970 $\pm$ 0,023 & 0,905 $\pm$ 0,049 \\
-Topológica & BiLSTM, diferenças & 0,676 $\pm$ 0,159 & 0,939 $\pm$ 0,034 & 0,993 $\pm$ 0,008 & 0,978 $\pm$ 0,017 & 0,902 $\pm$ 0,044 \\
-Topológica & MLP, acumulada & 0,692 $\pm$ 0,144 & 0,941 $\pm$ 0,032 & \textbf{0,994} $\pm$ 0,009 & 0,979 $\pm$ 0,025 & 0,920 $\pm$ 0,043 \\
-Topológica & MLP, diferenças & 0,758 $\pm$ 0,133 & 0,946 $\pm$ 0,062 & 0,991 $\pm$ 0,012 & 0,983 $\pm$ 0,023 & \textbf{0,940} $\pm$ 0,039 \\
-\bottomrule
-\end{tabular}%
-}
-\end{table}
-
-O ajuste fino foi decisivo no LA e no NHL, os \textit{datasets} de textura e de maior variabilidade de coloração. No LA, as três arquiteturas congeladas ficaram entre 0,863 e 0,926, contra 0,968 a 0,989 ajustadas, e no NHL entre 0,697 e 0,756, contra 0,854 a 0,908. Nos conjuntos menores, o padrão não se repetiu: no UCSB e no CR, a EfficientNet-B0 congelada igualou ou superou a ajustada (0,917 contra 0,912 e 0,987 contra 0,984), e o maior F1 médio do UCSB entre todas as linhas da tabela foi o dela. No UCSB, o desvio padrão entre partições foi de 0,083 a 0,185 nas configurações visuais, o que limita a interpretação das diferenças entre médias.
-
-\subsection{Comparações com a MobileViT-S ajustada com aumento}
-\label{subsec:res-vis-pareadas}
-
-A Tabela~\ref{tab:abl-vis-ref} compara as demais configurações visuais com a MobileViT-S ajustada com aumento, que é a configuração adotada como referência por ser a visual do modelo de dupla via. Seis das 30 comparações foram significativas após a correção de Holm, e todas envolveram configurações congeladas no LA ou no NHL, com $p$ ajustado de no máximo 0,02. As quedas foram de 0,059 a 0,122 no LA e de 0,152 a 0,211 no NHL. Nenhuma das 15 comparações com configurações ajustadas foi significativa. A DeiT-Tiny ajustada teve a maior queda média em relação à referência no UCSB ($-0{,}144$) e no NHL ($-0{,}053$), mas com intervalos de confiança que incluem o zero, e a EfficientNet-B0 ajustada diferiu da referência em no máximo 0,042 em todos os \textit{datasets}, também sem significância. Nenhuma equivalência dentro de $\pm 0{,}02$ foi demonstrada, e os intervalos do UCSB foram os mais largos, com amplitude de até 0,64 (MobileViT-S congelada). Os dados não distinguem, portanto, as três arquiteturas quando ajustadas, e a escolha da MobileViT-S não se apoia em superioridade demonstrada sobre a EfficientNet-B0 ou a DeiT-Tiny.
-
-\begin{table}[htb]
-\centering
-\caption{Diferença de F1 macro entre cada configuração visual e a MobileViT-S ajustada com aumento (configuração $-$ referência), com intervalo de confiança de 95\% corrigido. O asterisco indica $p<0{,}05$ após a correção de Holm entre as seis comparações de cada \textit{dataset}.}
-\label{tab:abl-vis-ref}
-\footnotesize
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Configuração} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
-\midrule
-DeiT-Tiny, congelado & $-0{,}159$ ($-0{,}369$ a $+0{,}052$) & $-0{,}031$ ($-0{,}062$ a $+0{,}000$) & $-0{,}122$ ($-0{,}182$ a $-0{,}063$)$^{*}$ & $-0{,}045$ ($-0{,}102$ a $+0{,}012$) & $-0{,}187$ ($-0{,}282$ a $-0{,}092$)$^{*}$ \\
-DeiT-Tiny, ajuste fino & $-0{,}144$ ($-0{,}413$ a $+0{,}126$) & $-0{,}003$ ($-0{,}047$ a $+0{,}041$) & $-0{,}017$ ($-0{,}061$ a $+0{,}026$) & $+0{,}008$ ($-0{,}018$ a $+0{,}034$) & $-0{,}053$ ($-0{,}115$ a $+0{,}009$) \\
-EfficientNet-B0, congelado & $+0{,}048$ ($-0{,}159$ a $+0{,}254$) & $0{,}000$ ($-0{,}039$ a $+0{,}038$) & $-0{,}059$ ($-0{,}097$ a $-0{,}021$)$^{*}$ & $-0{,}010$ ($-0{,}047$ a $+0{,}028$) & $-0{,}152$ ($-0{,}233$ a $-0{,}070$)$^{*}$ \\
-EfficientNet-B0, ajuste fino & $+0{,}042$ ($-0{,}067$ a $+0{,}152$) & $-0{,}003$ ($-0{,}039$ a $+0{,}034$) & $+0{,}004$ ($-0{,}018$ a $+0{,}025$) & $+0{,}006$ ($-0{,}016$ a $+0{,}029$) & $-0{,}011$ ($-0{,}100$ a $+0{,}078$) \\
-MobileViT-S, congelado & $-0{,}120$ ($-0{,}439$ a $+0{,}200$) & $-0{,}026$ ($-0{,}064$ a $+0{,}012$) & $-0{,}060$ ($-0{,}094$ a $-0{,}025$)$^{*}$ & $-0{,}021$ ($-0{,}050$ a $+0{,}008$) & $-0{,}211$ ($-0{,}297$ a $-0{,}125$)$^{*}$ \\
-MobileViT-S, ajuste fino sem aumento & $-0{,}058$ ($-0{,}296$ a $+0{,}180$) & $-0{,}008$ ($-0{,}038$ a $+0{,}023$) & $-0{,}007$ ($-0{,}037$ a $+0{,}023$) & $+0{,}013$ ($-0{,}018$ a $+0{,}043$) & $-0{,}013$ ($-0{,}076$ a $+0{,}050$) \\
-\bottomrule
-\end{tabular}%
-}
-\end{table}
-
-\subsection{Via visual contra via topológica}
-\label{subsec:res-vis-topologica}
-
-A Tabela~\ref{tab:abl-vis-topo} compara a MobileViT-S ajustada com aumento com as quatro variantes da via topológica nas mesmas partições. Nenhuma das 20 comparações foi significativa após a correção de Holm. As diferenças tiveram sinal consistente por \textit{dataset}. No UCSB, a via visual teve F1 médio maior que o das quatro variantes topológicas, com diferenças de $+0{,}112$ a $+0{,}194$, e no CR também, com diferenças de $+0{,}042$ a $+0{,}052$. No LA, a via topológica teve F1 médio maior nas quatro variantes, com diferenças de $-0{,}005$ a $-0{,}009$, e no LG as diferenças ficaram entre $0{,}000$ e $+0{,}013$. No NHL, os sinais foram mistos, de $-0{,}033$ a $+0{,}005$. O único intervalo de confiança que não incluiu o zero antes da correção foi o da BiLSTM com diferenças no CR ($+0{,}004$ a $+0{,}093$), com $p$ ajustado de 0,14. A equivalência dentro de $\pm 0{,}02$ foi demonstrada apenas entre a via visual e o MLP com diferenças no LG.
-
-\begin{table}[htb]
-\centering
-\caption{Diferença de F1 macro entre a MobileViT-S ajustada com aumento e a via topológica (visual $-$ topológica), com intervalo de confiança de 95\% corrigido. Valores positivos favorecem a via visual. Nenhuma diferença foi significativa após a correção de Holm entre as quatro variantes de cada \textit{dataset}. ``eq.'' indica equivalência dentro de $\pm 0{,}02$.}
-\label{tab:abl-vis-topo}
-\footnotesize
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Via topológica} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
-\midrule
-BiLSTM, acumulada & $+0{,}187$ ($-0{,}031$ a $+0{,}404$) & $+0{,}052$ ($-0{,}008$ a $+0{,}111$) & $-0{,}007$ ($-0{,}028$ a $+0{,}013$) & $+0{,}013$ ($-0{,}014$ a $+0{,}039$) & $+0{,}002$ ($-0{,}057$ a $+0{,}062$) \\
-BiLSTM, diferenças & $+0{,}194$ ($-0{,}038$ a $+0{,}426$) & $+0{,}048$ ($+0{,}004$ a $+0{,}093$) & $-0{,}008$ ($-0{,}027$ a $+0{,}012$) & $+0{,}005$ ($-0{,}017$ a $+0{,}027$) & $+0{,}005$ ($-0{,}059$ a $+0{,}070$) \\
-MLP, acumulada & $+0{,}178$ ($-0{,}036$ a $+0{,}391$) & $+0{,}046$ ($-0{,}003$ a $+0{,}096$) & $-0{,}009$ ($-0{,}029$ a $+0{,}012$) & $+0{,}003$ ($-0{,}021$ a $+0{,}027$) & $-0{,}012$ ($-0{,}065$ a $+0{,}041$) \\
-MLP, diferenças & $+0{,}112$ ($-0{,}060$ a $+0{,}283$) & $+0{,}042$ ($-0{,}042$ a $+0{,}125$) & $-0{,}005$ ($-0{,}026$ a $+0{,}015$) & $0{,}000$ ($-0{,}019$ a $+0{,}019$) eq. & $-0{,}033$ ($-0{,}100$ a $+0{,}034$) \\
-\bottomrule
-\end{tabular}%
-}
-\end{table}
-
-Os resultados não demonstram superioridade de uma via sobre a outra, e o desempenho de ambas é próximo do limite superior no LA e no LG (F1 médio de 0,97 a 0,99), onde há pouco espaço para diferenças. A tendência a favor da via visual nos dois conjuntos de diagnóstico menores (UCSB e CR) e a tendência oposta, de pequena magnitude, no LA indicam que as duas vias podem não falhar nos mesmos \textit{datasets}, mas essa leitura é descritiva: a complementaridade dos erros por imagem não foi analisada, e a comparação do modelo de dupla via com cada via isolada é o teste direto dessa hipótese (Seção~\ref{sec:experimentos}).
-
-\subsection{Efeito do aumento de dados}
-\label{subsec:res-vis-aumento}
-
-O aumento de dados, composto por inversões e rotações de 90 graus, foi avaliado apenas na MobileViT-S, na comparação entre o ajuste fino com e sem aumento nas mesmas partições (Tabela~\ref{tab:abl-vis-aug}). A diferença média foi de $+0{,}015$ a favor do aumento, que obteve F1 médio maior em quatro dos cinco \textit{datasets}. Nenhuma diferença foi significativa e nenhuma equivalência foi demonstrada. O ganho se concentrou no UCSB ($+0{,}058$, intervalo de $-0{,}180$ a $+0{,}296$), o menor \textit{dataset}, e o único em que o sinal foi oposto foi o LG ($-0{,}013$), onde a configuração sem aumento obteve o maior F1 médio entre todas as linhas da Tabela~\ref{tab:abl-vis-f1} (0,995). Os dados são compatíveis com um efeito pequeno e positivo do aumento, mas também com ausência de efeito, e o efeito nas outras duas arquiteturas não foi avaliado, pois elas foram ajustadas somente com aumento.
-
-\begin{table}[htb]
-\centering
-\caption{F1 macro da MobileViT-S ajustada sem e com aumento de dados e diferença $\Delta$ = F1(com aumento) $-$ F1(sem aumento), com intervalo de confiança de 95\% corrigido. Valores de $p$ ajustados por Holm entre os \textit{datasets}: todos iguais a 1,00.}
-\label{tab:abl-vis-aug}
-\scriptsize
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Arquitetura} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
-\midrule
-MobileViT-S & 0,811 $\to$ 0,870 & 0,980 $\to$ 0,987 & 0,978 $\to$ 0,985 & 0,995 $\to$ 0,983 & 0,894 $\to$ 0,908 \\
- & $\Delta=+0{,}058$ ($-0{,}180$ a $+0{,}296$) & $\Delta=+0{,}008$ ($-0{,}023$ a $+0{,}038$) & $\Delta=+0{,}007$ ($-0{,}023$ a $+0{,}037$) & $\Delta=-0{,}013$ ($-0{,}043$ a $+0{,}018$) & $\Delta=+0{,}013$ ($-0{,}050$ a $+0{,}076$) \\
+Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
+Híbrida & CoAtNet & \pend & \pend & \pend & \pend & \pend \\
+Convolucional & ResNet-50 & \pend & \pend & \pend & \pend & \pend \\
+Convolucional & EfficientNet-B0 & \pend & \pend & \pend & \pend & \pend \\
+\textit{Transformer} & ViT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+\textit{Transformer} & DeiT-Tiny & \pend & \pend & \pend & \pend & \pend \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
 \subsection{Ajuste de hiperparâmetros e custo}
-\label{subsec:res-vis-ajuste}
+\label{sec:res-vis-ajuste}
 
-O ganho de F1 do ajuste em relação à configuração padrão, medido nas mesmas partições, está na Tabela~\ref{tab:abl-vis-ganho}. Nas configurações congeladas, o módulo do ganho foi de no máximo 0,022. Nas configurações ajustadas, o ganho foi predominantemente positivo na MobileViT-S e na EfficientNet-B0, e concentrou-se no UCSB e no NHL: na MobileViT-S, de $+0{,}094$ e $+0{,}025$ com aumento e de $+0{,}076$ e $+0{,}056$ sem aumento, e na EfficientNet-B0, de $+0{,}032$ e $+0{,}034$. Na DeiT-Tiny ajustada, o ajuste reduziu o F1 em quatro dos cinco \textit{datasets}, com perda de até 0,051 no UCSB, o que é compatível com a seleção ruidosa observada na via topológica (Seção~\ref{subsec:res-ajuste}). Esses ganhos são descritivos e não foram testados, e o padrão é uma configuração conservadora, com taxa de aprendizado de $10^{-5}$ no \textit{backbone}.
+\pend{} (reportar os valores de hiperparâmetros mais selecionados, em especial a taxa de aprendizado do \textit{backbone}, e se o limite superior do espaço de busca foi o escolhido com frequência, além de relatar a contagem de parâmetros e o tempo mediano de treino por \textit{backbone}).
 
-\begin{table}[htb]
-\centering
-\caption{Ganho médio de F1 macro do ajuste de hiperparâmetros (F1 da configuração selecionada $-$ F1 da configuração padrão), nas mesmas partições externas.}
-\label{tab:abl-vis-ganho}
-\small
-\begin{tabular}{lccccc}
-\toprule
-\textbf{Configuração} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
-\midrule
-DeiT-Tiny, congelado & $-0{,}022$ & $-0{,}010$ & $+0{,}001$ & $-0{,}010$ & $-0{,}004$ \\
-DeiT-Tiny, ajuste fino com aumento & $-0{,}051$ & $-0{,}010$ & $-0{,}006$ & $+0{,}006$ & $-0{,}014$ \\
-EfficientNet-B0, congelado & $+0{,}015$ & $+0{,}003$ & $-0{,}003$ & $+0{,}002$ & $+0{,}015$ \\
-EfficientNet-B0, ajuste fino com aumento & $+0{,}032$ & $+0{,}002$ & $+0{,}004$ & $+0{,}003$ & $+0{,}034$ \\
-MobileViT-S, congelado & $+0{,}009$ & $0{,}000$ & $+0{,}005$ & $-0{,}006$ & $-0{,}006$ \\
-MobileViT-S, ajuste fino com aumento & $+0{,}094$ & $-0{,}002$ & $+0{,}001$ & $0{,}000$ & $+0{,}025$ \\
-MobileViT-S, ajuste fino sem aumento & $+0{,}076$ & $0{,}000$ & $+0{,}013$ & $+0{,}021$ & $+0{,}056$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Configurações selecionadas}
+\label{subsec:res-vis-selecionadas}
 
-A configuração padrão foi selecionada pela busca interna em 0\% das partições nas três configurações ajustadas da MobileViT-S e da EfficientNet-B0, em 11\% na DeiT-Tiny ajustada e em 9\% a 17\% nas congeladas, contra 8\% esperados se a escolha fosse aleatória entre as 12 configurações. A Tabela~\ref{tab:abl-vis-sel} mostra o valor mais selecionado de cada hiperparâmetro. Nas configurações ajustadas da MobileViT-S e da EfficientNet-B0, a busca selecionou a taxa de aprendizado do \textit{backbone} de $3 \times 10^{-4}$, o valor máximo do espaço de busca, em 76\% (com aumento) e 83\% (sem aumento) das partições da MobileViT-S e em 69\% das da EfficientNet-B0, e o valor padrão de $10^{-5}$ não foi selecionado em nenhuma partição da MobileViT-S. Como o limite superior do espaço foi o escolhido, o ótimo pode estar fora dele, e o ganho de ajuste reportado é, possivelmente, um limite inferior do que taxas maiores permitiriam. A DeiT-Tiny preferiu taxas menores ($10^{-4}$ em 47\% e $3 \times 10^{-5}$ em 39\% das partições). O \textit{dropout} de 0,5 predominou na MobileViT-S ajustada (56\% a 61\%) e o de 0,1 na DeiT-Tiny ajustada (49\%), e o decaimento de pesos de $10^{-1}$ não foi selecionado em nenhuma partição.
+As três configurações da via visual que seguem para a fusão estão na Tabela~\ref{tab:abl-vis-sel}.
 
 \begin{table}[htb]
 \centering
-\caption{Valor mais selecionado de cada hiperparâmetro (entre parênteses, a fração das 15 partições externas), mediana de épocas do treino final, número de parâmetros e tempo mediano por partição externa, que inclui toda a busca aninhada. A taxa de aprendizado do \textit{backbone} não se aplica às configurações congeladas.}
+\caption{Três melhores configurações da via visual, por ranking médio do F1 macro entre os \textit{datasets}.}
 \label{tab:abl-vis-sel}
-\scriptsize
+\small
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{lcccccrrr}
+\begin{tabular}{clccccc}
 \toprule
-\textbf{Configuração} & \textbf{$\mathrm{lr}_{bb}$} & \textbf{$\mathrm{lr}_{hd}$} & \textbf{Decaim.} & \textbf{\textit{Dropout}} & \textbf{Lote} & \textbf{Épocas} & \textbf{Parâmetros} & \textbf{Tempo (s)} \\
+\textbf{Posição} & \textbf{\textit{Backbone}} & $\mathrm{lr}_{bb}$ & $\mathrm{lr}_{hd}$ & \textbf{\textit{Dropout}} & \textbf{Lote} & \textbf{Ranking médio} \\
 \midrule
-DeiT-Tiny, congelado & --- & $10^{-4}$ (48\%) & $10^{-4}$ (47\%) & 0,5 (43\%) & 32 (49\%) & 51 & 41\,730 & 29 \\
-DeiT-Tiny, ajuste fino com aumento & $10^{-4}$ (47\%) & $10^{-4}$ (61\%) & $10^{-4}$ (43\%) & 0,1 (49\%) & 16 (65\%) & 15 & 5\,566\,146 & 421 \\
-EfficientNet-B0, congelado & --- & $10^{-4}$ (59\%) & $10^{-4}$ (53\%) & 0,5 (39\%) & 16 (57\%) & 32 & 180\,994 & 23 \\
-EfficientNet-B0, ajuste fino com aumento & $3 \times 10^{-4}$ (69\%) & $10^{-3}$ (47\%) & $10^{-2}$ (41\%) & 0,5 (47\%) & 16 (47\%) & 12 & 4\,188\,542 & 637 \\
-MobileViT-S, congelado & --- & $10^{-4}$ (51\%) & $10^{-4}$ (45\%) & 0,1 (41\%) & 16 (56\%) & 31 & 99\,074 & 28 \\
-MobileViT-S, ajuste fino com aumento & $3 \times 10^{-4}$ (76\%) & $10^{-4}$ (51\%) & $10^{-4}$ (51\%) & 0,5 (61\%) & 16 (51\%) & 15 & 5\,036\,706 & 601 \\
-MobileViT-S, ajuste fino sem aumento & $3 \times 10^{-4}$ (83\%) & $10^{-3}$ (41\%) & $10^{-4}$ (39\%) & 0,5 (56\%) & 16 (57\%) & 12 & 5\,036\,706 & 604 \\
+1 & \pend & \pend & \pend & \pend & \pend & \pend \\
+2 & \pend & \pend & \pend & \pend & \pend & \pend \\
+3 & \pend & \pend & \pend & \pend & \pend & \pend \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-O ajuste fino exigiu de 12 a 15 épocas medianas no treino final e cerca de 7 a 11 minutos por partição externa (421 a 637 s), contra 23 a 29 s nas configurações congeladas, de 15 a 28 vezes menos. Esses tempos são medianas entre os \textit{datasets}, incluem as 12 configurações com três partições internas cada e dependem do tamanho de cada conjunto. As configurações congeladas treinaram de 41\,730 a 180\,994 parâmetros e as ajustadas, de 4,2 a 5,6 milhões.
+\section{Síntese e encaminhamento para a fusão}
+\label{subsec:res-sintese-abl}
 
-\subsection{Síntese}
-\label{subsec:res-vis-sintese}
-
-A via visual isolada discriminou as classes com F1 macro médio de 0,85 a 0,99 nos \textit{datasets} diferentes do UCSB quando ajustada e de 0,73 a 0,91 no UCSB, e a MobileViT-S ajustada com aumento não foi significativamente diferente da via topológica em nenhum \textit{dataset}. No LA e no NHL, as três arquiteturas congeladas foram significativamente inferiores à referência ajustada. Entre as arquiteturas ajustadas, não houve diferença significativa, e a MobileViT-S ajustada com aumento obteve o melhor ranking médio. O aumento de dados teve efeito pequeno e não significativo, e a seleção de hiperparâmetros escolheu o limite superior da taxa de aprendizado do \textit{backbone}, o que indica que o espaço de busca pode ter sido restritivo. A MobileViT-S ajustada com aumento é mantida como via visual do modelo de dupla via com base no ranking descritivo e na compatibilidade com o desenho proposto (arquitetura híbrida de custo reduzido), e não em uma superioridade demonstrada, e as duas representações e os dois codificadores topológicos seguem para a comparação com a fusão.
+Foram selecionadas três configurações da via topológica (Tabela~\ref{tab:abl-top-sel}) e três da via visual (Tabela~\ref{tab:abl-vis-sel}), que compõem os modelos de dupla via. Todos os modelos finais são treinados com os 80\% de desenvolvimento e avaliados uma única vez nos 20\% de teste, reservados em todas as etapas deste capítulo. A comparação entre a via visual isolada, a via topológica isolada e a dupla via, que responde ao objetivo central do trabalho, está na Seção~\ref{sec:experimentos}. \pend{} (comentar, de forma descritiva, em quais \textit{datasets} cada via teve vantagem na validação interna, reservando a análise da integração combinada para o capítulo de fusão).
