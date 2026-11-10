@@ -6,13 +6,15 @@
 \chapter{Ablação}
 \label{chap:res-ablacao}
 
-Neste capítulo são detalhados os experimentos de ablação conduzidos para determinar as arquiteturas e os hiperparâmetros da via topológica e da via visual antes da composição do modelo de dupla via. As duas vias foram avaliadas de forma isolada sobre as mesmas partições de dados, com o propósito de selecionar as melhores configurações sem utilizar o conjunto de teste final reservado.
+Neste capítulo são detalhados os experimentos de ablação conduzidos para determinar as arquiteturas e os hiperparâmetros da via topológica e da via visual antes da composição do modelo de dupla via. As duas vias foram avaliadas de forma isolada sobre as mesmas partições de dados, com o propósito de selecionar as melhores configurações sem utilizar o conjunto de teste final reservado. A organização conceitual da avaliação das vias isoladas está ilustrada na \ref{fig:ablacao-vias}, abrangendo os modelos avaliados na via topológica e na via visual, com suas respectivas cabeças de classificação e extração de métricas.
+
+\input{ablacao_vias.tex}
 
 \section{Ablação da Via Topológica}
 \label{sec:via-topologica}
 \label{sec:ablacao-topologica}
 
-A via topológica recebe a sequência de características calculada a partir de redes complexas sobre 15 raios de conexão, denotada por $X_{\mathrm{top}} \in \mathbb{R}^{15 \times 18}$, em que cada passo contém 18 medidas descritoras. Para verificar a capacidade de aprendizado sobre essa sequência e avaliar a contribuição da dependência de ordem entre as escalas, foram selecionados cinco modelos de redes neurais recorrentes e um modelo não recorrente como \textit{baseline}:
+A via topológica recebe a sequência de características calculada a partir de redes complexas sobre 15 raios de conexão, denotada por $X_{\mathrm{top}} \in \mathbb{R}^{15 \times 18}$, em que cada passo contém 18 medidas descritoras. Para verificar a capacidade de aprendizado sobre essa sequência e avaliar a contribuição da dependência de ordem entre as escalas, foram selecionados cinco modelos de redes neurais recorrentes e um modelo não recorrente como \textit{baseline} (\ref{fig:ablacao-vias}a):
 
 \begin{itemize}
     \item a LSTM padrão \cite{hochreiter1997long,gers2000learning}, modelo com portas de esquecimento, entrada e saída, empregado como referência no processamento de sequências multiescala \cite{lin2022mslstm} e diagnósticos médicos \cite{mathiyalagi2026hclstm},
@@ -26,30 +28,32 @@ A via topológica recebe a sequência de características calculada a partir de 
 Todos os seis codificadores produzem um vetor de características com a mesma dimensão oculta, conectado à mesma cabeça de classificação, formada por normalização por camadas, camada linear de 128 neurônios com ativação ReLU, camada de \textit{dropout} e camada linear de saída com projeção para o número de classes de cada tarefa.
 
 \label{subsec:protocolo-ablacao}
-O protocolo experimental foi executado exclusivamente sobre a partição de desenvolvimento de cada conjunto de dados. Inicialmente, as imagens de cada conjunto foram divididas de forma estratificada, com semente 42, na proporção de 80\% para desenvolvimento e 20\% para teste final, permanecendo a partição de teste totalmente reservada e sem qualquer participação no processo de ablação. Sobre os 80\% de desenvolvimento, foi aplicada uma validação cruzada estratificada em cinco partições ($k = 5$). Para cada modelo e para cada combinação de hiperparâmetros, o treinamento foi conduzido em cinco rodadas independentes, nas quais quatro partições foram destinadas ao ajuste dos pesos e uma partição foi utilizada para a validação, alternando a partição de validação a cada rodada. Em cada rodada, as 18 medidas descritoras foram padronizadas por escore padrão calculado exclusivamente sobre as partições de treino, prevenindo vazamento de dados para a validação. As dimensões amostrais das partições e a grade de hiperparâmetros explorada para cada conjunto de dados estão sintetizadas na Tabela~\ref{tab:espaco-busca-top}.
+O protocolo experimental de particionamento, validação cruzada, busca em grade e seleção de hiperparâmetros dos modelos em ablação está esquematizado na \ref{fig:ablacao-treino}. O procedimento foi executado exclusivamente sobre a partição de desenvolvimento de cada conjunto de dados. Inicialmente, as imagens de cada conjunto foram divididas de forma estratificada, com semente 42, na proporção de 80\% para desenvolvimento e 20\% para teste final, permanecendo a partição de teste totalmente reservada e sem qualquer participação no processo de ablação. Sobre os 80\% de desenvolvimento, foi aplicada uma validação cruzada estratificada em cinco partições ($k = 5$). Para cada modelo e para cada combinação de hiperparâmetros, o treinamento foi conduzido em cinco rodadas independentes, nas quais quatro partições foram destinadas ao ajuste dos pesos e uma partição foi utilizada para a validação, alternando a partição de validação a cada rodada. As 18 medidas descritoras foram padronizadas em cada rodada por escore padrão calculado exclusivamente sobre as partições de treino, prevenindo vazamento de dados para a validação. A grade de hiperparâmetros explorada para cada conjunto de dados na via topológica está sintetizada na Tabela~\ref{tab:espaco-busca-top}.
+
+\input{ablacao_treino.tex}
 
 \begin{table}[htb]
 \centering
-\caption{Dimensões amostrais e espaço de busca de hiperparâmetros estratificado por conjunto de dados na via topológica.}
+\caption{Espaço de busca de hiperparâmetros estratificado por conjunto de dados na via topológica.}
 \label{tab:espaco-busca-top}
 \label{subsec:res-ajuste}
 \small
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{lccccccc}
+\begin{tabular}{lccccc}
 \toprule
-\textbf{\textit{Dataset}} & \textbf{Desenv. (80\%)} & \textbf{Treino / Val. (rodada)} & \textbf{Lote ($B$)} & \textbf{Taxa de aprendizado ($\eta$)} & \textbf{Decaimento ($\lambda$)} & \textbf{\textit{Dropout} ($p$)} & \textbf{Dim. oculta ($h$)} \\
+\textbf{\textit{Dataset}} & \textbf{Lote ($B$)} & \textbf{Taxa de aprendizado ($\eta$)} & \textbf{Decaimento ($\lambda$)} & \textbf{\textit{Dropout} ($p$)} & \textbf{Dim. oculta ($h$)} \\
 \midrule
-UCSB & 46  & 36 a 37 / 9 a 10   & $\{4, 8, 16\}$   & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
-CR   & 132 & 105 a 106 / 26 a 27 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
-LG   & 212 & 169 a 170 / 42 a 43 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
-NHL  & 299 & 239 a 240 / 59 a 60 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
-LA   & 422 & 337 a 338 / 84 a 85 & $\{16, 32, 64\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}\}$ & $\{10^{-4}, 10^{-3}, 10^{-2}\}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{32, 64, 128\}$ \\
+UCSB & $\{4, 8, 16\}$   & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+CR   & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+LG   & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+NHL  & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+LA   & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-O processo de treinamento foi conduzido com a função de perda de entropia cruzada, otimizador AdamW e norma de gradiente limitada ao valor 1,0 para conter oscilações numéricas. Em decorrência do tamanho reduzido das representações e dos volumes de dados, o treinamento foi delimitado ao teto de 50 épocas, com parada antecipada regulada por uma tolerância de 10 épocas consecutivas sem decrescimento da perda na partição de validação, restaurando os melhores pesos ao término de cada rodada.
+O processo de treinamento foi conduzido com a função de perda de entropia cruzada, otimizador AdamW e norma de gradiente limitada ao valor 1,0 para conter oscilações numéricas. O coeficiente de decaimento de pesos foi fixado no valor $\lambda = 10^{-4}$. Em decorrência do tamanho das representações e dos volumes de dados, o treinamento foi delimitado ao teto de 100 épocas, com parada antecipada regulada por uma tolerância de 15 épocas consecutivas sem decrescimento da perda na partição de validação, sendo os pesos da melhor época restaurados ao término de cada rodada.
 
 \label{subsec:res-codificadores}
 \label{subsec:res-top-selecionadas}
@@ -65,12 +69,12 @@ O desempenho de cada combinação foi computado pela média aritmética do F1 ma
 \toprule
 \textbf{Codificador} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
 \midrule
-LSTM & \pend & \pend & \pend & \pend & \pend \\
-BiLSTM & \pend & \pend & \pend & \pend & \pend \\
-GRU & \pend & \pend & \pend & \pend & \pend \\
-BiGRU & \pend & \pend & \pend & \pend & \pend \\
-SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
-MLP & \pend & \pend & \pend & \pend & \pend \\
+LSTM & 0{,}893 $\pm$ 0{,}124 & 0{,}992 $\pm$ 0{,}017 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}938 $\pm$ 0{,}043 \\
+BiLSTM & 0{,}870 $\pm$ 0{,}109 & 0{,}985 $\pm$ 0{,}034 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}956 $\pm$ 0{,}019 \\
+GRU & 0{,}892 $\pm$ 0{,}107 & \textbf{0{,}993} $\pm$ 0{,}017 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}956 $\pm$ 0{,}049 \\
+BiGRU & \textbf{0{,}933} $\pm$ 0{,}061 & 0{,}985 $\pm$ 0{,}034 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{0{,}995} $\pm$ 0{,}011 & 0{,}966 $\pm$ 0{,}021 \\
+SAC-LSTM & 0{,}867 $\pm$ 0{,}090 & 0{,}977 $\pm$ 0{,}034 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}921 $\pm$ 0{,}046 \\
+MLP & 0{,}871 $\pm$ 0{,}135 & \textbf{0{,}993} $\pm$ 0{,}017 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & \textbf{0{,}973} $\pm$ 0{,}020 \\
 \bottomrule
 \end{tabular}%
 }
@@ -89,105 +93,161 @@ As combinações ótimas de hiperparâmetros responsáveis pelos maiores índice
 \toprule
 \textbf{\textit{Dataset}} & \textbf{Modelo} & \textbf{Taxa de aprend.} & \textbf{\textit{Weight Decay}} & \textbf{\textit{Dropout}} & \textbf{Dim. oculta} & \textbf{Lote} \\
 \midrule
-UCSB & LSTM & \pend & \pend & \pend & \pend & \pend \\
-UCSB & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
-UCSB & GRU & \pend & \pend & \pend & \pend & \pend \\
-UCSB & BiGRU & \pend & \pend & \pend & \pend & \pend \\
-UCSB & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
-UCSB & MLP & \pend & \pend & \pend & \pend & \pend \\
+UCSB & LSTM & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}3 & 256 & 4 \\
+UCSB & BiLSTM & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}3 & 512 & 4 \\
+UCSB & GRU & $10^{-3}$ & $10^{-4}$ & 0{,}1 & 256 & 16 \\
+UCSB & BiGRU & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}3 & 256 & 8 \\
+UCSB & SAC-LSTM & $10^{-2}$ & $10^{-4}$ & 0{,}3 & 64 & 4 \\
+UCSB & MLP & $10^{-2}$ & $10^{-4}$ & 0{,}5 & 256 & 4 \\
 \midrule
-CR & LSTM & \pend & \pend & \pend & \pend & \pend \\
-CR & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
-CR & GRU & \pend & \pend & \pend & \pend & \pend \\
-CR & BiGRU & \pend & \pend & \pend & \pend & \pend \\
-CR & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
-CR & MLP & \pend & \pend & \pend & \pend & \pend \\
+CR & LSTM & $3\cdot 10^{-2}$ & $10^{-4}$ & 0{,}3 & 128 & 32 \\
+CR & BiLSTM & $10^{-2}$ & $10^{-4}$ & 0{,}3 & 64 & 32 \\
+CR & GRU & $10^{-2}$ & $10^{-4}$ & 0{,}1 & 128 & 16 \\
+CR & BiGRU & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}5 & 256 & 64 \\
+CR & SAC-LSTM & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}5 & 64 & 64 \\
+CR & MLP & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}3 & 512 & 64 \\
 \midrule
-LA & LSTM & \pend & \pend & \pend & \pend & \pend \\
-LA & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
-LA & GRU & \pend & \pend & \pend & \pend & \pend \\
-LA & BiGRU & \pend & \pend & \pend & \pend & \pend \\
-LA & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
-LA & MLP & \pend & \pend & \pend & \pend & \pend \\
+LA & LSTM & $3\cdot 10^{-4}$ & $10^{-4}$ & 0{,}1 & 128 & 16 \\
+LA & BiLSTM & $3\cdot 10^{-4}$ & $10^{-4}$ & 0{,}1 & 512 & 16 \\
+LA & GRU & $3\cdot 10^{-4}$ & $10^{-4}$ & 0{,}1 & 64 & 16 \\
+LA & BiGRU & $3\cdot 10^{-4}$ & $10^{-4}$ & 0{,}1 & 64 & 16 \\
+LA & SAC-LSTM & $3\cdot 10^{-4}$ & $10^{-4}$ & 0{,}1 & 512 & 32 \\
+LA & MLP & $10^{-3}$ & $10^{-4}$ & 0{,}1 & 64 & 16 \\
 \midrule
-LG & LSTM & \pend & \pend & \pend & \pend & \pend \\
-LG & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
-LG & GRU & \pend & \pend & \pend & \pend & \pend \\
-LG & BiGRU & \pend & \pend & \pend & \pend & \pend \\
-LG & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
-LG & MLP & \pend & \pend & \pend & \pend & \pend \\
+LG & LSTM & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}5 & 256 & 16 \\
+LG & BiLSTM & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}1 & 256 & 16 \\
+LG & GRU & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}1 & 256 & 32 \\
+LG & BiGRU & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}5 & 512 & 32 \\
+LG & SAC-LSTM & $10^{-3}$ & $10^{-4}$ & 0{,}1 & 512 & 32 \\
+LG & MLP & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}5 & 256 & 32 \\
 \midrule
-NHL & LSTM & \pend & \pend & \pend & \pend & \pend \\
-NHL & BiLSTM & \pend & \pend & \pend & \pend & \pend \\
-NHL & GRU & \pend & \pend & \pend & \pend & \pend \\
-NHL & BiGRU & \pend & \pend & \pend & \pend & \pend \\
-NHL & SAC-LSTM & \pend & \pend & \pend & \pend & \pend \\
-NHL & MLP & \pend & \pend & \pend & \pend & \pend \\
+NHL & LSTM & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}1 & 256 & 64 \\
+NHL & BiLSTM & $10^{-3}$ & $10^{-4}$ & 0{,}5 & 512 & 16 \\
+NHL & GRU & $10^{-3}$ & $10^{-4}$ & 0{,}3 & 256 & 16 \\
+NHL & BiGRU & $3\cdot 10^{-3}$ & $10^{-4}$ & 0{,}3 & 256 & 32 \\
+NHL & SAC-LSTM & $10^{-3}$ & $10^{-4}$ & 0{,}3 & 512 & 64 \\
+NHL & MLP & $3\cdot 10^{-4}$ & $10^{-4}$ & 0{,}1 & 512 & 16 \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-\section{Seleção da via visual}
+A análise dos desempenhos aponta pontuações elevadas em todos os seis codificadores avaliados na validação cruzada. A BiGRU alcançou a maior pontuação média global nas partições de validação ($0{,}976$), com o melhor resultado registrado no conjunto UCSB ($0{,}933 \pm 0{,}061$), onde o volume amostral é mais restrito. A GRU e o MLP alcançaram as maiores pontuações no conjunto CR ($0{,}993 \pm 0{,}017$), enquanto o MLP obteve o maior índice no conjunto NHL ($0{,}973 \pm 0{,}020$). Todos os modelos alcançaram separação perfeita ($1{,}000 \pm 0{,}000$) no conjunto LA e índices superiores a $0{,}995$ no conjunto LG, evidenciando que as variações multiescala das medidas descritoras capturam de forma discriminativa a progressão tecidual associada à idade e ao tipo de tecido.
+
+A distribuição dos hiperparâmetros selecionados evidencia a relevância da expansão da dimensão oculta. As dimensões ocultas ampliadas de $h = 256$ ou $h = 512$ foram selecionadas em 21 das 30 configurações ótimas (70\%), confirmando que espaços latentes mais amplos preservam com maior fidelidade as dinâmicas de conexão entre os raios. As taxas de aprendizado iguais ou superiores a $\eta = 3\cdot 10^{-3}$ prevaleceram em 18 configurações, atingindo até $3\cdot 10^{-2}$ no conjunto CR, sendo mantidas estáveis pela limitação da norma do gradiente. O tamanho de lote reduzido $B = 4$ foi o mais selecionado no conjunto UCSB em decorrência do volume restrito de imagens, enquanto tamanhos de $B = 16$ e $B = 32$ prevaleceram nos conjuntos com maior quantidade de amostras.
+
+\section{Ablação da Via Visual}
 \label{sec:ablacao-visual}
 
-A seleção da via visual seguiu o protocolo da Seção~\ref{subsec:protocolo-ablacao-visual}, com as mesmas 5 partições de validação da via topológica, seis \textit{backbones} e 12 combinações de hiperparâmetros por \textit{backbone}. Resultam 30 combinações de \textit{dataset} e \textit{backbone}. \pend{} (confirmar que todas foram concluídas).
+A via visual processa diretamente as imagens histopatológicas no formato de $256 \times 256$ pixels, obtidas pela preservação da proporção original com recorte central. Para aumentar a diversidade amostral durante o treinamento, foi aplicado aumento de dados rotacional composto por inversões horizontais e rotações ortogonais de 90 graus. A ablação da via visual foi conduzida com o propósito de avaliar o comportamento de diferentes abordagens de visão computacional e determinar as combinações ótimas de hiperparâmetros de cada modelo para a subsequente integração na arquitetura de dupla via. Foram avaliadas seis arquiteturas distribuídas em três famílias (\ref{fig:ablacao-vias}b):
 
-\subsection{Desempenho dos \textit{backbones}}
-\label{subsec:res-vis-desempenho}
+\begin{itemize}
+    \item a ResNet-50 \cite{he2016deep}, rede convolucional profunda com conexões residuais, empregada como referência padrão na classificação de tecidos histopatológicos \cite{litjens2017survey,histImgColorectal},
+    \item a EfficientNet-B0 \cite{tan2019efficientnet}, arquitetura convolucional compacta baseada em escalonamento composto uniforme e blocos invertidos com mecanismo de atenção por canal \cite{kushwah2026evcnet,yousaf2024twostream},
+    \item o ViT-Tiny \cite{dosovitskiy2020image}, modelo que processa a imagem como uma sequência unidimensional de projeções lineares de \textit{patches} por meio de camadas de autoatenção \cite{shamshad2023transformers,clinicalReview},
+    \item o DeiT-Tiny \cite{touvron2021training}, transformador visual projetado com técnicas de destilação e regularização voltadas ao treinamento com menor dependência de grandes volumes de dados \cite{oliveira2025hybrid},
+    \item a MobileViT-S \cite{mehta2022mobilevit}, arquitetura híbrida leve que intercala convoluções locais com blocos transformadores para equilibrar detalhamento celular e contexto amplo com baixo consumo paramétrico \cite{kabir2025semobilevit,ding2023himvit},
+    \item a CoAtNet-0 \cite{dai2021coatnet}, modelo híbrido hierárquico que unifica convoluções nos primeiros estágios com autoatenção relativa nos estágios finais \cite{oliveira2025hybrid,zaidkilani2025dualstream}.
+\end{itemize}
 
-O F1 macro médio de cada \textit{backbone}, na melhor combinação de hiperparâmetros, está na Tabela~\ref{tab:abl-vis-f1}. \pend{} (descrever o ranking médio, o desempenho por família de arquitetura nas classes híbrida, convolucional e \textit{transformer}, e a variabilidade no UCSB).
+Todos os seis modelos foram inicializados com pesos pré-treinados na base ImageNet-1k e ajustados de ponta a ponta. A camada original de classificação foi substituída por uma cabeça linear adaptada à dimensão de saída de cada arquitetura, composta por camada linear, normalização por camadas, camada oculta de 128 neurônios com ativação ReLU, camada de \textit{dropout} e camada final para o número de classes de cada conjunto de dados.
+
+O protocolo experimental seguiu a mesma divisão e metodologia adotadas na via topológica (\ref{fig:ablacao-treino}). A partição de teste final de 20\% foi mantida totalmente reservada e isolada do procedimento de busca. Sobre a partição de desenvolvimento de 80\%, foi executada uma validação cruzada estratificada em cinco partições ($k = 5$), com semente 42. Para cada modelo e para cada combinação de hiperparâmetros, foram executadas cinco rodadas nas quais quatro partições foram destinadas ao ajuste dos parâmetros e uma foi utilizada para a validação. A grade de hiperparâmetros explorada e as dimensões amostrais de cada conjunto de dados estão sintetizadas na Tabela~\ref{tab:espaco-busca-vis}.
 
 \begin{table}[htb]
 \centering
-\caption{F1 macro (média $\pm$ desvio padrão entre as 5 partições de validação) da via visual isolada, com \textit{fine-tuning} e aumento de dados rotacional, na melhor combinação de hiperparâmetros de cada \textit{backbone}. Em negrito, o maior valor médio de cada \textit{dataset}.}
+\caption{Dimensões amostrais e espaço de busca de hiperparâmetros estratificado por conjunto de dados na via visual.}
+\label{tab:espaco-busca-vis}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Desenv. (80\%)} & \textbf{Treino / Val. (rodada)} & \textbf{Lote ($B$)} & \textbf{Taxa do \textit{backbone} ($\eta_{bb}$)} & \textbf{Taxa da cabeça ($\eta_{hd}$)} & \textbf{Decaimento ($\lambda$)} & \textbf{\textit{Dropout} ($p$)} \\
+\midrule
+UCSB & 46  & 36 a 37 / 9 a 10   & $\{4, 8, 16\}$   & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+CR   & 132 & 105 a 106 / 26 a 27 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+LG   & 212 & 169 a 170 / 42 a 43 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+NHL  & 299 & 239 a 240 / 59 a 60 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+LA   & 422 & 337 a 338 / 84 a 85 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+O treinamento foi conduzido com a função de perda de entropia cruzada e o otimizador AdamW. O decaimento de pesos foi fixado em $10^{-4}$ e a norma máxima dos gradientes foi limitada a 1,0. O processo foi limitado a 50 épocas, com parada antecipada estabelecida em 10 épocas consecutivas sem decréscimo da perda na partição de validação.
+
+O desempenho de cada configuração foi mensurado pelo F1 macro médio nas cinco partições de validação interna. A combinação que atingiu a maior pontuação média foi definida como a configuração ótima de cada modelo em cada conjunto de dados. Os valores de F1 macro obtidos pelas melhores configurações de cada arquitetura estão reunidos na Tabela~\ref{tab:abl-vis-f1}.
+
+\begin{table}[htb]
+\centering
+\caption{F1 macro (média $\pm$ desvio padrão entre as 5 partições de validação) da via visual isolada, na melhor combinação de hiperparâmetros de cada modelo. Em negrito, o maior valor médio de cada conjunto de dados.}
 \label{tab:abl-vis-f1}
 \small
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llccccc}
 \toprule
-\textbf{Família} & \textbf{\textit{Backbone}} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\textbf{Família} & \textbf{Modelo} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
 \midrule
-Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
-Híbrida & CoAtNet & \pend & \pend & \pend & \pend & \pend \\
 Convolucional & ResNet-50 & \pend & \pend & \pend & \pend & \pend \\
 Convolucional & EfficientNet-B0 & \pend & \pend & \pend & \pend & \pend \\
 \textit{Transformer} & ViT-Tiny & \pend & \pend & \pend & \pend & \pend \\
 \textit{Transformer} & DeiT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
+Híbrida & CoAtNet-0 & \pend & \pend & \pend & \pend & \pend \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-\subsection{Ajuste de hiperparâmetros e custo}
-\label{sec:res-vis-ajuste}
-
-\pend{} (reportar os valores de hiperparâmetros mais selecionados, em especial a taxa de aprendizado do \textit{backbone}, e se o limite superior do espaço de busca foi o escolhido com frequência, além de relatar a contagem de parâmetros e o tempo mediano de treino por \textit{backbone}).
-
-\subsection{Configurações selecionadas}
-\label{subsec:res-vis-selecionadas}
-
-As três configurações da via visual que seguem para a fusão estão na Tabela~\ref{tab:abl-vis-sel}.
+As combinações ótimas de hiperparâmetros responsáveis pelos maiores índices de F1 macro em cada conjunto de dados estão detalhadas na Tabela~\ref{tab:abl-vis-params}.
 
 \begin{table}[htb]
 \centering
-\caption{Três melhores configurações da via visual, por ranking médio do F1 macro entre os \textit{datasets}.}
-\label{tab:abl-vis-sel}
+\caption{Melhores combinações de hiperparâmetros obtidas na validação cruzada para cada modelo visual nos cinco conjuntos de dados.}
+\label{tab:abl-vis-params}
 \small
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{clccccc}
+\begin{tabular}{lllccccc}
 \toprule
-\textbf{Posição} & \textbf{\textit{Backbone}} & $\mathrm{lr}_{bb}$ & $\mathrm{lr}_{hd}$ & \textbf{\textit{Dropout}} & \textbf{Lote} & \textbf{Ranking médio} \\
+\textbf{\textit{Dataset}} & \textbf{Família} & \textbf{Modelo} & $\eta_{bb}$ & $\eta_{hd}$ & \textbf{\textit{Dropout}} & \textbf{Lote} & \textbf{F1 macro} \\
 \midrule
-1 & \pend & \pend & \pend & \pend & \pend & \pend \\
-2 & \pend & \pend & \pend & \pend & \pend & \pend \\
-3 & \pend & \pend & \pend & \pend & \pend & \pend \\
+UCSB & Convolucional & ResNet-50 & \pend & \pend & \pend & \pend & \pend \\
+UCSB & Convolucional & EfficientNet-B0 & \pend & \pend & \pend & \pend & \pend \\
+UCSB & \textit{Transformer} & ViT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+UCSB & \textit{Transformer} & DeiT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+UCSB & Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
+UCSB & Híbrida & CoAtNet-0 & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+CR & Convolucional & ResNet-50 & \pend & \pend & \pend & \pend & \pend \\
+CR & Convolucional & EfficientNet-B0 & \pend & \pend & \pend & \pend & \pend \\
+CR & \textit{Transformer} & ViT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+CR & \textit{Transformer} & DeiT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+CR & Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
+CR & Híbrida & CoAtNet-0 & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+LA & Convolucional & ResNet-50 & \pend & \pend & \pend & \pend & \pend \\
+LA & Convolucional & EfficientNet-B0 & \pend & \pend & \pend & \pend & \pend \\
+LA & \textit{Transformer} & ViT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+LA & \textit{Transformer} & DeiT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+LA & Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
+LA & Híbrida & CoAtNet-0 & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+LG & Convolucional & ResNet-50 & \pend & \pend & \pend & \pend & \pend \\
+LG & Convolucional & EfficientNet-B0 & \pend & \pend & \pend & \pend & \pend \\
+LG & \textit{Transformer} & ViT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+LG & \textit{Transformer} & DeiT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+LG & Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
+LG & Híbrida & CoAtNet-0 & \pend & \pend & \pend & \pend & \pend \\
+\midrule
+NHL & Convolucional & ResNet-50 & \pend & \pend & \pend & \pend & \pend \\
+NHL & Convolucional & EfficientNet-B0 & \pend & \pend & \pend & \pend & \pend \\
+NHL & \textit{Transformer} & ViT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+NHL & \textit{Transformer} & DeiT-Tiny & \pend & \pend & \pend & \pend & \pend \\
+NHL & Híbrida & MobileViT-S & \pend & \pend & \pend & \pend & \pend \\
+NHL & Híbrida & CoAtNet-0 & \pend & \pend & \pend & \pend & \pend \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-\section{Síntese e encaminhamento para a fusão}
-\label{subsec:res-sintese-abl}
-
-Foram selecionadas três configurações da via topológica (Tabela~\ref{tab:abl-top-sel}) e três da via visual (Tabela~\ref{tab:abl-vis-sel}), que compõem os modelos de dupla via. Todos os modelos finais são treinados com os 80\% de desenvolvimento e avaliados uma única vez nos 20\% de teste, reservados em todas as etapas deste capítulo. A comparação entre a via visual isolada, a via topológica isolada e a dupla via, que responde ao objetivo central do trabalho, está na Seção~\ref{sec:experimentos}. \pend{} (comentar, de forma descritiva, em quais \textit{datasets} cada via teve vantagem na validação interna, reservando a análise da integração combinada para o capítulo de fusão).
+As configurações ótimas identificadas nas ablações da via topológica e da via visual fornecem os parâmetros fixos para a composição da arquitetura unificada de dupla via. O treinamento da rede de dupla via com os modelos selecionados e a avaliação do ganho preditivo frente às vias isoladas e aos métodos de referência no conjunto de teste independente são apresentados no Capítulo~\ref{chap:resultados}.

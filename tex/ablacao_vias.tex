@@ -1,0 +1,95 @@
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        main_block/.style={
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        title_block/.style={
+            rectangle, rounded corners=3pt, inner sep=3.5pt, align=center,
+            font=\footnotesize\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {thick, ->, >={Stealth[length=2.5mm]}},
+        box_delimitador/.style = {
+            rectangle, rounded corners=8pt, draw=black!70, fill=black!2, line width=0.8pt
+        },
+        model/.style = {
+            rectangle, rounded corners=3pt, align=center, draw=black!70, line width=0.7pt,
+            font=\footnotesize, minimum width=2.5cm, minimum height=0.75cm, inner sep=3pt
+        },
+        legend_sq/.style = {
+            rectangle, draw=black!70, line width=0.5pt, minimum size=0.28cm, inner sep=0pt
+        },
+        cnn/.style = {fill=blue!15},
+        trf/.style = {fill=green!15},
+        hyb/.style = {fill=orange!22},
+        rec/.style = {fill=blue!15},
+        base/.style = {fill=black!10}
+    ]
+
+        %%%%%%%%%%%%%%%% (a) VIA TOPOLÓGICA %%%%%%%%%%%%%%%%
+        \node (ds_a)  [main_block, minimum width=1.9cm] at (0,0) {\textit{Datasets}};
+        \node (ssn_a) [main_block, minimum width=2.2cm] at (3.1,0) {SSN};
+
+        \node (grp_a) [box_delimitador, minimum width=9.0cm, minimum height=3.6cm] at (9.6,0) {};
+        \node (grp_a_t) [title_block] at (grp_a.north) {6 modelos testados individualmente};
+        \node [model, rec,  minimum width=2.5cm] at (6.9,0.55)  {LSTM};
+        \node [model, rec,  minimum width=2.5cm] at (9.6,0.55)  {BiLSTM};
+        \node [model, rec,  minimum width=2.5cm] at (12.3,0.55) {GRU};
+        \node [model, rec,  minimum width=2.5cm] at (6.9,-0.45) {BiGRU};
+        \node [model, rec,  minimum width=2.5cm] at (9.6,-0.45) {SAC-LSTM};
+        \node [model, base, minimum width=2.5cm] at (12.3,-0.45) {MLP};
+        \node [legend_sq, rec]  at (6.2,-1.35) {};
+        \node [anchor=west, font=\scriptsize] at (6.4,-1.35) {Recorrente};
+        \node [legend_sq, base] at (8.9,-1.35) {};
+        \node [anchor=west, font=\scriptsize] at (9.1,-1.35) {\textit{Baseline} não recorrente};
+
+        \node (head_a) [main_block, minimum width=2.4cm, align=center] at (16.2,0) {Cabeça\\MLP};
+        \node (met_a)  [main_block, minimum width=1.9cm] at (19.3,0) {Métricas};
+
+        \draw [arrow] (ds_a.east)  -- (ssn_a.west);
+        \draw [arrow] (ssn_a.east) -- (grp_a.west);
+        \node [below=2pt of ssn_a, font=\scriptsize] {$15\times18$};
+        \draw [arrow] (grp_a.east) -- (head_a.west);
+        \draw [arrow] (head_a.east) -- (met_a.west);
+
+        \node [font=\small] at (9.65,-2.35) {(a) Via topológica};
+
+        %%%%%%%%%%%%%%%% (b) VIA VISUAL %%%%%%%%%%%%%%%%
+        \begin{scope}[yshift=-6.4cm]
+        \node (ds_b)  [main_block, minimum width=1.9cm] at (0,0) {\textit{Datasets}};
+        \node (aug_b) [main_block, minimum width=2.2cm, align=center] at (3.1,0) {\footnotesize Aumento de\\[-1pt]\footnotesize dados};
+
+        \node (grp_b) [box_delimitador, minimum width=9.0cm, minimum height=3.6cm] at (9.6,0) {};
+        \node (grp_b_t) [title_block] at (grp_b.north) {6 modelos testados individualmente};
+        \node [model, cnn] at (6.9,0.55)  {ResNet-50};
+        \node [model, cnn] at (6.9,-0.45) {EfficientNet-B0};
+        \node [model, trf] at (9.6,0.55)  {ViT-Tiny};
+        \node [model, trf] at (9.6,-0.45) {DeiT-Tiny};
+        \node [model, hyb] at (12.3,0.55) {MobileViT-S};
+        \node [model, hyb] at (12.3,-0.45){CoAtNet-0};
+        \node [legend_sq, cnn] at (5.9,-1.35) {};
+        \node [anchor=west, font=\scriptsize] at (6.1,-1.35) {Convolucional};
+        \node [legend_sq, trf] at (8.4,-1.35) {};
+        \node [anchor=west, font=\scriptsize] at (8.6,-1.35) {\textit{Transformer}};
+        \node [legend_sq, hyb] at (11.0,-1.35) {};
+        \node [anchor=west, font=\scriptsize] at (11.2,-1.35) {Híbrida};
+
+        \node (head_b) [main_block, minimum width=2.4cm, align=center] at (16.2,0) {Cabeça\\MLP};
+        \node (met_b)  [main_block, minimum width=1.9cm] at (19.3,0) {Métricas};
+
+        \draw [arrow] (ds_b.east)  -- (aug_b.west);
+        \draw [arrow] (aug_b.east) -- (grp_b.west);
+        \node [below=2pt of aug_b, font=\scriptsize] {$256\times256$};
+        \draw [arrow] (grp_b.east) -- (head_b.west);
+        \draw [arrow] (head_b.east) -- (met_b.west);
+
+        \node [font=\small] at (9.65,-2.35) {(b) Via visual};
+        \end{scope}
+
+    \end{tikzpicture}%
+    }
+    \caption{Ablação das vias isoladas. (a) Via topológica: a sequência de características da SSN é processada por seis codificadores (cinco recorrentes e uma MLP como \textit{baseline}), cada um testado de forma independente. (b) Via visual: as imagens, após aumento de dados, são processadas por seis modelos (convolucionais, \textit{transformers} e híbridos), também testados individualmente. Cada via possui sua própria cabeça MLP, da qual são extraídas as métricas.}
+    \label{fig:ablacao-vias}
+\end{figure}

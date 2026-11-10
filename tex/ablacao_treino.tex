@@ -1,0 +1,78 @@
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{0.75\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        recntagle/.style={
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        title_block/.style={
+            rectangle, rounded corners=3pt, inner sep=4.5pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {thick, ->, >={Stealth[length=2.5mm]}},
+        box_delimitador/.style = {
+            rectangle, rounded corners=8pt, draw=black!70, fill=black!2, line width=0.8pt
+        },
+        dashed_box/.style = {
+            rectangle, rounded corners=4pt, draw=black!70, dashed, line width=0.8pt,
+            fill=white, align=center
+        },
+        sub_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=black!70, fill=blue!5, line width=0.7pt, font=\small
+        },
+        fold/.style = {
+            rectangle, draw=black!70, line width=0.6pt, minimum width=1.3cm,
+            minimum height=0.7cm, font=\small, inner sep=2pt
+        },
+        legend_sq/.style = {
+            rectangle, draw=black!70, line width=0.5pt, minimum size=0.3cm, inner sep=0pt
+        }
+    ]
+
+        % 1. Partição estratificada
+        \node (split_box) [box_delimitador, minimum width=8.6cm, minimum height=2.4cm] at (0,0) {};
+        \node (split_title) [title_block] at (split_box.north) {1. Partição estratificada (semente 42)};
+        \node (dev) [sub_block, minimum width=5.2cm, minimum height=0.95cm] at (-1.5,-0.25) {Desenvolvimento (80\%)};
+        \node (test) [dashed_box, minimum width=1.9cm, minimum height=0.95cm] at (2.9,-0.25) {\footnotesize Teste (20\%)\\\scriptsize reservado};
+
+        % 2. Validação cruzada
+        \node (cv_box) [box_delimitador, minimum width=8.6cm, minimum height=2.9cm] at (0,-3.9) {};
+        \node (cv_title) [title_block] at (cv_box.north) {2. Validação cruzada ($k=5$)};
+        \node (f1) [fold, fill=blue!10]   at (-2.9,-3.8) {F1};
+        \node (f2) [fold, fill=blue!10]   at (-1.45,-3.8) {F2};
+        \node (f3) [fold, fill=blue!10]   at (0,-3.8) {F3};
+        \node (f4) [fold, fill=blue!10]   at (1.45,-3.8) {F4};
+        \node (f5) [fold, fill=orange!25] at (2.9,-3.8) {F5};
+        \node [legend_sq, fill=blue!10]   at (-3.3,-4.85) {};
+        \node [anchor=west, font=\scriptsize] at (-3.1,-4.85) {Treino (4 partições)};
+        \node [legend_sq, fill=orange!25] at (-0.1,-4.85) {};
+        \node [anchor=west, font=\scriptsize] at (0.1,-4.85) {Validação (1 partição)};
+
+        % 3. Busca de hiperparâmetros
+        \node (hp_box) [box_delimitador, minimum width=8.6cm, minimum height=2.4cm] at (0,-7.5) {};
+        \node (hp_title) [title_block] at (hp_box.north) {3. Busca de hiperparâmetros};
+        \node (c1) [sub_block, minimum width=1.7cm] at (-3.1,-7.2) {Comb. 1};
+        \node (c2) [sub_block, minimum width=1.7cm] at (-1.05,-7.2) {Comb. 2};
+        \node (c3) [sub_block, minimum width=1.7cm] at (1.0,-7.2) {$\cdots$};
+        \node (cx) [sub_block, minimum width=1.7cm] at (3.05,-7.2) {Comb. $X$};
+        \node [font=\scriptsize, align=center] at (0,-8.2) {cada combinação é treinada nas 5 rodadas\\(4 partições de treino $\times$ 1 de validação, alternada)};
+
+        % 4. Seleção
+        \node (sel_box) [box_delimitador, minimum width=8.6cm, minimum height=2.0cm] at (0,-10.9) {};
+        \node (sel_title) [title_block] at (sel_box.north) {4. Seleção da configuração};
+        \node (avg) [sub_block, text width=3.2cm] at (-2.3,-11.1) {F1 macro médio por combinação};
+        \node (best) [sub_block, text width=2.4cm] at (2.6,-11.1) {Melhor configuração};
+        \draw [arrow] (avg.east) -- (best.west);
+
+        % Conexões
+        \draw [arrow] (split_box.south) -- (cv_title.north);
+        \draw [arrow] (cv_box.south) -- (hp_title.north);
+        \draw [arrow] (hp_box.south) -- (sel_title.north);
+
+    \end{tikzpicture}%
+    }
+    \caption{Protocolo de ablação para o treinamento dos modelos: partição estratificada em 80\% para desenvolvimento e 20\% para teste final (reservado), validação cruzada com cinco partições sobre os 80\%, avaliação de $X$ combinações de hiperparâmetros e seleção da combinação de maior desempenho médio.}
+    \label{fig:ablacao-treino}
+\end{figure}

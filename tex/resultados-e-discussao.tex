@@ -1,2 +1,44 @@
 \chapter{Resultados e Discussão}
+\label{chap:resultados}
+
+Neste capítulo são apresentados e discutidos os resultados finais obtidos pela arquitetura proposta de dupla via (\textit{Two-Stream Network}) em comparação com as vias individuais e com métodos clássicos de caracterização tecidual. As avaliações foram conduzidas sobre a partição de teste independente (20\% dos dados), mantida sem qualquer contato com as etapas anteriores de ajuste e seleção de hiperparâmetros. Para atenuar a variabilidade decorrente da inicialização dos pesos e das transformações estocásticas de aumento de dados, o treinamento final nos 80\% de desenvolvimento e a inferência no teste foram repetidos sob cinco sementes aleatórias distintas, reportando a média e o respectivo desvio padrão das métricas.
+
+\section{Comparação entre as Vias Isoladas e a Rede de Dupla Via}
+\label{sec:res-dupla-via}
+
+A avaliação central deste trabalho investiga se a integração conjunta das representações topológicas multiescala com as representações visuais profundas resulta em ganho preditivo frente ao processamento isolado de cada modalidade. Para cada conjunto de dados, a rede de dupla via foi configurada com o codificador topológico ótimo determinado no Capítulo~\ref{chap:res-ablacao} e com a melhor arquitetura de visão computacional selecionada na ablação correspondente. O desempenho preditivo alcançado pelas vias isoladas e pela rede unificada de dupla via na partição de teste independente está sintetizado na Tabela~\ref{tab:res-comparacao-final}.
+
+\begin{table}[htb]
+\centering
+\caption{Comparação de desempenho (média $\pm$ desvio padrão ao longo de 5 sementes) no conjunto de teste independente (20\% das amostras) entre as vias isoladas e a arquitetura unificada de dupla via.}
+\label{tab:res-comparacao-final}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Métrica} & \textbf{Via Topológica Isolada} & \textbf{Via Visual Isolada} & \textbf{Rede de Dupla Via} \\
+\midrule
+UCSB & F1 macro & \pend & \pend & \pend \\
+UCSB & Acurácia & \pend & \pend & \pend \\
+UCSB & AUC-ROC  & \pend & \pend & \pend \\
+\midrule
+CR   & F1 macro & \pend & \pend & \pend \\
+CR   & Acurácia & \pend & \pend & \pend \\
+CR   & AUC-ROC  & \pend & \pend & \pend \\
+\midrule
+LA   & F1 macro & \pend & \pend & \pend \\
+LA   & Acurácia & \pend & \pend & \pend \\
+LA   & AUC-ROC  & \pend & \pend & \pend \\
+\midrule
+LG   & F1 macro & \pend & \pend & \pend \\
+LG   & Acurácia & \pend & \pend & \pend \\
+LG   & AUC-ROC  & \pend & \pend & \pend \\
+\midrule
+NHL  & F1 macro & \pend & \pend & \pend \\
+NHL  & Acurácia & \pend & \pend & \pend \\
+NHL  & AUC-ROC  & \pend & \pend & \pend \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
