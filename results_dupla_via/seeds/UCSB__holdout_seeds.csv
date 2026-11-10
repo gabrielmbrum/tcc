@@ -1,0 +1,16 @@
+dataset,seed,approach,top_model,vis_model,f1,acc,auc
+UCSB,42,top,bigru,coatnet_0,0.916083916083916,0.9166666666666666,0.9714285714285715
+UCSB,42,vis,bigru,coatnet_0,1.0,1.0,1.0
+UCSB,42,dupla,bigru,coatnet_0,0.9111111111111111,0.9166666666666666,1.0
+UCSB,43,top,bigru,coatnet_0,0.916083916083916,0.9166666666666666,0.9714285714285715
+UCSB,43,vis,bigru,coatnet_0,1.0,1.0,1.0
+UCSB,43,dupla,bigru,coatnet_0,1.0,1.0,1.0
+UCSB,44,top,bigru,coatnet_0,0.916083916083916,0.9166666666666666,1.0
+UCSB,44,vis,bigru,coatnet_0,1.0,1.0,1.0
+UCSB,44,dupla,bigru,coatnet_0,1.0,1.0,1.0
+UCSB,45,top,bigru,coatnet_0,0.916083916083916,0.9166666666666666,1.0
+UCSB,45,vis,bigru,coatnet_0,1.0,1.0,1.0
+UCSB,45,dupla,bigru,coatnet_0,0.9111111111111111,0.9166666666666666,1.0
+UCSB,46,top,bigru,coatnet_0,0.8285714285714285,0.8333333333333334,0.9714285714285715
+UCSB,46,vis,bigru,coatnet_0,1.0,1.0,1.0
+UCSB,46,dupla,bigru,coatnet_0,1.0,1.0,1.0

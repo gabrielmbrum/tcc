@@ -1,0 +1,16 @@
+dataset,seed,approach,top_model,vis_model,f1,acc,auc
+CR,42,top,gru,coatnet_0,0.907735321528425,0.9090909090909091,0.9370370370370371
+CR,42,vis,gru,coatnet_0,1.0,1.0,1.0
+CR,42,dupla,gru,coatnet_0,1.0,1.0,1.0
+CR,43,top,gru,coatnet_0,0.907735321528425,0.9090909090909091,0.9203703703703704
+CR,43,vis,gru,coatnet_0,1.0,1.0,1.0
+CR,43,dupla,gru,coatnet_0,1.0,1.0,1.0
+CR,44,top,gru,coatnet_0,0.9379699248120301,0.9393939393939394,0.9425925925925926
+CR,44,vis,gru,coatnet_0,1.0,1.0,1.0
+CR,44,dupla,gru,coatnet_0,1.0,1.0,1.0
+CR,45,top,gru,coatnet_0,0.9379699248120301,0.9393939393939394,0.9574074074074075
+CR,45,vis,gru,coatnet_0,1.0,1.0,1.0
+CR,45,dupla,gru,coatnet_0,1.0,1.0,1.0
+CR,46,top,gru,coatnet_0,0.9379699248120301,0.9393939393939394,0.9314814814814815
+CR,46,vis,gru,coatnet_0,1.0,1.0,1.0
+CR,46,dupla,gru,coatnet_0,1.0,1.0,1.0

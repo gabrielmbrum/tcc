@@ -1,0 +1,35 @@
+% Tabela tab:res-comparacao-final gerada automaticamente por treino_dupla_via.py
+
+\begin{table}[htb]
+\centering
+\caption{Comparação de desempenho (média $\pm$ desvio padrão ao longo de 5 sementes) no conjunto de teste independente (20\% das amostras) entre as vias isoladas e a arquitetura unificada de dupla via.}
+\label{tab:res-comparacao-final}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Métrica} & \textbf{Via Topológica Isolada} & \textbf{Via Visual Isolada} & \textbf{Rede de Dupla Via} \\
+\midrule
+UCSB & F1 macro & 0.899 $\pm$ 0.039 & 1.000 $\pm$ 0.000 & \textbf{0.964 $\pm$ 0.049} \\
+UCSB & Acurácia & 0.900 $\pm$ 0.037 & 1.000 $\pm$ 0.000 & \textbf{0.967 $\pm$ 0.046} \\
+UCSB & AUC-ROC  & 0.983 $\pm$ 0.016 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+\midrule
+CR & F1 macro & 0.926 $\pm$ 0.017 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+CR & Acurácia & 0.927 $\pm$ 0.017 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+CR & AUC-ROC  & 0.938 $\pm$ 0.014 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+\midrule
+LA & F1 macro & 1.000 $\pm$ 0.000 & 0.996 $\pm$ 0.008 & \textbf{0.998 $\pm$ 0.004} \\
+LA & Acurácia & 1.000 $\pm$ 0.000 & 0.996 $\pm$ 0.008 & \textbf{0.998 $\pm$ 0.004} \\
+LA & AUC-ROC  & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+\midrule
+LG & F1 macro & 0.996 $\pm$ 0.009 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+LG & Acurácia & 0.996 $\pm$ 0.008 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+LG & AUC-ROC  & 1.000 $\pm$ 0.000 & 1.000 $\pm$ 0.000 & \textbf{1.000 $\pm$ 0.000} \\
+\midrule
+NHL & F1 macro & 0.865 $\pm$ 0.025 & 0.922 $\pm$ 0.037 & \textbf{0.938 $\pm$ 0.026} \\
+NHL & Acurácia & 0.864 $\pm$ 0.024 & 0.923 $\pm$ 0.037 & \textbf{0.939 $\pm$ 0.026} \\
+NHL & AUC-ROC  & 0.978 $\pm$ 0.006 & 0.995 $\pm$ 0.007 & \textbf{0.992 $\pm$ 0.005} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
