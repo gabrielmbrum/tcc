@@ -1,0 +1,74 @@
+% Tabelas geradas automaticamente por ablacao_via_visual.py
+
+% Tabela tab:abl-vis-f1
+\begin{table}[htb]
+\centering
+\caption{F1 macro (média $\pm$ desvio padrão entre as 5 partições de validação) da via visual isolada, na melhor combinação de hiperparâmetros de cada modelo. Em negrito, o maior valor médio de cada conjunto de dados.}
+\label{tab:abl-vis-f1}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Família} & \textbf{Modelo} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\midrule
+Convolucional & ResNet-50 & 0.980 $\pm$ 0.045 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & 0.995 $\pm$ 0.010 & 0.950 $\pm$ 0.052 \\
+Convolucional & EfficientNet-B0 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & 0.967 $\pm$ 0.031 \\
+\textit{Transformer} & ViT-Tiny & 0.977 $\pm$ 0.052 & \textbf{1.000} $\pm$ 0.000 & 0.998 $\pm$ 0.005 & \textbf{1.000} $\pm$ 0.000 & 0.921 $\pm$ 0.043 \\
+\textit{Transformer} & DeiT-Tiny & 0.956 $\pm$ 0.060 & \textbf{1.000} $\pm$ 0.000 & 0.998 $\pm$ 0.005 & \textbf{1.000} $\pm$ 0.000 & 0.938 $\pm$ 0.047 \\
+Híbrida & MobileViT-S & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & 0.969 $\pm$ 0.044 \\
+Híbrida & CoAtNet-0 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & \textbf{1.000} $\pm$ 0.000 & \textbf{0.980} $\pm$ 0.026 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+
+% Tabela tab:abl-vis-params
+\begin{table}[htb]
+\centering
+\caption{Melhores combinações de hiperparâmetros obtidas na validação cruzada para cada modelo visual nos cinco conjuntos de dados.}
+\label{tab:abl-vis-params}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Família} & \textbf{Modelo} & $\eta_{bb}$ & $\eta_{hd}$ & \textbf{\textit{Dropout}} & \textbf{Lote} & \textbf{F1 macro} \\
+\midrule
+UCSB & Convolucional & ResNet-50 & $3\cdot 10^{-4}$ & $3\cdot 10^{-4}$ & 0.5 & 16 & 0.980 $\pm$ 0.045 \\
+UCSB & Convolucional & EfficientNet-B0 & $3\cdot 10^{-4}$ & $3\cdot 10^{-4}$ & 0.3 & 4 & 1.000 $\pm$ 0.000 \\
+UCSB & \textit{Transformer} & ViT-Tiny & $10^{-4}$ & $0.001$ & 0.3 & 8 & 0.977 $\pm$ 0.052 \\
+UCSB & \textit{Transformer} & DeiT-Tiny & $3\cdot 10^{-5}$ & $10^{-4}$ & 0.1 & 4 & 0.956 $\pm$ 0.060 \\
+UCSB & Híbrida & MobileViT-S & $3\cdot 10^{-4}$ & $10^{-4}$ & 0.5 & 8 & 1.000 $\pm$ 0.000 \\
+UCSB & Híbrida & CoAtNet-0 & $3\cdot 10^{-5}$ & $0.001$ & 0.3 & 8 & 1.000 $\pm$ 0.000 \\
+\midrule
+CR & Convolucional & ResNet-50 & $10^{-4}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+CR & Convolucional & EfficientNet-B0 & $10^{-5}$ & $0.001$ & 0.5 & 32 & 1.000 $\pm$ 0.000 \\
+CR & \textit{Transformer} & ViT-Tiny & $10^{-5}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+CR & \textit{Transformer} & DeiT-Tiny & $10^{-5}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+CR & Híbrida & MobileViT-S & $10^{-4}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+CR & Híbrida & CoAtNet-0 & $10^{-5}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+\midrule
+LA & Convolucional & ResNet-50 & $3\cdot 10^{-4}$ & $10^{-4}$ & 0.3 & 16 & 1.000 $\pm$ 0.000 \\
+LA & Convolucional & EfficientNet-B0 & $10^{-4}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+LA & \textit{Transformer} & ViT-Tiny & $10^{-4}$ & $3\cdot 10^{-4}$ & 0.1 & 32 & 0.998 $\pm$ 0.005 \\
+LA & \textit{Transformer} & DeiT-Tiny & $10^{-5}$ & $3\cdot 10^{-4}$ & 0.1 & 32 & 0.998 $\pm$ 0.005 \\
+LA & Híbrida & MobileViT-S & $3\cdot 10^{-5}$ & $0.001$ & 0.5 & 16 & 1.000 $\pm$ 0.000 \\
+LA & Híbrida & CoAtNet-0 & $10^{-5}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+\midrule
+LG & Convolucional & ResNet-50 & $10^{-4}$ & $3\cdot 10^{-4}$ & 0.5 & 64 & 0.995 $\pm$ 0.010 \\
+LG & Convolucional & EfficientNet-B0 & $10^{-4}$ & $10^{-4}$ & 0.1 & 32 & 1.000 $\pm$ 0.000 \\
+LG & \textit{Transformer} & ViT-Tiny & $10^{-5}$ & $10^{-4}$ & 0.1 & 32 & 1.000 $\pm$ 0.000 \\
+LG & \textit{Transformer} & DeiT-Tiny & $10^{-5}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+LG & Híbrida & MobileViT-S & $10^{-4}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+LG & Híbrida & CoAtNet-0 & $10^{-5}$ & $10^{-4}$ & 0.1 & 16 & 1.000 $\pm$ 0.000 \\
+\midrule
+NHL & Convolucional & ResNet-50 & $3\cdot 10^{-4}$ & $10^{-4}$ & 0.5 & 32 & 0.950 $\pm$ 0.052 \\
+NHL & Convolucional & EfficientNet-B0 & $3\cdot 10^{-4}$ & $10^{-4}$ & 0.1 & 32 & 0.967 $\pm$ 0.031 \\
+NHL & \textit{Transformer} & ViT-Tiny & $10^{-4}$ & $10^{-4}$ & 0.3 & 64 & 0.921 $\pm$ 0.043 \\
+NHL & \textit{Transformer} & DeiT-Tiny & $3\cdot 10^{-5}$ & $10^{-4}$ & 0.5 & 32 & 0.938 $\pm$ 0.047 \\
+NHL & Híbrida & MobileViT-S & $3\cdot 10^{-4}$ & $3\cdot 10^{-4}$ & 0.5 & 16 & 0.969 $\pm$ 0.044 \\
+NHL & Híbrida & CoAtNet-0 & $3\cdot 10^{-5}$ & $3\cdot 10^{-4}$ & 0.5 & 32 & 0.980 $\pm$ 0.026 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
