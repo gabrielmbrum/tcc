@@ -35,7 +35,7 @@
 %----------------------------------------------------------------------------------------%
     \newcommand{\nomeDoAutor}{Gabriel Martins Brum}
     \newcommand{\nomeDoCurso}{Ciências da Computação} % Ajuste se for outro curso
-    \newcommand{\tituloDoTrabalho}{Classificação de Imagens Médicas via Fusão de Deep Learning e Redes Complexas utilizando Redes Neurais Recorrentes}
+    \newcommand{\tituloDoTrabalho}{Classificação de Imagens Histopatológicas via Fusão de Deep Learning e Redes Complexas utilizando Redes Neurais Recorrentes}
     \newcommand{\subtituloDoTrabalho}{}
     \newcommand{\tipoDeTrabalho}{Trabalho de Conclusão de Curso}
     \newcommand{\NomeDaFaculdade}{Instituto de Biociências, Letras e Ciências Exatas}
@@ -146,8 +146,14 @@
 
     % A G R A D E C I M E N T O S
     \begin{agradecimentos}
-        Gostaria de agradecer ao Prof. Dr. Leandro Alves Neves pela orientação... % Exemplo
-    \end{agradecimentos}
+    Dedico meus primeiros agradecimentos aos meus pais, Joneslei Aparecido Leite Brum e Marcia Aparecida Martins Brum. Vocês sempre me incentivaram a focar nos estudos e foram a base que tornou a escrita deste trabalho possível. Serei eternamente grato por todo o esforço e amor com que me criaram, espero um dia poder retribuir por tudo.
+
+    À minha amada, Júlia Carreno Garcia Leal, que esteve ao meu lado nas conquistas e nos desafios mais intensos desta jornada. Obrigado por manter o amor e a parceria firmes, mesmo à distância na maior parte do tempo, e por me apoiar nos dias difíceis. Seu carinho foi fundamental para que eu chegasse até aqui.
+	
+    Gostaria de agradecer também aos grandes amigos que a graduação me presenteou. Primeiro, aos meus parceiros de pensão e apartamento, Allan de Carvalho de Almeida, João Carlos Gonçalves Nobre e Felipe do Amparo Lauria, que deixaram o dia a dia mais leve e foram uma verdadeira família para mim. Estendo esse agradecimento aos meus queridos colegas, os "lipaizinhos" Felipe Gomes da Silva, Luís Henrique Salomão Lobato e Matheus Thomé da Silva. Mais do que parceiros de descontração, vocês foram companhias valiosas no grupo de pesquisa e o apoio de vocês nos estudos e no desenvolvimento das pesquisas foi essencial.
+
+    Por fim, agradeço ao meu orientador, Prof. Dr. Leandro Alves Neves. Além da amizade e da notável qualidade futebolística, obrigado por acreditar na minha capacidade e por me incentivar a ir cada vez mais longe na ciência.
+     \end{agradecimentos}
     
     % E P Í G R A F E
     \begin{epigrafe}
@@ -163,18 +169,18 @@
     
     % R E S U M O
     \begin{resumo}
-        O avanço das arquiteturas de aprendizado profundo revolucionou a análise computacional... % Começaremos a escrever aqui depois
+	    A classificação computacional de imagens histopatológicas sob restrição amostral enfrenta diversos desafios, e para mitigar tais limitações, este trabalho propõe e avalia uma arquitetura de aprendizado profundo de dupla via que integra uma dinâmica topológica multiescalar a representações visuais. Na via topológica, as imagens são modeladas como redes complexas espaço-espectrais direcionadas e ponderadas, originando sequências multiescala de 270 atributos nodais descritores processadas por codificadores sequenciais recorrentes e por um MLP estático (\textit{baseline}). Paralelamente, a via visual extrai atributos visuais por meio de modelos CNN, ViT e CNN-ViT pré-treinados na base ImageNet-1k. As representações resultantes são equalizadas em 128 dimensões por projeção linear, normalizadas por camadas de forma independente, concatenadas em um vetor unificado de 256 atributos e classificadas por uma cabeça MLP ajustada de ponta a ponta. A avaliação contemplou cinco bases histopatológicas divididas em 80\% para desenvolvimento em validação cruzada estratificada de cinco partições e 20\% para teste independente avaliado sob cinco sementes pré-fixadas (42 a 46). No conjunto multiclasse desafiador NHL, a rede de dupla via atingiu F1 macro de $0{,}938 \pm 0{,}026$ e acurácia de $0{,}939 \pm 0{,}026$, superando a via visual isolada ($0{,}922 \pm 0{,}037$) e a via topológica ($0{,}865 \pm 0{,}025$), reduzindo a dispersão entre sementes em 30\%. No conjunto LA, o modelo integrado alcançou F1 macro de $0{,}998 \pm 0{,}004$, cortando a dispersão pela metade, enquanto nas tarefas binárias de alto contraste (CR e LG) sustentou separação perfeita ($1{,}000 \pm 0{,}000$). A via topológica adiciona menos de 1\% aos parâmetros globais sem onerar a memória gráfica. Os resultados confirmam que a topologia de redes complexas atua como regularizador eficaz, aumentando a acurácia diagnóstica sob escassez de dados.
         
-        \vspace*{0.5cm}
-        \noindent\textbf{{Palavras-Chave: }} Redes Complexas; Redes Neurais Recorrentes; Classificação de Imagens Médicas; Fusão Tardia; Deep Learning.
+        \vspace{\onelineskip}
+        \noindent\textbf{Palavras-chave:} Redes Complexas. Redes Neurais Recorrentes. Visão Computacional. Imagens Histopatológicas. Fusão Tardia. Aprendizado Profundo.
     \end{resumo}
     
     % A B S T R A C T
     \begin{resumo}[Abstract]
-        The advancement of deep learning architectures has revolutionized computational analysis... % Começaremos a escrever aqui depois
+        Computational classification of histopathological images in low-data regimes suffers with several challenges and this study proposes and evaluates a two-stream deep learning architecture integrating multiscale topological dynamics with deep visual representations. In the topological stream, histology images are modeled as spatio-spectral directed and weighted complex networks, generating an ordered multiscale sequence of 270 nodal features processed by recurrent neural encoders and a static MLP control baseline. Simultaneously, the visual stream extracts semantic features using ImageNet-1k pre-trained models across CNN, ViT and CNN-ViT architectures. The resulting representations are projected to 128 dimensions, normalized via layer normalization, concatenated into a 256-dimensional joint embedding, and classified by an MLP head trained end-to-end. The approach was evaluated on five histopathological benchmarks, split into 80\% development with 5-fold stratified cross-validation for hyperparameter ablation and 20\% independent test evaluated over five random seeds. In the challenging multiclass NHL task, the two-stream network achieved a macro F1-score of $0.938 \pm 0.026$ and an accuracy of $0.939 \pm 0.026$, outperforming both the isolated visual stream ($0.922 \pm 0.037$) and topological stream ($0.865 \pm 0.025$) while reducing inter-seed variance by 30\%. In the LA dataset, the model reached a macro F1-score of $0.998 \pm 0.004$, halving the visual dispersion, while sustaining perfect separation ($1.000 \pm 0.000$) in high-contrast binary tasks (CR and LG). The topological stream introduces less than 1\% parametric overhead without requiring dedicated GPU memory. These findings demonstrate that complex network topology acts as an effective regularizer, improving diagnostic reliability under data constraints.
         
-        \vspace*{0.5cm}
-        \noindent\textbf{{Keywords: }} Complex Networks; Recurrent Neural Networks; Medical Image Classification; Late Fusion; Deep Learning.
+        \vspace{\onelineskip}
+        \noindent\textbf{Keywords:} Complex Networks. Recurrent Neural Networks. Computer Vision. Histopathological Images. Late Fusion. Deep Learning.
     \end{resumo}
     
     % L I S T A S
@@ -186,51 +192,139 @@
     
     % Siglas descomentadas com exemplos relacionados ao seu TCC
     \begin{siglas}
-        \item [CNN] \textit{Convolutional Neural Network} (Rede Neural Convolucional)
- 	\item [ViT] \textit{Vision Transformer}
-	 \item [CNN-ViT] \textit{Convolutional Neural Network with Vision Transformer}
-        \item [RNN] \textit{Recurrent Neural Network} (Rede Neural Recorrente)
-        \item [RaNN] \textit{Randomized Neural Network} (Rede Neural Aleatorizada)
-	\item [RGB] \textit{Red, Green, Blue}
-       	\item [CN] \textit{Complex Network} (Redes Complexas)
-       	\item [DL] \textit{Deep Learning} (Aprendizado Profundo)
-        \item [BiLSTM] \textit{Bidirectional Long Short-Term Memory} (Memória de Curto e Longo Prazo Bidirecional)
-        \item [GLCM] \textit{Gray-Level Co-occurrence Matrix} (Matriz de Coocorrência de Níveis de Cinza)
-        \item [HOG] \textit{Histogram of Oriented Gradients} (Histograma de Gradientes Orientados)
-        \item [LBP] \textit{Local Binary Patterns} (Padrões Binários Locais)
-        \item [MLP] \textit{Multilayer Perceptron} (Perceptron Multicamadas)
-        \item [LSTM] \textit{Long Short-Term Memory} (Memória de Curto e Longo Prazo)
-        \item [GRU] \textit{Gated Recurrent Unit} (Unidade Recorrente com Portas)
-        \item [AUC-ROC] \textit{Area Under the Receiver Operating Characteristic Curve} (Área sob a Curva ROC)
-        \item [H\&E] \textit{Hematoxylin and Eosin} (Hematoxilina e Eosina)
-        \item [LN] \textit{Layer Normalization} (Normalização de Camada)
-        \item [SIFT] \textit{Scale-Invariant Feature Transform} (Transformada de Características Invariante à Escala)
-        \item [SSN] \textit{Spatio-Spectral Network} (Rede Espaço-Espectral)
-        \item [ReLU] \textit{Rectified Linear Unit} (Unidade Linear Retificada)
-        \item [SVM] \textit{Support Vector Machine} (Máquina de Vetores de Suporte)
-        \item [RBF] \textit{Radial Basis Function} (Função de Base Radial)
-        \item [kNN] \textit{k-Nearest Neighbors} (k Vizinhos Mais Próximos)
-        \item [CNN1D] \textit{One-Dimensional Convolutional Neural Network} (Rede Neural Convolucional Unidimensional)
-        \item [CPU] \textit{Central Processing Unit} (Unidade Central de Processamento)
-        \item [GPU] \textit{Graphics Processing Unit} (Unidade de Processamento Gráfico)
+        \item [CNN] \textit{Convolutional Neural Network}
+        \item [ViT] \textit{Vision Transformer}
+        \item [CNN-ViT] \textit{Convolutional Neural Network with Vision Transformer}
+        \item [RNN] \textit{Recurrent Neural Network}
+        \item [RaNN] \textit{Randomized Neural Network}
+        \item [RGB] \textit{Red, Green, Blue}
+        \item [CN] \textit{Complex Network}
+        \item [DL] \textit{Deep Learning}
+        \item [BiLSTM] \textit{Bidirectional Long Short-Term Memory}
+        \item [BiGRU] \textit{Bidirectional Gated Recurrent Unit}
+        \item [GLCM] \textit{Gray-Level Co-occurrence Matrix}
+        \item [HOG] \textit{Histogram of Oriented Gradients}
+        \item [LBP] \textit{Local Binary Patterns}
+        \item [MLP] \textit{Multilayer Perceptron}
+        \item [LSTM] \textit{Long Short-Term Memory}
+        \item [GRU] \textit{Gated Recurrent Unit}
+        \item [SAC-LSTM] \textit{Self-Attention Coupled Long Short-Term Memory}
+        \item [AUC-ROC] \textit{Area Under the Receiver Operating Characteristic Curve}
+        \item [H\&E] \textit{Hematoxylin and Eosin}
+        \item [LN] \textit{Layer Normalization}
+        \item [SIFT] \textit{Scale-Invariant Feature Transform}
+        \item [SSN] \textit{Spatio-Spectral Network}
+        \item [ReLU] \textit{Rectified Linear Unit}
+        \item [SVM] \textit{Support Vector Machine}
+        \item [RBF] \textit{Radial Basis Function}
+        \item [kNN] \textit{k-Nearest Neighbors}
+        \item [CNN1D] \textit{One-Dimensional Convolutional Neural Network}
+        \item [CPU] \textit{Central Processing Unit}
+        \item [GPU] \textit{Graphics Processing Unit}
         \item [UCSB] \textit{University of California, Santa Barbara}
-        \item [CR] \textit{Colorectal} (Colorretal)
-        \item [LA] \textit{Liver Aging} (Envelhecimento Hepático)
-        \item [LG] \textit{Liver Gender} (Sexo Hepático)
-        \item [NHL] \textit{Non-Hodgkin Lymphoma} (Linfoma Não Hodgkin)
-        \item [CLL] \textit{Chronic Lymphocytic Leukemia} (Leucemia Linfocítica Crônica)
-        \item [FL] \textit{Follicular Lymphoma} (Linfoma Folicular)
-        \item [MCL] \textit{Mantle Cell Lymphoma} (Linfoma de Células do Manto)
+        \item [CR] \textit{Colorectal}
+        \item [LA] \textit{Liver Aging}
+        \item [LG] \textit{Liver Gender}
+        \item [NHL] \textit{Non-Hodgkin Lymphoma}
+        \item [CLL] \textit{Chronic Lymphocytic Leukemia}
+        \item [FL] \textit{Follicular Lymphoma}
+        \item [MCL] \textit{Mantle Cell Lymphoma}
         \item [UCP] Unidade Central de Processamento
     \end{siglas}  
 
-    % Símbolos descomentados com exemplos relacionados ao seu TCC
+    % Lista de Símbolos completa com os termos citados na fundamentação teórica e em materiais e métodos
     \begin{simbolos}
-        \item[$r$] Raio de conexão do grafo
-        \item[$k$] Número de partições na validação cruzada (k-Fold)
+        \item[$G$] Grafo ou rede complexa espaço-espectral ($G = (V, E)$)
+        \item[$V$] Conjunto de vértices da rede complexa
+        \item[$E$] Conjunto de arestas direcionadas da rede complexa
+        \item[$v_i$] Vértice associado ao pixel nas coordenadas $(x_i, y_i)$ no canal de cor $c$
+        \item[$(x_i, y_i)$] Coordenadas espaciais do pixel na grade bidimensional da imagem
+        \item[$c, c_w$] Canais ou camadas de cor da imagem no espaço RGB
+        \item[$\rho_{ij}$] Distância euclidiana espacial entre os pixels dos vértices $v_i$ e $v_j$
+        \item[$\rho_{ij}^2$] Distância euclidiana quadrática entre os vértices $v_i$ e $v_j$
+        \item[$r$] Raio de conexão espacial da rede complexa
+        \item[$r_{\max}$] Raio máximo de conexão estabelecido para a rede complexa ($r_{\max} = 15$)
+        \item[$I(x_i, y_i, c)$] Intensidade luminosa do pixel nas coordenadas $(x_i, y_i)$ no canal $c$
+        \item[$w_{ij}$] Diferença absoluta de intensidade luminosa entre os vértices $v_i$ e $v_j$
+        \item[$\omega_{ij}$] Peso normalizado atribuído à aresta direcionada entre $v_i$ e $v_j$ no raio $r$
+        \item[$L$] Nível máximo de intensidade em imagens de 8 bits por canal ($L = 255$)
+        \item[$\mathcal{N}$] Topologia de rede espaço-espectral completa (\textit{full})
+        \item[$\mathcal{N}_w$] Topologia de rede espaço-espectral intra-canal (\textit{within})
+        \item[$\mathcal{N}_b$] Topologia de rede espaço-espectral inter-canais (\textit{between})
+        \item[$d_{\mathrm{out}}$] Grau de saída acumulado de um vértice até o raio de conexão $r$
+        \item[$n_{\mathrm{out}}$] Quantidade de arestas direcionadas de saída formadas em um raio discreto
+        \item[$\text{force}_{\mathrm{out}}$] Força de saída acumulada de um vértice até o raio de conexão $r$
+        \item[$\text{force}_{\mathrm{in}}$] Força de entrada acumulada de um vértice até o raio de conexão $r$
+        \item[$\mathcal{N}_{\mathrm{out}}$] Conjunto de vértices vizinhos de saída até o raio de conexão $r$
+        \item[$\mathcal{N}_{\mathrm{in}}$] Conjunto de vértices vizinhos de entrada até o raio de conexão $r$
+        \item[$x_r$] Vetor de atributos topológicos extraídos no raio de conexão $r$ ($x_r \in \mathbb{R}^{18}$)
+        \item[$X_{\mathrm{top}}$] Sequência ordenada de descritores topológicos multiescala ($X_{\mathrm{top}} \in \mathbb{R}^{15 \times 18}$)
+        \item[$t$] Passo temporal ou índice de escala na sequência de atributos
+        \item[$x_t$] Vetor de atributos de entrada no passo temporal $t$
+        \item[$h_t$] Estado oculto da unidade recorrente no passo temporal $t$
+        \item[$c_t$] Estado da célula de memória da LSTM no passo temporal $t$
+        \item[$\tilde{c}_t$] Estado candidato da célula de memória da LSTM no passo temporal $t$
+        \item[$f_t$] Vetor de ativação da porta de esquecimento da LSTM no passo temporal $t$
+        \item[$i_t$] Vetor de ativação da porta de entrada da LSTM no passo temporal $t$
+        \item[$o_t$] Vetor de ativação da porta de saída da LSTM no passo temporal $t$
+        \item[$W$] Matriz de pesos associada às entradas da rede neural
+        \item[$U$] Matriz de pesos recorrentes associada aos estados ocultos anteriores
+        \item[$b$] Vetor de viés (\textit{bias}) da camada neural
+        \item[$\sigma(\cdot)$] Função de ativação sigmoide logística
+        \item[$\tanh(\cdot)$] Função de ativação tangente hiperbólica
+        \item[$\odot$] Operador de produto de Hadamard (multiplicação elemento a elemento)
+        \item[$r_t$] Vetor de ativação da porta de reinicialização da GRU no passo temporal $t$
+        \item[$z_t$] Vetor de ativação da porta de atualização da GRU no passo temporal $t$
+        \item[$\tilde{h}_t$] Estado oculto candidato da GRU no passo temporal $t$
+        \item[$\overrightarrow{h}_r$] Estado oculto da camada recorrente no sentido direto no passo $r$
+        \item[$\overleftarrow{h}_r$] Estado oculto da camada recorrente no sentido reverso no passo $r$
+        \item[$\Vert$] Operador de concatenação vetorial
+        \item[$h_{\mathrm{rec}}$] Vetor latente concatenado dos estados finais do codificador recorrente
+        \item[$h$] Dimensão oculta (\textit{hidden size}) das camadas recorrentes e do MLP topológico
+        \item[$z_{\mathrm{top}}$] Vetor de características (\textit{embedding}) da via topológica ($z_{\mathrm{top}} \in \mathbb{R}^{128}$)
+        \item[$T$] Comprimento total da sequência de escalas da via topológica ($T = 15$)
+        \item[$\alpha_t$] Coeficiente de autoatenção atribuído ao passo temporal $t$ na SAC-LSTM
+        \item[$u_t$] Vetor latente intermediário do estado oculto na atenção da SAC-LSTM
+        \item[$u_s$] Vetor de contexto ajustável do mecanismo de autoatenção na SAC-LSTM
+        \item[$W_a, b_a$] Matriz de projeção e vetor de viés da camada de atenção na SAC-LSTM
+        \item[$\operatorname{vec}(\cdot)$] Operador de vetorização (achatamento de matriz em vetor unidimensional)
+        \item[$h_{\mathrm{mlp}}$] Vetor latente gerado pelo codificador MLP estático da via topológica
+        \item[$W_t, b_t$] Matriz de pesos e vetor de viés da camada linear do MLP topológico
+        \item[$I$] Imagem histopatológica de entrada em matriz digital de pixels
+        \item[$f_{\mathrm{vis}}(\cdot)$] Função de mapeamento do extrator de atributos da via visual
+        \item[$z_{\mathrm{vis}}$] Vetor de características (\textit{embedding}) extraído pela via visual ($z_{\mathrm{vis}} \in \mathbb{R}^D$)
+        \item[$D$] Dimensionalidade do vetor de saída do modelo visual pré-treinado
+        \item[$A$] Tensor tridimensional de ativações da última camada convolucional ($A \in \mathbb{R}^{C' \times H' \times W'}$)
+        \item[$C'$] Contagem de canais do mapa tridimensional de ativações ($C' = D$)
+        \item[$H', W'$] Dimensões de altura e largura espaciais do mapa de ativações
+        \item[$z_{\mathrm{vis}, c'}$] Componente do vetor visual no canal $c'$ gerada por agrupamento médio global
+        \item[$\tilde{z}_{\mathrm{vis}}$] Vetor visual projetado linearmente para equalização dimensional ($\tilde{z}_{\mathrm{vis}} \in \mathbb{R}^{128}$)
+        \item[$W_p, b_p$] Matriz de pesos e vetor de viés da projeção linear da via visual
+        \item[$\operatorname{LN}(\cdot)$] Operador de normalização por camada (\textit{Layer Normalization})
+        \item[$\mu$] Média das ativações calculada ao longo dos elementos do vetor na normalização por camada
+        \item[$\sigma^2$] Variância das ativações calculada ao longo dos elementos do vetor na normalização por camada
+        \item[$\varepsilon$] Constante infinitesimal de estabilidade numérica na normalização por camada
+        \item[$d$] Dimensionalidade dos vetores equalizados na normalização por camada ($d = 128$)
+        \item[$z_{\mathrm{fus}}$] Vetor de características unificado fundido ($z_{\mathrm{fus}} \in \mathbb{R}^{256}$)
+        \item[$h_{\mathrm{cls}}$] Vetor de ativações da camada oculta do classificador MLP final
+        \item[$W_1, b_1$] Matriz de pesos e vetor de viés da camada oculta do classificador MLP
+        \item[$W_2, b_2$] Matriz de pesos e vetor de viés da camada de saída do classificador MLP
+        \item[$C$] Quantidade de classes diagnósticas da tarefa de classificação
+        \item[$\hat{y}$] Vetor de probabilidades de classe preditas gerado pela função \textit{softmax}
+        \item[$p$] Probabilidade de desativação aleatória na camada de \textit{Dropout} ($p = 0{,}5$)
+        \item[$\eta_{bb}$] Taxa de aprendizado (\textit{learning rate}) atribuída ao modelo visual (\textit{backbone})
+        \item[$\eta_{\mathrm{top}}$] Taxa de aprendizado atribuída ao codificador da via topológica
+        \item[$\eta_{hd}$] Taxa de aprendizado da cabeça classificadora MLP e projeção (\textit{head})
+        \item[$B$] Tamanho do lote de treinamento (\textit{batch size})
+        \item[$\lambda$] Coeficiente de decaimento de pesos (\textit{weight decay}, $\lambda = 10^{-4}$)
+        \item[$k$] Número de partições na validação cruzada estratificada ($k = 5$); raio discreto na soma de arestas
     \end{simbolos}
     
     % S U M Á R I O
+    \cftsetindents{chapter}{0em}{\cftlastnumwidth}
+    \cftsetindents{section}{1.0em}{\cftlastnumwidth}
+    \cftsetindents{subsection}{2.0em}{\cftlastnumwidth}
+    \cftsetindents{subsubsection}{3.0em}{\cftlastnumwidth}
     \tableofcontents*
     \newpage
     
@@ -240,15 +334,13 @@
     \textual
     \pagestyle{simple} 
     
-    % Classificação de Imagens Médicas via Fusão de Deep Learning e Redes Complexas utilizando Redes Neurais Recorrentes
+    % Classificação de Imagens Histopatológicas via Fusão de Deep Learning e Redes Complexas utilizando Redes Neurais Recorrentes
 
     \input{introducao}
 
     \input{fundamentacao}
 
     \input{materiais-e-metodos}
-
-    \input{ablacao}
 
     \input{resultados-e-discussao}
     
@@ -268,11 +360,12 @@
     % \chapter*{GLOSSÁRIO} \addcontentsline{toc}{chapter}{GLOSSÁRIO} 
     % \noindent\textbf{Termo:} Definição...
 
-    % A P Ê N D I C E S (Opcional)
-    % \begin{apendicesenv}
-    %     \chapter{TÍTULO DO APÊNDICE}
-    %     % Insira o conteúdo do apêndice aqui...
-    % \end{apendicesenv}
+    % A P Ê N D I C E S
+    \begin{apendicesenv}
+        \input{apendice_topologica}
+        \input{apendice_visual}
+        \input{apendice_holdout}
+    \end{apendicesenv}
     
     % A N E X O S (Opcional)
     % \begin{anexosenv}

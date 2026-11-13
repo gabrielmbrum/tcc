@@ -1,13 +1,13 @@
 \chapter{Materiais e Métodos}
 
-As imagens utilizadas provêm de cinco \textit{datasets} histopatológicos, descritos na Seção~\ref{sec:datasets}. A arquitetura proposta extrai características de cada imagem por duas vias, a topológica e a visual (Seção~\ref{sec:duas-vias}). Os \textit{embeddings} resultantes são concatenados (Seção~\ref{sec:fusao-embeddings}) e classificados por um MLP (Seção~\ref{sec:mlp}), e o desempenho é medido pelo protocolo da Seção~\ref{sec:protocolo}. O fluxo completo está apresentado na \ref{fig:pipeline-geral}.
+Neste capítulo, o protocolo metodológico desenvolvido para avaliar a integração de duas vias na classificação de imagens histopatológicas é apresentado. A investigação contemplou cinco bases histopatológicas ao longo de quatro etapas principais: (i) aumento de dados e extração de atributos por redes espaço-espectrais, (ii) treinamento, busca de hiperparâmetros e avaliação de cada via de forma isolada, (iii) treinamento e avaliação da arquitetura de dupla via a partir das melhores configurações de cada modalidade, e (iv) comparação dos desempenhos obtidos entre as vias isoladas e o modelo integrado. Os critérios de particionamento, as métricas de avaliação e a configuração do ambiente computacional também foram formalizados neste capítulo. O fluxo geral dos procedimentos foi ilustrado na \ref{fig:pipeline-geral}.
 
-\input{pipeline_geral.tex}
+\input{pipeline_geral.tex} 
 
 \section{\textit{Datasets}}
 \label{sec:datasets}
 
-A avaliação foi conduzida em cinco \textit{datasets} de imagens histopatológicas, com 58 a 528 imagens cada. Os conjuntos incluem tarefas de classificação binária e multiclasse, com diferentes tamanhos amostrais e graus de desbalanceamento de classes, o que permite observar o comportamento do modelo em cenários com poucos dados. As características de cada conjunto estão resumidas na Tabela~\ref{tab:datasets}. Os conjuntos LA e LG não correspondem a tarefas diagnósticas, pois as classes são a idade e o sexo de camundongos. Esses conjuntos foram incluídos como \textit{benchmarks} de textura histológica, nos quais a distinção entre as classes depende do padrão do tecido hepático e não de uma lesão.
+A avaliação foi conduzida em cinco \textit{datasets} de imagens histopatológicas, com 58 a 528 imagens cada. Os conjuntos compreenderam tarefas de classificação binária e multiclasse, com diferentes tamanhos amostrais e graus de desbalanceamento de classes, o que permitiu observar o comportamento do modelo em cenários com poucos dados. As características de cada conjunto foram sintetizadas na Tabela~\ref{tab:datasets}. Os conjuntos LA e LG não correspondiam a tarefas diagnósticas, pois as classes representavam a idade e o sexo de camundongos. Esses conjuntos foram incluídos como \textit{benchmarks} de textura histológica, nos quais a distinção entre as classes dependia do padrão do tecido hepático e não de uma lesão.
 
 \begin{table}[htb]
 \centering
@@ -29,11 +29,11 @@ NHL  & Linfoma (CLL / FL / MCL)          & 374 & 3 & 113 / 139 / 122 & $1388 \ti
 }
 \end{table}
 
-% TODO: o log de dimensões cobriu apenas UCSB/Benign, LA/1, LG/1 e NHL/MCL. Rodar nas demais classes e confirmar a uniformidade antes de manter a tabela.
+As imagens foram mantidas em inteiros de 8 bits por canal e alimentaram as duas vias em resoluções distintas. A via topológica utilizou a imagem na resolução original de cada \textit{dataset} (Tabela~\ref{tab:datasets}), sem redimensionamento e sem alteração de intensidades, pois as arestas das redes complexas dependiam da comparação de intensidades inteiras, incluindo os empates, e a interpolação suavizaria essas diferenças. A via visual utilizou uma versão de $256 \times 256$ pixels, escala em que os modelos utilizados foram pré-treinados, o que também uniformizou as dimensões dos lotes. Essa versão foi obtida pelo redimensionamento do lado menor para 256 pixels, por interpolação de área e com a proporção preservada, seguido de um recorte central de $256 \times 256$ pixels. As imagens de $256 \times 256$ pixels foram calculadas uma única vez, mantidas como inteiros de 8 bits e armazenadas em cache, com a ordem dos arquivos conferida contra a da via topológica. A conversão para o intervalo $[0,1]$ e a normalização por canal foram aplicadas a cada lote conforme a configuração de pré-treinamento de cada modelo na biblioteca \textit{timm} (Seção~\ref{subsec:ext-hibrido}), utilizando a média de $(0{,}485, 0{,}456, 0{,}406)$ e o desvio padrão de $(0{,}229, 0{,}224, 0{,}225)$ da ImageNet para os modelos ResNet-50, EfficientNet-B0, ViT-Tiny, DeiT-Tiny e CoAtNet-0, e padronização sem subtração de média para a MobileViT-S. Esse procedimento preservou as proporções relativas dos compartimentos celulares, embora o recorte central descartasse faixas periféricas em imagens não quadradas.
 
-As imagens foram mantidas em inteiros de 8 bits por canal e alimentaram as duas vias em resoluções distintas. A via topológica utilizou a imagem na resolução original de cada \textit{dataset} (Tabela~\ref{tab:datasets}), sem redimensionamento e sem alteração de intensidades, pois as arestas das redes complexas dependem da comparação de intensidades inteiras, incluindo os empates, e a interpolação suavizaria essas diferenças. A via visual utilizou uma versão de $256 \times 256$ pixels, escala em que os modelos utilizados foram pré-treinados, o que também uniformiza as dimensões dos lotes. Essa versão foi obtida pelo redimensionamento do lado menor para 256 pixels, por interpolação de área e com a proporção preservada, seguido de um recorte central de $256 \times 256$ pixels. As imagens de $256 \times 256$ pixels foram calculadas uma única vez, mantidas como inteiros de 8 bits e armazenadas em cache, com a ordem dos arquivos conferida contra a da via topológica. A conversão para o intervalo $[0,1]$ e a normalização foram aplicadas a cada lote, com a média e o desvio padrão do pré-processamento de cada \textit{backbone} pré-treinado (Seção~\ref{subsec:ext-hibrido}): a média de $(0{,}485;\, 0{,}456;\, 0{,}406)$ e o desvio padrão de $(0{,}229;\, 0{,}224;\, 0{,}225)$ da ImageNet para a EfficientNet-B0 e a DeiT-Tiny, e média nula e desvio unitário para a MobileViT-S, cujos pesos foram pré-treinados sem normalização por canal. Esse procedimento evita a distorção de proporção, mas o recorte central descarta as bordas das imagens que não são quadradas.
+O conjunto UCSB \cite{UCSB} compreendeu imagens de tecido epitelial mamário obtidas por microscopia óptica sob aumento de 20$\times$ (\ref{fig:dataset-ucsb}). Entre os conjuntos analisados, essa base reuniu o volume amostral mais reduzido da investigação, impondo severa restrição ao treinamento supervisionado. O desafio da classificação decorreu da diferenciação entre alterações epiteliais benignas, acompanhadas por estroma denso colagenoso, e carcinomas invasivos caracterizados por atipias celulares e desarranjo da conformação tecidual típica, demandando alta capacidade de discriminação sob amostragem restrita.
 
-O \textit{dataset} UCSB \cite{UCSB} é composto por 58 imagens RGB de tecido de câncer de mama (\ref{fig:dataset-ucsb}), sendo 32 benignas e 26 malignas, e possui o menor número de amostras entre os conjuntos avaliados. O \textit{dataset} CR \cite{CR} contém 165 imagens RGB de tecido colorretal, obtidas a partir de 16 seções histológicas representativas de câncer colorretal nos estágios T3 e T4. O conjunto é levemente desbalanceado, com 74 imagens de tecido benigno e 91 de tecido maligno, e a resolução original é de $775 \times 522$ pixels em 151 imagens, enquanto 14 imagens (7 por classe) têm resoluções menores, de $567 \times 430$ a $589 \times 453$ pixels, com proporção diferente das demais (\ref{fig:dataset-cr}).
+O conjunto CR \cite{CR} foi obtido a partir de seções histológicas representativas de adenocarcinoma colorretal avançado nos estágios patológicos T3 e T4 (\ref{fig:dataset-cr}). A distinção diagnóstica envolveu a perda da conformação criptal tubular característica do epitélio benigno e a proliferação irregular de células atípicas pelo estroma tecidual. O conjunto exibiu a particularidade de conter 14 imagens capturadas em resoluções atípicas com relações de aspecto distintas das demais amostras, exigindo atenção no procedimento de recorte central padronizado para evitar o descarte de arranjos glandulares atípicos periféricos.
 
 \begin{figure}[htbp]
     \centering
@@ -95,7 +95,7 @@ O \textit{dataset} UCSB \cite{UCSB} é composto por 58 imagens RGB de tecido de 
     \label{fig:dataset-cr}
 \end{figure}
 
-Os \textit{datasets} LA e LG \cite{iicbu2008} compreendem micrografias RGB de tecido hepático de camundongos. O LA tem como objetivo classificar a idade dos animais fêmeas em quatro grupos, com um mês (100 imagens), seis meses (115), 16 meses (162) e 24 meses (151), totalizando 528 imagens. O LG contém 265 imagens para classificação de sexo, divididas em 150 machos e 115 fêmeas. As amostras dos dois conjuntos estão na \ref{fig:dataset-la} e na \ref{fig:dataset-lg}.
+Os conjuntos LA e LG \cite{iicbu2008} reuniram micrografias de tecido hepático de camundongos voltadas à caracterização quantitativa de padrões biológicos fisiológicos normais, sem presença de lesões neoplásicas (\ref{fig:dataset-la} e \ref{fig:dataset-lg}). No conjunto LA, a classificação de quatro faixas etárias permitiu acompanhar o processo contínuo de envelhecimento tecidual, refletido em alterações graduais no parênquima hepático, aumento da variabilidade volumétrica dos hepatócitos e desarranjo progressivo dos cordões celulares. No conjunto LG, a distinção entre fêmeas e machos foi governada por variações na vascularização sinusoidal e na densidade nuclear média do parênquima. Ambos os conjuntos atuaram como referenciais de textura biológica gradual em condições livres de processos tumorais.
 
 \begin{figure}[htbp]
     \centering
@@ -155,7 +155,7 @@ Os \textit{datasets} LA e LG \cite{iicbu2008} compreendem micrografias RGB de te
     \label{fig:dataset-lg}
 \end{figure}
 
-O \textit{dataset} NHL \cite{iicbu2008} contém 374 imagens RGB de linfoma não Hodgkin, distribuídas em três classes diagnósticas: CLL (113 imagens), FL (139 imagens) e MCL (122 imagens). Diferentemente de aquisições realizadas em um único centro, o NHL reúne espécimes preparados por diferentes histologistas em diversos hospitais e laboratórios, com variações marcantes de coloração e iluminação (\ref{fig:dataset-nhl}). Essa variabilidade cromática motivou a inclusão do conjunto. Como as partições de validação cruzada e de teste foram obtidas dentro do próprio conjunto e sem metadados de laboratório, o protocolo não avalia a generalização para laboratórios não vistos.
+O conjunto NHL \cite{iicbu2008} contemplou subtipos de linfoma não Hodgkin, abrangendo leucemia linfocítica crônica (CLL), linfoma folicular (FL) e linfoma de células do manto (MCL) (\ref{fig:dataset-nhl}). A principal particularidade do conjunto decorreu da aquisição multicêntrica dos espécimes, preparados por diferentes histologistas em diversos hospitais e laboratórios. Esse protocolo heterogêneo introduziu variações acentuadas de saturação, coloração histoquímica e iluminação entre as lâminas, reproduzindo condições operacionais desafiadoras para modelos computacionais. Como as partições de validação e teste foram geradas dentro do próprio acervo sem metadados relativos ao laboratório de origem de cada lâmina, a avaliação não contemplou a transferência direta para centros clínicos não observados durante o desenvolvimento.
 
 \begin{figure}[htbp]
     \centering
@@ -181,156 +181,182 @@ O \textit{dataset} NHL \cite{iicbu2008} contém 374 imagens RGB de linfoma não 
 \end{figure}
 
 
-\section{\textit{Two-Stream Network}}
-\label{sec:duas-vias}
+\section{Protocolo experimental}
+\label{sec:protocolo}
 
-A arquitetura proposta, ilustrada na \ref{fig:pipeline-geral}, é uma rede de dupla via (\textit{Two-Stream Network}) para a classificação de imagens histopatológicas. A via topológica representa a imagem por medidas de redes complexas processadas por uma BiLSTM ou por um MLP, e a via visual extrai características diretamente da imagem RGB por uma arquitetura híbrida baseada em convoluções e atenção. As duas vias são independentes durante a extração. Os \textit{embeddings} resultantes são projetados para a mesma dimensão, concatenados e classificados por um MLP, e todos os parâmetros são ajustados em conjunto no treinamento (Seção~\ref{sec:protocolo}).
+O protocolo experimental foi delineado para viabilizar a comparação equitativa entre as vias isoladas e mensurar com rigor empírico a contribuição decorrente da integração multimodal sob restrição amostral. Para assegurar a generalização dos resultados e prevenir o vazamento de dados, o procedimento metodológico compreendeu duas fases sequenciais: a exploração por validação cruzada na partição de desenvolvimento e a avaliação confirmatória final no conjunto de teste independente, conforme esquematizado na \ref{fig:ablacao-treino}.
 
-Na arquitetura proposta, a via topológica descreve as relações entre pixels em raios de conexão crescentes, e a via visual aprende representações a partir dos pixels da imagem. O fundamento das arquiteturas de dupla via e da combinação das representações está na Seção~\ref{sec:fusao-fundamentacao}.
+As amostras de cada conjunto de dados foram divididas de forma estratificada na proporção de 80\% para desenvolvimento e 20\% para teste final independente, com semente pseudoaleatória 42. A partição de teste final de 20\% foi mantida estritamente isolada durante toda a etapa de desenvolvimento, sem intervenção na seleção de arquiteturas ou no ajuste de hiperparâmetros, atuando unicamente na inferência confirmatória final.
 
-O processamento ocorre em quatro etapas. A primeira extrai as características topológicas por redes complexas e as codifica por uma BiLSTM ou por um MLP. A segunda extrai as características visuais pela MobileViT-S. A terceira projeta, normaliza e concatena os dois \textit{embeddings}. A quarta classifica o vetor concatenado por um MLP.
+Na partição de desenvolvimento (80\%), foi aplicada validação cruzada estratificada em cinco dobras ($k = 5$), também configurada com semente 42. Em cada uma das cinco rodadas, quatro dobras foram destinadas ao treinamento e uma dobra foi reservada para validação. As transformações de padronização foram calibradas estritamente com os parâmetros estatísticos das dobras de treino de cada rodada, prevenindo o vazamento de informações para a validação. O desempenho médio de validação ao longo das cinco dobras, quantificado pelo F1 macro, foi adotado como critério para a seleção dos hiperparâmetros ótimos e dos melhores modelos de cada via.
 
-\subsection{Via topológica}
-\label{subsec:ext-tex}
+Concluída a seleção das configurações ótimas em cada modalidade, a fase confirmatória consistiu no treinamento dos modelos sobre a totalidade da partição de desenvolvimento (80\%) e na avaliação do desempenho na partição de teste independente (20\%). Para mensurar a estabilidade frente a fatores estocásticos (inicialização de pesos das camadas não pré-treinadas, embaralhamento de lotes e transformações de aumento de dados), o treinamento e a inferência no teste independente foram repetidos sob cinco sementes aleatórias pré-fixadas ($s \in \{42, 43, 44, 45, 46\}$), sendo reportados a média e o desvio padrão obtidos.
 
-A primeira via descreve a textura da imagem por medidas topológicas de redes complexas (Seção~\ref{sec:redes-complexas}). Cada imagem foi convertida em uma rede direcionada e ponderada, na qual cada pixel é um vértice e as arestas ligam pixels cuja distância é de no máximo $r_{\max}$. O peso de cada aresta combina a diferença absoluta de intensidade e a distância euclidiana entre os pixels (Seção~\ref{sec:redes-complexas}), e a direção vai do pixel de menor intensidade para o de maior intensidade \cite{Scabini_2020,BACKES2013168,ribas2020fusion,ribas2024colorspectral}. As imagens foram modeladas em redes do tipo \textit{full}, que permite a criação tanto entre pixels de mesmo canal de cor quanto entre pixels de diferentes canais de cores \cite{Scabini_2020}. As conexões intercanais incluem as arestas de distância nula entre os canais de um mesmo pixel, que pertencem ao raio 1 \cite{ribas2024colorspectral}. A rede foi construída sobre a imagem original de 8 bits, na resolução nativa de cada \textit{dataset}, sem redimensionamento e sem normalização. As medidas por raio são médias e desvios padrão sobre os vértices, de modo que imagens de tamanhos diferentes geram sequências com a mesma dimensão. Por serem determinísticas, as medidas foram calculadas uma única vez por imagem e reutilizadas em todas as partições.
+\input{ablacao_treino.tex}
 
-Para cada vértice foram calculados o grau de saída, a força de saída e a força de entrada, acumulados até cada raio $r \in \{1, 2, \ldots, r_{\max}\}$, e o grau de entrada não foi utilizado por ser uma combinação linear do grau de saída \citeonline{ribas2024colorspectral}. Em cada raio, a média global e o desvio padrão global das três medidas foram calculados para cada um dos três canais, o que produz 18 características por raio. A imagem é descrita pela sequência
+\subsection{Métricas de avaliação}
+\label{subsec:metricas}
+
+A capacidade preditiva dos modelos foi mensurada pela acurácia, pelo F1-\textit{score} macro e pela AUC-ROC. A acurácia quantificou a proporção global de predições corretas. O F1-\textit{score} macro foi calculado pela média aritmética dos valores de F1 apurados individualmente para cada classe, correspondendo cada F1 à média harmônica entre precisão e sensibilidade:
 
 \begin{equation}
-X_{\mathrm{top}} =
-[x_1,x_2,\ldots,x_{15}],
+\text{F1}_{\text{macro}} = \frac{1}{C} \sum_{c=1}^{C} \frac{2 \cdot \text{Precisão}_c \cdot \text{Sensibilidade}_c}{\text{Precisão}_c + \text{Sensibilidade}_c},
+\label{eq:met-f1-macro}
+\end{equation}
+
+atribuindo peso paritário às classes minoritárias e majoritárias, propriedade relevante em conjuntos desbalanceados. A métrica AUC-ROC foi calculada pela abordagem um-contra-todos com média macro nas tarefas multiclasse (LA e NHL).
+
+\section{Modelagem e exploração das vias isoladas}
+\label{sec:vias-isoladas}
+
+Com o propósito de determinar as arquiteturas mais adequadas e as combinações ótimas de hiperparâmetros antes da composição do modelo de dupla via, as duas vias foram avaliadas de forma isolada sobre as mesmas partições de dados da validação cruzada. A organização da avaliação das vias isoladas foi ilustrada na \ref{fig:ablacao-vias}, abrangendo os modelos avaliados na via topológica e na via visual, acompanhados de suas respectivas cabeças de classificação.
+
+\input{ablacao_vias.tex}
+
+\subsection{Via topológica}
+\label{subsec:via-topologica}
+\label{subsec:ext-tex}
+
+A extração das características da via topológica foi executada por meio de rotinas determinísticas implementadas em C++ com paralelização OpenMP em 16 \textit{threads}. As redes espaço-espectrais foram construídas diretamente sobre as imagens na resolução nativa de 8 bits de cada conjunto de dados (Tabela~\ref{tab:datasets}), sem redimensionamento e sem interpolação de intensidades, preservando as comparações numéricas originais entre os pixels (Seção~\ref{sec:redes-complexas}). Foi adotada a topologia de rede \textit{full} ($\mathcal{N}$) sobre os canais RGB, com raios de conexão discretos variando de $r = 1$ a $r_{\max} = 15$ \cite{Scabini_2020}.
+
+Para cada raio de alcance $r$, foram calculadas as distribuições nodais de grau de saída, força de saída e força de entrada sobre a totalidade dos vértices, sendo o grau de entrada descartado por redundância matemática em relação ao grau de saída (Seção~\ref{sec:redes-complexas}). A sumarização estatística dessas três medidas pela média e pelo desvio padrão em cada um dos três canais de cor resultou em 18 atributos nodais por escala. A representação da imagem foi organizada como uma sequência ordenada por raios crescentes:
+
+\begin{equation}
+X_{\mathrm{top}} = [x_1, x_2, \ldots, x_{15}],
 \label{eq:met-sequencia-topologica}
 \end{equation}
 
-em que cada passo $x_r \in \mathbb{R}^{18}$ corresponde ao raio $r$, e a sequência completa contém 270 valores. As medidas por raio seguem a SSN \cite{Scabini_2020}. A sequência é processada por um codificador, a BiLSTM ou o MLP (descritos adiante), cujo vetor de saída forma o descritor topológico $z_{\mathrm{top}} \in \mathbb{R}^{128}$.
+na qual cada vetor $x_r \in \mathbb{R}^{18}$ corresponde ao raio $r$, compondo uma sequência multiescala de dimensão $15 \times 18 = 270$ atributos. Durante a validação cruzada, cada uma das 18 coordenadas foi padronizada com base na média e no desvio padrão apurados exclusivamente na partição de treino da respectiva rodada.
 
-O raio de conexão variou de 1 a 15, de modo que $r_{\max}=15$, intervalo analisado na literatura de redes complexas aplicadas à textura \cite{CNT}. A sensibilidade ao valor de $r_{\max}$ foi verificada na via topológica isolada, com $r_{\max} \in \{4, 7, 10, 15\}$ (Seção~\ref{sec:via-topologica}). Como o raio é medido em pixels, $r_{\max}=15$ cobre uma fração maior da imagem nos conjuntos de menor resolução (LA e LG) e menor nos de maior resolução (NHL), o que altera a extensão tecidual descrita pelas medidas.
+Para avaliar a relevância da ordem sequencial entre as escalas frente a uma projeção estática desordenada, foram investigadas duas abordagens de codificação: cinco arquiteturas de redes neurais recorrentes (LSTM, BiLSTM, GRU, BiGRU e SAC-LSTM), formuladas conceitualmente na Seção~\ref{sec:rnn-topologicas}, e um codificador denso baseado em MLP atuando como linha de base de controle experimental \cite{huang2022fusing,rumelhart1986learning}.
 
-As medidas são acumuladas e crescem de forma monotônica com $r$, assumindo magnitudes mais elevadas nos raios maiores. Cada uma das 270 coordenadas de $X_{\mathrm{top}}$ foi padronizada pela média e pelo desvio padrão calculados sobre o conjunto de treino de cada rodada da validação cruzada e do treinamento final, sendo os parâmetros de padronização replicados nas partições de validação e de teste. Na ablação da via topológica isolada (Seção~\ref{sec:ablacao-topologica}), foram avaliadas diferentes arquiteturas recorrentes e uma linha de base sem recorrência para determinar os melhores hiperparâmetros de cada base de dados.
-
-A BiLSTM foi adotada como o codificador recorrente principal, pela capacidade de processar a sequência nos sentidos direto e inverso, enquanto o MLP atua como modelo de controle estático sem recorrência. A arquitetura de dupla via integra a representação topológica $z_{\mathrm{top}}$ com a representação visual, mantendo a fusão (Seção~\ref{sec:fusao-embeddings}) e o classificador (Seção~\ref{sec:mlp}) unificados para verificar o ganho preditivo ao unir as vias (Seção~\ref{sec:experimentos}).
-
-\subsubsection{Codificador BiLSTM}
-\label{subsubsec:enc-bilstm}
-
-A sequência padronizada foi processada por uma BiLSTM \cite{hochreiter1997long,schuster1997bidirectional}. Na configuração adotada, a rede possui uma camada e unidades ocultas configuradas conforme a dimensão selecionada na ablação da via topológica (Seção~\ref{sec:ablacao-topologica}), produzindo um vetor de características $z_{\mathrm{top}} \in \mathbb{R}^{128}$. A rede opera no formato \textit{many-to-one}, e o \textit{embedding} topológico é a concatenação do estado final da leitura direta, do raio 1 ao 15, com o estado final da leitura inversa:
+Nos modelos unidirecionais, a representação latente correspondeu ao estado oculto terminal ($h_{\mathrm{rec}} = h_{15}$). Nos modelos bidirecionais (BiLSTM e BiGRU), a representação latente foi formada pela concatenação dos estados terminais dos dois sentidos de leitura:
 
 \begin{equation}
-z_{\mathrm{top}} = \left[\overrightarrow{h}_{15}\,\Vert\,\overleftarrow{h}_{1}\right] \in \mathbb{R}^{128}.
+h_{\mathrm{rec}} = \left[\overrightarrow{h}_{15}\,\Vert\,\overleftarrow{h}_{1}\right] \in \mathbb{R}^{h},
 \label{eq:met-embedding-topologico}
 \end{equation}
 
-A leitura direta acumula progressivamente a informação dos raios menores nos raios maiores, enquanto a leitura inversa fornece a cada raio o acesso ao contexto das escalas maiores, capturando a transição das propriedades teciduais \cite{schuster1997bidirectional,graves2005framewise}.
-
-\subsubsection{Codificador MLP}
-\label{subsubsec:enc-mlp}
-
-No segundo codificador, os 15 vetores de $X_{\mathrm{top}}$ são concatenados em um único vetor de 270 valores, $\operatorname{vec}(X_{\mathrm{top}}) \in \mathbb{R}^{270}$, processado por um MLP \cite{rumelhart1986learning}. Na configuração padrão, o codificador possui uma camada linear de 128 neurônios seguida da função de ativação ReLU, resultando em um \textit{embedding} de 128 dimensões:
+em que $h \in \{64, 128, 256, 512\}$ denota a capacidade interna avaliada. Quando $h \neq 128$, uma camada linear com ativação ReLU projetou $h_{\mathrm{rec}}$ para o descritor padronizado $z_{\mathrm{top}} \in \mathbb{R}^{128}$, sendo $z_{\mathrm{top}} = h_{\mathrm{rec}}$ fixado diretamente para $h = 128$. No codificador de controle MLP, os 15 vetores de $X_{\mathrm{top}}$ foram concatenados em um único vetor plano $\operatorname{vec}(X_{\mathrm{top}}) \in \mathbb{R}^{270}$, processado por uma camada densa com ativação ReLU:
 
 \begin{equation}
-z_{\mathrm{top}} = \operatorname{ReLU}\left(W_{t}\,\operatorname{vec}(X_{\mathrm{top}}) + b_{t}\right) \in \mathbb{R}^{128}, \qquad W_{t} \in \mathbb{R}^{128 \times 270}.
+h_{\mathrm{mlp}} = \operatorname{ReLU}\left(W_{t}\,\operatorname{vec}(X_{\mathrm{top}}) + b_{t}\right) \in \mathbb{R}^{h}, \qquad W_{t} \in \mathbb{R}^{h \times 270},
 \label{eq:met-embedding-topologico-mlp}
 \end{equation}
 
-Diferentemente da BiLSTM, o MLP não compartilha pesos entre os raios nem impõe uma ordem de leitura, de modo que cada coordenada possui pesos próprios. A dimensão oculta e a taxa de \textit{dropout} foram determinadas na ablação da via topológica (Seção~\ref{sec:ablacao-topologica}). A normalização LN aplicada antes da concatenação (Seção~\ref{sec:fusao-embeddings}) uniformiza a escala das ativações topológicas com as representações da via visual.
+seguido pela mesma projeção linear para 128 dimensões quando $h \neq 128$.
+
+Na fase de exploração isolada da via topológica, o descritor $z_{\mathrm{top}} \in \mathbb{R}^{128}$ alimentou uma cabeça classificadora composta por normalização por camadas, camada linear de 128 neurônios com ativação ReLU, camada de desativação aleatória (\textit{dropout}) e camada linear de saída com projeção para o número de classes $C$ da tarefa. O treinamento foi conduzido com função de perda de entropia cruzada, otimizador AdamW com decaimento de pesos fixado em $\lambda = 10^{-4}$ e norma euclidiana máxima de gradientes limitada a 1,0. O treinamento foi delimitado a um teto de 100 épocas, com parada antecipada regulada por tolerância de 15 épocas consecutivas sem decréscimo da perda na partição de validação. A grade de busca hiperparamétrica da via topológica foi sintetizada na Tabela~\ref{tab:espaco-busca-top}.
+
+\begin{table}[htb]
+\centering
+\caption{Espaço de busca de hiperparâmetros estratificado por conjunto de dados na via topológica.}
+\label{tab:espaco-busca-top}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Lote ($B$)} & \textbf{Taxa de aprendizado ($\eta$)} & \textbf{Decaimento ($\lambda$)} & \textbf{\textit{Dropout} ($p$)} & \textbf{Dim. oculta ($h$)} \\
+\midrule
+UCSB & $\{4, 8, 16\}$   & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+CR   & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+LG   & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+NHL  & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+LA   & $\{16, 32, 64\}$ & $\{3\cdot 10^{-4}, 10^{-3}, 3\cdot 10^{-3}, 10^{-2}, 3\cdot 10^{-2}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ & $\{64, 128, 256, 512\}$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
 \subsection{Via visual}
+\label{subsec:via-visual}
 \label{subsec:ext-hibrido}
 
-A via visual extrai atributos diretamente da imagem RGB por meio de modelos profundos de visão computacional. Foram avaliadas seis arquiteturas distribuídas nas famílias convolucional (ResNet-50 e EfficientNet-B0), transformadores visuais (ViT-Tiny e DeiT-Tiny) e híbridas (MobileViT-S e CoAtNet-0), conforme detalhado no Capítulo~\ref{chap:res-ablacao}. Cada arquitetura recebeu a versão de $256 \times 256$ pixels da imagem (Seção~\ref{sec:datasets}), normalizada pelos parâmetros de média e desvio padrão do pré-treinamento da ImageNet-1k, tendo a camada densa original de classificação removida. Os pesos foram obtidos da biblioteca \textit{timm}.
+A via visual processou atributos diretamente dos pixels da imagem RGB por meio de modelos de visão computacional pré-treinados na base ImageNet-1k \cite{imagenet}. Foram avaliadas seis arquiteturas distribuídas em três famílias:
+\begin{itemize}
+    \item família convolucional: ResNet-50 \cite{he2016deep} e EfficientNet-B0 \cite{tan2019efficientnet};
+    \item família de transformadores visuais: ViT-Tiny \cite{dosovitskiy2020image} e DeiT-Tiny \cite{touvron2021training};
+    \item família de arquiteturas híbridas: MobileViT-S \cite{mehta2022mobilevit} e CoAtNet-0 \cite{dai2021coatnet}.
+\end{itemize}
 
-As ativações do último estágio de extração de características foram agregadas por agrupamento médio global (\textit{Global Average Pooling}) ou pelo \textit{token} de classificação, reduzindo a representação a um vetor denso. Sendo $I$ a imagem processada e $f_{\mathrm{vis}}(\cdot)$ o codificador visual, o mapeamento é dado por
+As imagens de entrada foram redimensionadas para a escala padronizada de $256 \times 256$ pixels (Seção~\ref{sec:datasets}). Durante o treinamento das rodadas, foi aplicado aumento de dados composto por inversão horizontal com probabilidade de 0,5 e rotações ortogonais de 0, 90, 180 ou 270 graus. Cada modelo recebeu a imagem com a camada original de classificação da ImageNet removida, gerando o vetor denso $z_{\mathrm{vis}} \in \mathbb{R}^{D}$, cuja dimensão $D$ variava conforme a arquitetura ($D=2048$ na ResNet-50, $D=1280$ na EfficientNet-B0, $D=192$ no ViT-Tiny e DeiT-Tiny, $D=640$ na MobileViT-S e $D=768$ na CoAtNet-0).
 
-\begin{equation}
-z_{\mathrm{vis}} = f_{\mathrm{vis}}(I),
-\label{eq:met-embedding-visual}
-\end{equation}
+Na avaliação isolada da via visual, a camada original foi substituída pela mesma composição de cabeça classificadora utilizada na via topológica, contendo camada linear adaptada à dimensão $D$, normalização por camadas, camada oculta de 128 neurônios com ativação ReLU, camada de desativação aleatória e camada linear de saída.
 
-em que $z_{\mathrm{vis}} \in \mathbb{R}^{D}$ representa o vetor de características visuais, com dimensão $D$ dependente de cada arquitetura. No modelo de dupla via, a via visual recebeu aumento de dados por inversão horizontal e rotações de 90 graus aplicadas exclusivamente durante o treinamento (Seção~\ref{sec:protocolo}).
+O treinamento foi conduzido com a função de perda de entropia cruzada e o otimizador AdamW, com taxa de decaimento de pesos fixada em $\lambda = 10^{-4}$ e norma máxima dos gradientes limitada a 1,0. As taxas de aprendizado foram calibradas separadamente para o extrator visual ($\eta_{bb}$) e para a cabeça de classificação ($\eta_{hd}$). O treinamento foi delimitado a 50 épocas, com critério de parada antecipada após 10 épocas consecutivas sem decréscimo da perda na partição de validação. A grade de hiperparâmetros explorada e as dimensões amostrais de cada conjunto de dados na via visual foram sintetizadas na Tabela~\ref{tab:espaco-busca-vis}.
+
+\begin{table}[htb]
+\centering
+\caption{Dimensões amostrais e espaço de busca de hiperparâmetros estratificado por conjunto de dados na via visual.}
+\label{tab:espaco-busca-vis}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Desenv. (80\%)} & \textbf{Treino / Val. (rodada)} & \textbf{Lote ($B$)} & \textbf{Taxa do \textit{backbone} ($\eta_{bb}$)} & \textbf{Taxa da cabeça ($\eta_{hd}$)} & \textbf{Decaimento ($\lambda$)} & \textbf{\textit{Dropout} ($p$)} \\
+\midrule
+UCSB & 46  & 36 a 37 / 9 a 10   & $\{4, 8, 16\}$   & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+CR   & 132 & 105 a 106 / 26 a 27 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+LG   & 212 & 169 a 170 / 42 a 43 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+NHL  & 299 & 239 a 240 / 59 a 60 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+LA   & 422 & 337 a 338 / 84 a 85 & $\{16, 32, 64\}$ & $\{10^{-5}, 3\cdot 10^{-5}, 10^{-4}, 3\cdot 10^{-4}\}$ & $\{10^{-4}, 3\cdot 10^{-4}, 10^{-3}\}$ & $10^{-4}$ & $\{0{,}1, 0{,}3, 0{,}5\}$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\section{Arquitetura unificada de dupla via}
+\label{sec:duas-vias}
+
+A arquitetura de dupla via integrou as propriedades relacionais multiescala da via topológica às representações visuais profundas extraídas por modelos de visão computacional. As duas vias processaram a imagem de forma paralela e independente. Para compor o modelo unificado de cada conjunto de dados, foram combinados o codificador topológico e o modelo visual que obtiveram o maior F1 macro médio nas etapas de ablação das vias isoladas.
 
 \subsection{Fusão por concatenação de \textit{embeddings}}
 \label{sec:fusao-embeddings}
 
-Os \textit{embeddings} das duas vias foram combinados em nível de características, antes do classificador, na estratégia denominada fusão por concatenação de \textit{embeddings} (Seção~\ref{sec:fusao-fundamentacao}). Como o modelo é treinado de ponta a ponta, as duas vias são ajustadas em conjunto, e a separação entre elas se limita à extração das representações.
-
-Os dois vetores têm escalas e dimensões distintas. Os valores de $z_{\mathrm{top}}$ da BiLSTM são limitados ao intervalo $(-1, 1)$ pela tangente hiperbólica da célula de memória, e os do MLP são não negativos e sem limite superior, por saírem de uma ReLU. Já $z_{\mathrm{vis}}$ resulta de ativações sem limitação, e a diferença de escala pode fazer as características de maior magnitude predominarem na primeira camada do classificador. O vetor visual, com dimensão $D$ dependente do modelo empregado, também difere do vetor topológico de 128 dimensões. Por esse motivo, $z_{\mathrm{vis}}$ foi projetado para 128 dimensões por uma camada linear, e cada vetor foi normalizado por LN antes da concatenação:
+Os vetores $z_{\mathrm{top}}$ e $z_{\mathrm{vis}}$ apresentavam ordens de grandeza e dimensionalidades distintas. Para equalizar as duas modalidades antes da combinação, o vetor visual foi projetado linearmente para 128 dimensões por meio de uma matriz de pesos $W_p \in \mathbb{R}^{128 \times D}$. Em seguida, a normalização por camadas foi aplicada de forma independente a cada uma das representações, equalizando suas escalas numéricas:
 
 \begin{align}
 \tilde{z}_{\mathrm{vis}} &= W_p\, z_{\mathrm{vis}} + b_p, \qquad W_p \in \mathbb{R}^{128 \times D}, \label{eq:met-projecao}\\
 z_{\mathrm{fus}} &= \left[\operatorname{LN}(z_{\mathrm{top}})\,\Vert\,\operatorname{LN}(\tilde{z}_{\mathrm{vis}})\right] \in \mathbb{R}^{256}. \label{eq:met-fusao-concat}
 \end{align}
 
-O símbolo $\Vert$ indica a concatenação dos vetores, e $z_{\mathrm{top}}$ é o \textit{embedding} da BiLSTM (Equação~\ref{eq:met-embedding-topologico}) ou do MLP (Equação~\ref{eq:met-embedding-topologico-mlp}), conforme a variante da via topológica, de modo que a fusão é idêntica nos dois casos. O vetor $z_{\mathrm{fus}}$ contém 128 dimensões de cada via e é a entrada do classificador.
+O operador $\Vert$ denota a concatenação vetorial. O vetor unificado $z_{\mathrm{fus}}$ reuniu 128 atributos da via topológica e 128 atributos da via visual, totalizando 256 características alimentadas no classificador final.
 
 \subsection{Classificador MLP}
 \label{sec:mlp}
 
-A classificação foi realizada por um MLP \cite{rumelhart1986learning}, distinto do MLP usado como codificador topológico (Seção~\ref{subsubsec:enc-mlp}), com uma camada oculta de 128 neurônios, o que resulta em cerca de 33 mil parâmetros na primeira camada. A camada oculta é dada por
+A predição das classes foi executada por um classificador MLP \cite{rumelhart1986learning} com camada oculta de 128 neurônios e ativação ReLU:
 
 \begin{equation}
-h = \operatorname{ReLU}\left(W_1 z_{\mathrm{fus}} + b_1\right),
+h_{\mathrm{cls}} = \operatorname{ReLU}\left(W_1 z_{\mathrm{fus}} + b_1\right), \qquad W_1 \in \mathbb{R}^{128 \times 256}.
 \label{eq:met-mlp-hidden}
 \end{equation}
 
-em que a ReLU introduz a não linearidade. Sobre $h$ foi aplicada uma camada de \textit{Dropout} com probabilidade de desativação de $0{,}5$ durante o treinamento \cite{srivastava2014dropout}, como regularização para os conjuntos com poucas imagens, como UCSB e CR. A camada de saída tem $C$ neurônios, com $C$ igual ao número de classes de cada \textit{dataset} (de 2 a 4), e as probabilidades são obtidas por
+Sobre o vetor $h_{\mathrm{cls}}$ foi aplicada regularização por desativação aleatória com taxa de descarte $p = 0{,}5$ durante o treinamento \cite{srivastava2014dropout}. A camada linear terminal mapeou os atributos para o número de classes $C$ de cada conjunto de dados ($C \in \{2, 3, 4\}$), permitindo o cálculo das probabilidades preditas pela função \textit{softmax}:
 
 \begin{equation}
-\hat{y} = \operatorname{softmax}\left(W_2 h + b_2\right).
+\hat{y} = \operatorname{softmax}\left(W_2 h_{\mathrm{cls}} + b_2\right), \qquad W_2 \in \mathbb{R}^{C \times 128}.
 \label{eq:met-mlp-output}
 \end{equation}
 
-\section{Protocolo de treinamento}
-\label{sec:protocolo}
+\subsection{Treinamento de ponta a ponta e herança de hiperparâmetros}
+\label{subsec:treino-dupla-via}
 
-A arquitetura de dupla via (\textit{Two-Stream Network}) foi treinada de ponta a ponta (\textit{end-to-end}). Os parâmetros do modelo de visão computacional da via visual, da camada de projeção linear, do codificador da via topológica e do classificador MLP foram atualizados conjuntamente por meio da minimização da função de perda de entropia cruzada, com o otimizador AdamW e norma máxima dos gradientes limitada a 1,0.
+A arquitetura unificada de dupla via foi ajustada de ponta a ponta. Os parâmetros do modelo visual, da camada de projeção linear, do codificador topológico e do classificador MLP foram atualizados simultaneamente por retropropagação dos gradientes gerados pela função de perda de entropia cruzada, utilizando o otimizador AdamW com decaimento de pesos $\lambda = 10^{-4}$ e norma máxima de gradientes limitada a 1,0.
 
-A definição dos hiperparâmetros da arquitetura unificada adotou a estratégia direta de herança dos valores ótimos estabelecidos durante as etapas de ablação das vias isoladas (Capítulo~\ref{chap:res-ablacao}). O \textit{backbone} visual foi inicializado com pesos pré-treinados na ImageNet-1k e ajustado com a taxa de aprendizado ótima ($\eta_{bb}$) selecionada na ablação da via visual (Seção~\ref{sec:ablacao-visual}). O codificador topológico foi inicializado aleatoriamente e ajustado com a taxa de aprendizado ótima ($\eta_{\mathrm{top}}$) e a dimensão oculta ($h$) selecionadas na ablação da via topológica (Seção~\ref{sec:ablacao-topologica}). A camada de projeção linear e a cabeça de classificação MLP foram ajustadas com a taxa de aprendizado de cabeça ($\eta_{hd}$) obtida na ablação visual. O tamanho de lote ($B$), o decaimento de pesos ($\lambda = 10^{-4}$) e a taxa de \textit{dropout} foram igualmente fixados nos valores ótimos correspondentes a cada conjunto de dados. Essa formulação elimina a necessidade de novas buscas hiperparamétricas na via dupla, permitindo isolar o efeito da união das representações frente a cada via operando de forma isolada.
+A definição dos hiperparâmetros da arquitetura unificada adotou a estratégia de herança direta dos valores ótimos estabelecidos durante as etapas de ablação das vias isoladas (Seção~\ref{sec:vias-isoladas}), sem a realização de uma nova busca hiperparamétrica na arquitetura integrada. Para cada conjunto de dados, foram combinados o codificador topológico e o modelo visual que obtiveram o maior F1 macro médio na validação cruzada individual. O modelo visual herdou a taxa de aprendizado do extrator ($\eta_{bb}$) selecionada na ablação visual. O codificador topológico herdou a taxa de aprendizado da via ($\eta_{\mathrm{top}}$) e a dimensão oculta ($h$) selecionadas na ablação topológica. A camada de projeção linear e o classificador MLP foram ajustados com a taxa de aprendizado da cabeça ($\eta_{hd}$) selecionada na ablação visual. O tamanho de lote ($B$) e a taxa de desativação aleatória (\textit{dropout}) foram igualmente herdados das configurações ótimas apuradas em cada conjunto de dados.
 
-O treinamento foi delimitado ao teto de 50 épocas, com critério de parada antecipada regulado por uma tolerância de 10 épocas consecutivas sem decréscimo da perda na partição de validação e restauração dos melhores pesos. A via visual recebeu aumento de dados composto por inversão horizontal (probabilidade 0,5) e rotações de 0, 90, 180 ou 270 graus aplicadas exclusivamente durante o treino. A via topológica não recebeu transformações adicionais, uma vez que as medidas topológicas globais (médias e desvios padrão calculados sobre os vértices da rede) são computadas sobre a imagem original e preservam a invariância rotacional de 90 graus e inversões.
+A decisão metodológica de não realizar uma nova busca em grade no modelo integrado assegura a integridade da comparação experimental. Ao fixar os componentes nos níveis de melhor desempenho apurados individualmente, qualquer variação nos resultados decorre exclusivamente da integração das representações multiescala e visual, impedindo que ganhos de acurácia sejam mascarados por um sobreajuste assimétrico de hiperparâmetros na fusão.
 
-\subsection{Validação}
-\label{subsec:validacao}
+O treinamento foi delimitado a um teto de 50 épocas, com aplicação de critério de parada antecipada após 10 épocas consecutivas sem decréscimo da perda na partição de validação. A via visual recebeu aumento de dados por inversão horizontal com probabilidade de 0,5 e rotações de 0, 90, 180 ou 270 graus exclusivamente durante o treino, enquanto a via topológica não recebeu transformações adicionais em virtude da invariância rotacional intrínseca às métricas estatísticas globais calculadas sobre a rede.
 
-A avaliação do desempenho foi organizada em duas fases distintas sobre a mesma separação amostral (\ref{fig:folds_tcc}):
+\subsection{Avaliação confirmatória no teste independente}
+\label{subsec:aval-confirmatoria}
 
-\input{validacao_folds.tex}
-
-Inicialmente, 20\% das imagens de cada conjunto de dados foram separadas de forma estratificada (semente 42) como partição de teste final (\textit{holdout}) e mantidas totalmente isoladas de todos os procedimentos de ajuste e ablação. As 80\% das imagens restantes formaram o conjunto de desenvolvimento.
-
-Sobre os 80\% de desenvolvimento, foi conduzida a avaliação por validação cruzada estratificada em cinco partições ($k = 5$) com semente 42:
-\begin{enumerate}
-    \item Em cada rodada, quatro partições foram destinadas ao treinamento conjunto dos parâmetros e uma partição foi utilizada para a validação.
-    \item Para as vias isoladas (topológica e visual), essa validação cruzada serviu para a exploração da grade de hiperparâmetros e identificação das configurações ótimas (Capítulo~\ref{chap:res-ablacao}).
-    \item Para a rede de dupla via, os hiperparâmetros fixados foram herdados diretamente das configurações ótimas identificadas nas ablações isoladas (Capítulo~\ref{chap:res-ablacao}), dispensando novas etapas de busca combinatória.
-    \item O desempenho de cada abordagem no desenvolvimento foi quantificado pela média aritmética e pelo desvio padrão do F1 macro entre as cinco partições de validação.
-\end{enumerate}
-
-Para a avaliação confirmatória final, o modelo unificado de dupla via com os hiperparâmetros fixados foi treinado sobre a totalidade da partição de desenvolvimento (80\% das imagens) e avaliado na partição de teste final (\textit{holdout}, 20\%). O ajuste final foi repetido sob cinco sementes aleatórias distintas para quantificar a dispersão associada à inicialização estocástica dos pesos e ao aumento de dados, reportando a média e o desvio padrão obtidos em dados nunca observados durante o desenvolvimento (Capítulo~\ref{chap:resultados}).
-
-\subsection{Métricas}
-\label{subsec:metricas}
-
-A capacidade preditiva dos modelos foi mensurada pela acurácia, pelo F1-\textit{score} macro e pela área sob a curva ROC (AUC-ROC). A acurácia expressa a proporção global de acertos do classificador. O F1-\textit{score} macro é definido como a média aritmética harmônica entre precisão e sensibilidade calculada individualmente para cada classe, atribuindo peso equivalente às classes minoritárias e majoritárias, aspecto relevante em conjuntos com desbalanceamento amostral como o CR. A métrica AUC-ROC foi calculada pela abordagem um-contra-todos (\textit{one-vs-rest}) com média macro para tarefas multiclasse (LA e NHL). As métricas foram calculadas tanto nas cinco partições de validação do desenvolvimento quanto no conjunto de teste final.
-
-\subsection{Limitações do protocolo}
-\label{subsec:limitacoes}
-
-O protocolo delineado apresenta limitações metodológicas consideradas na interpretação dos resultados. Em conjuntos com volume reduzido, como o UCSB (58 imagens no total), a partição de teste final contém 12 imagens e cada partição de validação do desenvolvimento abriga entre 9 e 10 amostras, o que torna as pontuações discretas e sensíveis a oscilações em poucas predições. As partições foram organizadas por imagem em virtude da ausência de identificadores de paciente ou lâmina em algumas bases públicas, de modo que recortes de um mesmo bloco de tecido podem ocorrer em partições distintas. Adicionalmente, a via visual processa um recorte central com redimensionamento para $256 \times 256$ pixels, descartando margens periféricas em imagens não quadradas, enquanto a via topológica é extraída sobre a resolução integral da imagem original. Por fim, o raio máximo de conexão fixado em 15 pixels abrange proporções de tecido distintas conforme a resolução de digitalização de cada base de dados.
-
-\section{Comparações com os métodos de referência}
-\label{sec:experimentos}
-
-A avaliação da arquitetura de dupla via foi estruturada para verificar se a união das representações supera o desempenho alcançado por cada modalidade de forma isolada e por métodos de referência da literatura:
-\begin{itemize}
-    \item a via topológica isolada, avaliada com os diferentes codificadores sequenciais (Capítulo~\ref{chap:res-ablacao}),
-    \item a via visual isolada, avaliada com diferentes famílias de modelos de visão computacional (Capítulo~\ref{chap:res-ablacao}),
-    \item a rede de dupla via (\textit{Two-Stream Network}), combinando os melhores modelos de cada via por projeção linear, normalização por camadas e concatenação,
-    \item descritores clássicos de textura (GLCM, LBP e HOG) combinados a classificadores densos, servindo de controle para a caracterização tecidual multiescala.
-\end{itemize}
-A avaliação confirmatória da rede de dupla via frente às vias isoladas e aos métodos de referência sobre o conjunto de teste independente compõe o Capítulo~\ref{chap:resultados}.
+A avaliação confirmatória final da arquitetura unificada de dupla via seguiu o protocolo delineado na Seção~\ref{sec:protocolo}. O modelo integrado foi treinado sobre a totalidade da partição de desenvolvimento (80\% dos dados) e avaliado na partição de teste independente (20\%), sob a mesma sequência de cinco sementes aleatórias ($s \in \{42, 43, 44, 45, 46\}$). Os índices consolidados pela média e pelo desvio padrão do F1 macro e da AUC-ROC no teste independente forneceram a validação empírica conclusiva da fusão frente às vias isoladas (Capítulo~\ref{chap:resultados}).
 
 \section{Configuração de ambiente}
 \label{sec:env}
 
-Os experimentos foram executados em uma infraestrutura com uma UCP \textit{13th Gen Intel(R) Core(TM) i5-13400F} com duas placas de vídeo NVIDIA, sendo uma RTX 4060 Ti e a outra uma RTX 4070 Ti SUPER. Os pesos pré-treinados de todos os modelos foram obtidos da biblioteca \textit{timm} (versão \textbf{1.0.3}), e as imagens de $256 \times 256$ pixels foram preparadas com a biblioteca OpenCV. As redes complexas foram construídas por uma implementação em C++ com paralelismo OpenMP em 16 \textit{threads}. As bibliotecas utilizadas foram \textit{torch} (versão \textbf{2.15}), \textit{torchvision} (versão \textbf{0.29.2}), \textit{scikit-image} (versão \textbf{0.26}), scikit-learn (versão \textbf{1.9.1}), \textit{pandas} (versão \textbf{3.1}), \textit{opencv} (versão \textbf{5.0}) e \textit{pillow} (versão \textbf{13.0}). 
+Os experimentos foram executados em uma infraestrutura computacional equipada com um processador \textit{13th Gen Intel(R) Core(TM) i5-13400F} e duas unidades de processamento gráfico NVIDIA, sendo uma RTX 4060 Ti e uma RTX 4070 Ti SUPER. Os pesos pré-treinados dos modelos visuais foram obtidos por meio da biblioteca \textit{timm} (versão 1.0.3). A extração determinística das redes espaço-espectrais foi realizada por implementação própria em C++ com paralelismo OpenMP em 16 \textit{threads}. As bibliotecas de suporte computacional empregadas foram \textit{torch} (versão 2.15), \textit{torchvision} (versão 0.29.2), \textit{scikit-image} (versão 0.26), \textit{scikit-learn} (versão 1.9.1), \textit{pandas} (versão 3.1), \textit{opencv} (versão 5.0) e \textit{pillow} (versão 13.0).
+ 

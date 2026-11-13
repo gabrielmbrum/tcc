@@ -1,0 +1,74 @@
+\begin{figure}[!hbtp]
+    \centering
+    \resizebox{0.6\columnwidth}{!}{%
+    \begin{tikzpicture}[
+        recntagle/.style={
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        title_block/.style={
+            rectangle, rounded corners=3pt, inner sep=4.5pt, align=center,
+            font=\small\bfseries, draw=black!70, fill=blue!10, line width=0.8pt
+        },
+        arrow/.style = {thick, ->, >={Stealth[length=2.5mm]}},
+        box_delimitador/.style = {
+            rectangle, rounded corners=8pt, draw=black!70, fill=black!2, line width=0.8pt
+        },
+        sub_block/.style = {
+            rectangle, rounded corners=3pt, inner sep=5pt, align=center,
+            draw=black!70, fill=blue!5, line width=0.7pt, font=\small
+        },
+        emb/.style = {
+            rectangle, draw=black!70, line width=0.6pt, minimum width=1.4cm,
+            minimum height=0.6cm, font=\footnotesize, inner sep=2pt
+        }
+    ]
+
+        % 1. Datasets
+        \node (dataset) [recntagle, minimum width=6cm] at (0,0) {1. \textit{Datasets} histopatológicos};
+
+        % 2. SSN (via topológica)
+        \node (ssn_box) [box_delimitador, minimum width=4.6cm, minimum height=1.9cm] at (-3.4,-3.4) {};
+        \node (ssn_title) [title_block] at (ssn_box.north) {2. SSN};
+        \node (ssn_sub) [sub_block] at ([yshift=-0.2cm]ssn_box.center) {\textit{Spatio-Spectral}\\\textit{Network}};
+
+        % 3. RNN
+        \node (rnn_box) [box_delimitador, minimum width=4.6cm, minimum height=1.9cm] at (-3.4,-6.9) {};
+        \node (rnn_title) [title_block] at (rnn_box.north) {3. RNN};
+        \node (rnn_sub) [sub_block] at ([yshift=-0.2cm]rnn_box.center) {Codificador\\recorrente};
+
+        % 4. Modelos visuais (via visual)
+        \node (vis_box) [box_delimitador, minimum width=4.6cm, minimum height=5.4cm] at (3.4,-5.15) {};
+        \node (vis_title) [title_block] at (vis_box.north) {4. Modelos visuais};
+        \node (vis_img) [sub_block] at (3.4,-3.7) {Imagem\\$256\times256$};
+        \node (vis_mod) [sub_block] at (3.4,-6.1) {CNN, ViT ou\\CNN-ViT};
+        \draw [arrow] (vis_img.south) -- (vis_mod.north);
+
+        % 5. MLP (concatenação + classificação)
+        \node (mlp_box) [box_delimitador, minimum width=8.8cm, minimum height=2.3cm] at (0,-10.4) {};
+        \node (mlp_title) [title_block] at (mlp_box.north) {5. MLP};
+        \node (cat_rnn) [emb, fill=blue!15]   at (-3.3,-10.9) {RNN};
+        \node (cat_vis) [emb, fill=orange!20] at (-1.9,-10.9) {Visual};
+        \node [font=\footnotesize, align=center] at (-2.6,-10.25) {Concatenação de\\\textit{embeddings}};
+        \node (mlp_sub) [sub_block, minimum width=2.4cm] at (2.2,-10.9) {MLP};
+        \draw [arrow] ([xshift=0.1cm]cat_vis.east) -- (mlp_sub.west);
+
+        % 6. Métricas
+        \node (metrics) [recntagle, minimum width=5.4cm] at (0,-13.3) {6. Extração de métricas};
+
+        % Conexões
+        \draw [arrow] (dataset.south) -- ++(0,-0.6) -| (ssn_title.north);
+        \draw [arrow] (dataset.south) -- ++(0,-0.6) -| (vis_title.north);
+        \draw [arrow] (ssn_box.south) -- (rnn_title.north)
+            node [midway, right, font=\footnotesize, xshift=1pt] {$X_{\mathrm{top}} \in \mathbb{R}^{15\times 18}$};
+        \draw [arrow] (rnn_box.south) -- (rnn_box.south |- mlp_box.north);
+        \draw [arrow] (vis_box.south) -- (vis_box.south |- mlp_box.north);
+        \draw [arrow] (mlp_box.south) -- (metrics.north)
+            node [midway, right, font=\footnotesize, align=left, xshift=2pt] {Classificação\\histopatológica};
+
+    \end{tikzpicture}%
+    }
+    \caption{Pipeline geral da abordagem proposta: os \textit{datasets} histopatológicos alimentam duas vias paralelas, uma topológica (SSN seguida de RNN) e uma visual (modelos CNN, ViT ou híbridos). Os \textit{embeddings} das duas vias são concatenados e classificados por um MLP, do qual são extraídas as métricas.}
+    \label{fig:pipeline-geral}
+    \label{fig:pipeline_tcc}
+\end{figure}

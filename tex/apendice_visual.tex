@@ -1,0 +1,53 @@
+\chapter{Resultados Completos da Validação Cruzada da Via Visual}
+\label{apendice:visual}
+
+Os desempenhos obtidos pelas arquiteturas de visão computacional na via visual durante a busca de hiperparâmetros sobre as cinco partições de validação cruzada estão reunidos neste apêndice. Para cada modelo e conjunto de dados, são reportadas as taxas de aprendizado do \textit{backbone} ($\eta_{bb}$) e da cabeça linear ($\eta_{hd}$), a taxa de \textit{dropout} ($p$), o tamanho do lote ($B$), a média de épocas até a convergência, a acurácia média e a pontuação de F1 macro.
+
+\begin{table}[H]
+\centering
+\caption{Desempenho detalhado por validação cruzada (5 partições) e configurações ótimas da via visual.}
+\label{tab:apendice-vis}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllccccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Família} & \textbf{Modelo} & $\eta_{bb}$ & $\eta_{hd}$ & $p$ & $B$ & \textbf{Épocas} & \textbf{Acurácia} & \textbf{F1 macro} \\
+\midrule
+CR & Híbrida & CoAtNet-0 & $10^{-5}$ & $10^{-4}$ & 0{,}1 & 16 & 45{,}0 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+CR & \textit{Transformer} & DeiT-Tiny & $10^{-5}$ & $10^{-4}$ & 0{,}1 & 16 & 44{,}8 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+CR & Convolucional & EfficientNet-B0 & $10^{-5}$ & $10^{-3}$ & 0{,}5 & 32 & 12{,}8 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+CR & Híbrida & MobileViT-S & $10^{-4}$ & $10^{-4}$ & 0{,}1 & 16 & 38{,}2 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+CR & Convolucional & ResNet-50 & $10^{-4}$ & $10^{-4}$ & 0{,}1 & 16 & 45{,}0 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+CR & \textit{Transformer} & ViT-Tiny & $10^{-5}$ & $10^{-4}$ & 0{,}1 & 16 & 48{,}2 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+\midrule
+LA & Híbrida & CoAtNet-0 & $10^{-5}$ & $10^{-4}$ & 0{,}1 & 16 & 31{,}0 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & \textit{Transformer} & DeiT-Tiny & $10^{-5}$ & $3 \cdot 10^{-4}$ & 0{,}1 & 32 & 32{,}2 & 0{,}998 & 0{,}998 $\pm$ 0{,}005 \\
+LA & Convolucional & EfficientNet-B0 & $10^{-4}$ & $10^{-4}$ & 0{,}1 & 16 & 38{,}4 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & Híbrida & MobileViT-S & $3 \cdot 10^{-5}$ & $10^{-3}$ & 0{,}5 & 16 & 29{,}6 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & Convolucional & ResNet-50 & $3 \cdot 10^{-4}$ & $10^{-4}$ & 0{,}3 & 16 & 32{,}6 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & \textit{Transformer} & ViT-Tiny & $10^{-4}$ & $3 \cdot 10^{-4}$ & 0{,}1 & 32 & 27{,}2 & 0{,}998 & 0{,}998 $\pm$ 0{,}005 \\
+\midrule
+LG & Híbrida & CoAtNet-0 & $10^{-5}$ & $10^{-4}$ & 0{,}1 & 16 & 26{,}2 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LG & \textit{Transformer} & DeiT-Tiny & $10^{-5}$ & $10^{-4}$ & 0{,}1 & 16 & 37{,}6 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LG & Convolucional & EfficientNet-B0 & $10^{-4}$ & $10^{-4}$ & 0{,}1 & 32 & 31{,}8 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LG & Híbrida & MobileViT-S & $10^{-4}$ & $10^{-4}$ & 0{,}1 & 16 & 40{,}4 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LG & Convolucional & ResNet-50 & $10^{-4}$ & $3 \cdot 10^{-4}$ & 0{,}5 & 64 & 29{,}2 & 0{,}995 & 0{,}995 $\pm$ 0{,}010 \\
+LG & \textit{Transformer} & ViT-Tiny & $10^{-5}$ & $10^{-4}$ & 0{,}1 & 32 & 35{,}2 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+\midrule
+NHL & Híbrida & CoAtNet-0 & $3 \cdot 10^{-5}$ & $3 \cdot 10^{-4}$ & 0{,}5 & 32 & 21{,}8 & 0{,}980 & 0{,}980 $\pm$ 0{,}026 \\
+NHL & \textit{Transformer} & DeiT-Tiny & $3 \cdot 10^{-5}$ & $10^{-4}$ & 0{,}5 & 32 & 24{,}6 & 0{,}940 & 0{,}938 $\pm$ 0{,}047 \\
+NHL & Convolucional & EfficientNet-B0 & $3 \cdot 10^{-4}$ & $10^{-4}$ & 0{,}1 & 32 & 13{,}4 & 0{,}967 & 0{,}967 $\pm$ 0{,}031 \\
+NHL & Híbrida & MobileViT-S & $3 \cdot 10^{-4}$ & $3 \cdot 10^{-4}$ & 0{,}5 & 16 & 18{,}8 & 0{,}970 & 0{,}969 $\pm$ 0{,}044 \\
+NHL & Convolucional & ResNet-50 & $3 \cdot 10^{-4}$ & $10^{-4}$ & 0{,}5 & 32 & 30{,}2 & 0{,}950 & 0{,}950 $\pm$ 0{,}052 \\
+NHL & \textit{Transformer} & ViT-Tiny & $10^{-4}$ & $10^{-4}$ & 0{,}3 & 64 & 23{,}0 & 0{,}923 & 0{,}921 $\pm$ 0{,}043 \\
+\midrule
+UCSB & Híbrida & CoAtNet-0 & $3 \cdot 10^{-5}$ & $10^{-3}$ & 0{,}3 & 8 & 10{,}0 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+UCSB & \textit{Transformer} & DeiT-Tiny & $3 \cdot 10^{-5}$ & $10^{-4}$ & 0{,}1 & 4 & 16{,}4 & 0{,}958 & 0{,}956 $\pm$ 0{,}060 \\
+UCSB & Convolucional & EfficientNet-B0 & $3 \cdot 10^{-4}$ & $3 \cdot 10^{-4}$ & 0{,}3 & 4 & 11{,}4 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+UCSB & Híbrida & MobileViT-S & $3 \cdot 10^{-4}$ & $10^{-4}$ & 0{,}5 & 8 & 17{,}2 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+UCSB & Convolucional & ResNet-50 & $3 \cdot 10^{-4}$ & $3 \cdot 10^{-4}$ & 0{,}5 & 16 & 23{,}8 & 0{,}980 & 0{,}980 $\pm$ 0{,}045 \\
+UCSB & \textit{Transformer} & ViT-Tiny & $10^{-4}$ & $10^{-3}$ & 0{,}3 & 8 & 9{,}6 & 0{,}978 & 0{,}977 $\pm$ 0{,}052 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}

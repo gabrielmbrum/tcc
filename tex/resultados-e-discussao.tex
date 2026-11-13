@@ -1,12 +1,210 @@
 \chapter{Resultados e Discussão}
 \label{chap:resultados}
 
-Neste capítulo são apresentados e discutidos os resultados finais obtidos pela arquitetura proposta de dupla via (\textit{Two-Stream Network}) em comparação com as vias individuais e com métodos clássicos de caracterização tecidual. As avaliações foram conduzidas sobre a partição de teste independente (20\% dos dados), mantida sem qualquer contato com as etapas anteriores de ajuste e seleção de hiperparâmetros. Para atenuar a variabilidade decorrente da inicialização dos pesos e das transformações estocásticas de aumento de dados, o treinamento final nos 80\% de desenvolvimento e a inferência no teste foram repetidos sob cinco sementes aleatórias distintas, reportando a média e o respectivo desvio padrão das métricas.
+Os resultados obtidos no desenvolvimento e na avaliação da arquitetura de dupla via, bem como das vias isoladas que a compõem, são apresentados e discutidos neste capítulo. O capítulo foi organizado em cinco etapas sequenciais. Na Seção~\ref{sec:ablacao}, são detalhados os experimentos de ablação executados sobre a partição de desenvolvimento (80\% dos dados) para determinar os codificadores mais adequados e as combinações ótimas de hiperparâmetros na via topológica (Subseção~\ref{sec:ablacao-topologica}) e na via visual (Subseção~\ref{sec:ablacao-visual}). Na Seção~\ref{sec:res-vias-isoladas}, a capacidade de generalização de cada modalidade isolada sob as configurações selecionadas é mensurada sobre a partição de teste independente (20\% dos dados) ao longo da sequência de cinco sementes pré-fixadas (42 a 46). Na Seção~\ref{sec:res-dupla-via}, o desempenho confirmatório da rede unificada de dupla via é comparado diretamente às vias isoladas sobre a mesma partição de teste. Na Seção~\ref{sec:res-classes}, o comportamento dos modelos é analisado sob a perspectiva do diagnóstico patológico por classe e tecido biológico. Por fim, na Seção~\ref{sec:res-eficiencia}, a eficiência paramétrica e o custo de inferência computacional da arquitetura proposta são examinados.
+
+\section{Ablação e seleção de configurações}
+\label{sec:ablacao}
+\label{chap:res-ablacao}
+
+Nesta seção são apresentados e discutidos os resultados dos experimentos de ablação conduzidos sobre a partição de desenvolvimento sob validação cruzada, em que as duas vias foram avaliadas conforme explicado na Seção ~\ref{sec:vias-isoladas}, com o propósito de mensurar a capacidade discriminativa individual de cada modelo e identificar as configurações ótimas para a subsequente composição da arquitetura de dupla via.
+
+\subsection{Ablação da via topológica}
+\label{sec:via-topologica}
+\label{sec:ablacao-topologica}
+
+A via topológica foi avaliada sobre os seis codificadores descritos na metodologia, e seus respectivos desempenhos para cada combinação de hiperparâmetros foi mensurado pela média aritmética do F1 macro obtido nas cinco partições de validação interna, sendo a combinação responsável pela maior pontuação média estabelecida como a configuração ótima de cada modelo em cada conjunto de dados. Os valores médios de F1 macro e os respectivos desvios padrão obtidos pelas configurações selecionadas de cada codificador estão consolidados na Tabela~\ref{tab:abl-f1}.
+
+\begin{table}[htb]
+\centering
+\caption{F1 macro (média $\pm$ desvio padrão entre as 5 partições de validação) da via topológica isolada, na melhor combinação de hiperparâmetros de cada modelo. Em negrito, o maior valor médio de cada conjunto de dados.}
+\label{tab:abl-f1}
+\label{subsec:res-codificadores}
+\label{subsec:res-top-selecionadas}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Codificador} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\midrule
+LSTM & 0{,}893 $\pm$ 0{,}124 & 0{,}992 $\pm$ 0{,}017 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}938 $\pm$ 0{,}043 \\
+BiLSTM & 0{,}870 $\pm$ 0{,}109 & 0{,}985 $\pm$ 0{,}034 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}956 $\pm$ 0{,}019 \\
+GRU & 0{,}892 $\pm$ 0{,}107 & \textbf{0{,}993} $\pm$ 0{,}017 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}956 $\pm$ 0{,}049 \\
+BiGRU & \textbf{0{,}933} $\pm$ 0{,}061 & 0{,}985 $\pm$ 0{,}034 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{0{,}995} $\pm$ 0{,}011 & 0{,}966 $\pm$ 0{,}021 \\
+SAC-LSTM & 0{,}867 $\pm$ 0{,}090 & 0{,}977 $\pm$ 0{,}034 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & 0{,}921 $\pm$ 0{,}046 \\
+MLP & 0{,}871 $\pm$ 0{,}135 & \textbf{0{,}993} $\pm$ 0{,}017 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}011 & \textbf{0{,}973} $\pm$ 0{,}020 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+A comparação dos desempenhos na Tabela~\ref{tab:abl-f1} revela padrões distintos na resposta dos codificadores topológicos conforme a natureza e a complexidade de cada conjunto de dados. Em bases com volume amostral restrito e marcadas por atipias celulares, como o UCSB e o CR, os modelos recorrentes dotados de mecanismos de portas simplificados (BiGRU e GRU) apresentaram maior capacidade de generalização e menor dispersão ($0{,}933 \pm 0{,}061$ no UCSB e $0{,}985 \pm 0{,}034$ no CR) em comparação à LSTM padrão ($0{,}893 \pm 0{,}124$). Esse comportamento sugere que a redução no número de portas internas atenua a memorização de ruído sob restrição de dados. Nas bases hepáticas LA e LG, todos os seis codificadores alcançaram patamares máximos ($1{,}000 \pm 0{,}000$ em LA e índices superiores a $0{,}995$ em LG), indicando que as medidas multiescala de grau e força capturam diretamente os padrões contínuos de senescência e dimorfismo tecidual, permitindo a separação das classes independentemente da complexidade temporal do codificador. No conjunto multiclasse NHL, caracterizado por heterogeneidade decorrente da aquisição em múltiplos centros, o codificador estático MLP alcançou a maior pontuação média ($0{,}973 \pm 0{,}020$), seguido de perto pela BiGRU ($0{,}966 \pm 0{,}021$). Esse resultado evidencia que uma projeção linear densa ampla ($h=512$) sobre os 270 atributos opera com alta capacidade discriminativa perante variações globais entre lâminas, ao mesmo tempo em que a leitura ordenada dos raios preserva representações informativas.
+
+A análise dos hiperparâmetros selecionados no Apêndice~\ref{apendice:topologica} (Tabela~\ref{tab:apendice-top}) corrobora esses padrões. A expansão da dimensão oculta para $h = 256$ ou $h = 512$ foi selecionada em 21 das 30 configurações avaliadas (70\%), indicando que espaços latentes mais amplos preservam com maior fidelidade as trajetórias de conectividade entre os 15 raios sucessivos. As taxas de aprendizado moderadas ou superiores ($\eta \geq 3\cdot 10^{-3}$) predominaram em 18 configurações, enquanto o tamanho de lote acompanhou a densidade de cada base, com $B = 4$ no conjunto UCSB em razão da amostragem restrita e $B \in \{16, 32\}$ nas demais bases.
+
+As combinações ótimas de hiperparâmetros selecionadas para a composição da via topológica em cada conjunto de dados estão consolidadas na Tabela~\ref{tab:abl-top-melhores}. No conjunto restrito UCSB, a BiGRU foi selecionada com dimensão oculta $h = 256$, taxa de aprendizado $\eta = 3\cdot 10^{-3}$, taxa de desativação aleatória $p = 0{,}3$ e tamanho de lote $B = 8$. No conjunto CR, a GRU foi selecionada com $\eta = 10^{-2}$, $h = 128$, $p = 0{,}1$ e $B = 16$. Nas bases hepáticas LA e LG, a BiGRU foi fixada com $h = 64$ e $h = 512$, respectivamente. Por fim, na base multiclasse NHL, o MLP foi selecionado com dimensão ampla $h = 512$, taxa de aprendizado $\eta = 3\cdot 10^{-4}$, regularização $p = 0{,}1$ e lote $B = 16$. O detalhamento completo de todas as 30 configurações avaliadas está documentado na Tabela~\ref{tab:apendice-top} do Apêndice~\ref{apendice:topologica}.
+
+\begin{table}[htb]
+\centering
+\caption{Configurações ótimas de hiperparâmetros e desempenhos dos codificadores selecionados na via topológica por conjunto de dados.}
+\label{tab:abl-top-melhores}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Codificador} & $\eta$ & $h$ & $p$ & $B$ & \textbf{Épocas} & \textbf{Acurácia} & \textbf{F1 macro} \\
+\midrule
+UCSB & BiGRU & $3\cdot 10^{-3}$ & 256 & 0{,}3 & 8  & 28 & 0{,}936 & 0{,}933 $\pm$ 0{,}061 \\
+CR   & GRU   & $10^{-2}$        & 128 & 0{,}1 & 16 & 19 & 0{,}993 & 0{,}993 $\pm$ 0{,}017 \\
+LA   & BiGRU & $3\cdot 10^{-4}$ & 64  & 0{,}1 & 16 & 85 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LG   & BiGRU & $3\cdot 10^{-3}$ & 512 & 0{,}5 & 32 & 12 & 0{,}995 & 0{,}995 $\pm$ 0{,}011 \\
+NHL  & MLP   & $3\cdot 10^{-4}$ & 512 & 0{,}1 & 16 & 24 & 0{,}973 & 0{,}973 $\pm$ 0{,}020 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Ablação da via visual}
+\label{sec:ablacao-visual}
+
+A ablação da via visual foi conduzida sobre as seis arquiteturas de visão computacional distribuídas nas três famílias conceituais (convolucionais, transformadores e híbridas). O desempenho de cada configuração foi mensurado pelo F1 macro médio nas cinco partições de validação interna, sendo a combinação que atingiu a maior pontuação média definida como a configuração ótima de cada modelo em cada conjunto de dados. Os valores médios de F1 macro e seus respectivos desvios padrão estão reunidos na Tabela~\ref{tab:abl-vis-f1}.
+
+\begin{table}[htb]
+\centering
+\caption{F1 macro (média $\pm$ desvio padrão entre as 5 partições de validação) da via visual isolada, na melhor combinação de hiperparâmetros de cada modelo. Em negrito, o maior valor médio de cada conjunto de dados.}
+\label{tab:abl-vis-f1}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Família} & \textbf{Modelo} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\midrule
+Convolucional & ResNet-50 & 0{,}980 $\pm$ 0{,}045 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}995 $\pm$ 0{,}010 & 0{,}950 $\pm$ 0{,}052 \\
+Convolucional & EfficientNet-B0 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}967 $\pm$ 0{,}031 \\
+\textit{Transformer} & ViT-Tiny & 0{,}977 $\pm$ 0{,}052 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}998 $\pm$ 0{,}005 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}921 $\pm$ 0{,}043 \\
+\textit{Transformer} & DeiT-Tiny & 0{,}956 $\pm$ 0{,}060 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}998 $\pm$ 0{,}005 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}938 $\pm$ 0{,}047 \\
+Híbrida & MobileViT-S & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}969 $\pm$ 0{,}044 \\
+Híbrida & CoAtNet-0 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{0{,}980} $\pm$ 0{,}026 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+A análise comparativa na Tabela~\ref{tab:abl-vis-f1} evidencia comportamentos nitidamente diferenciados entre as famílias arquiteturais de visão computacional em função da complexidade amostral de cada base. Nos conjuntos binários UCSB, CR, LA e LG, a maioria dos modelos alcançou pontuações perfeitas ($1{,}000 \pm 0{,}000$) na melhor combinação hiperparamétrica, refletindo a alta capacidade discriminativa dos extratores pré-treinados na ImageNet perante classes com padrões celulares claramente contrastantes. Em contrapartida, na base multiclasse NHL, caracterizada pela heterogeneidade cromática de lâminas preparadas em diferentes hospitais e laboratórios, emergiu uma separação marcante entre as famílias:
+\begin{itemize}
+    \item as arquiteturas puramente baseadas em transformadores visuais (ViT-Tiny com $0{,}921 \pm 0{,}043$ e DeiT-Tiny com $0{,}938 \pm 0{,}047$) registraram os menores desempenhos, indicando maior vulnerabilidade à escassez de dados anotados quando desprovidas de filtros convolucionais locais;
+    \item as arquiteturas híbridas (CoAtNet-0 com $0{,}980 \pm 0{,}026$ e MobileViT-S com $0{,}969 \pm 0{,}044$) e a rede convolucional eficiente (EfficientNet-B0 com $0{,}967 \pm 0{,}031$) alcançaram os maiores índices, demonstrando que a extração convolucional de bordas celulares associada a mecanismos de autoatenção contextual confere maior estabilidade perante a dispersão cromática interlaboratorial.
+\end{itemize}
+
+A calibração dos hiperparâmetros documentada no Apêndice~\ref{apendice:visual} (Tabela~\ref{tab:apendice-vis}) reflete as demandas de regularização de cada modelo. As taxas atenuadas no extrator ($\eta_{bb} \leq 3\cdot 10^{-5}$) predominaram nos modelos com blocos de autoatenção (CoAtNet-0, DeiT-Tiny e ViT-Tiny), preservando os filtros genéricos pré-treinados contra a desestabilização por retropropagação em dados escassos. A cabeça de classificação demandou taxas superiores ($\eta_{hd} \in \{10^{-4}, 10^{-3}\}$), acelerando o alinhamento das fronteiras de decisão. A regularização por desativação aleatória exigiu valores mais severos ($p = 0{,}3$ e $p = 0{,}5$) nos conjuntos com menor volume amostral relativo (UCSB e NHL), ao passo que taxas brandas ($p = 0{,}1$) foram suficientes nas bases CR e LA.
+
+As configurações selecionadas para a via visual em cada conjunto de dados estão sintetizadas na Tabela~\ref{tab:abl-vis-melhores}. O modelo híbrido CoAtNet-0 alcançou a maior pontuação média nas cinco bases avaliadas. No conjunto NHL, a configuração ótima associou taxa atenuada de extrator ($\eta_{bb} = 3\cdot 10^{-5}$), taxa intermediária de cabeça ($\eta_{hd} = 3\cdot 10^{-4}$), desativação aleatória $p = 0{,}5$ e tamanho de lote $B = 32$. Nas tarefas binárias CR, LA e LG, a convergência ocorreu sob taxas basais $\eta_{bb} = 10^{-5}$ e $\eta_{hd} = 10^{-4}$ com lote $B = 16$ e $p = 0{,}1$. No conjunto compacto UCSB, uma taxa de cabeça mais agressiva ($\eta_{hd} = 10^{-3}$) acelerou a convergência da projeção em apenas 10 épocas. O detalhamento das 30 configurações da via visual está consolidado na Tabela~\ref{tab:apendice-vis} do Apêndice~\ref{apendice:visual}.
+
+\begin{table}[htb]
+\centering
+\caption{Configurações ótimas de hiperparâmetros e desempenhos dos modelos selecionados na via visual por conjunto de dados.}
+\label{tab:abl-vis-melhores}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllccccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Família} & \textbf{Modelo} & $\eta_{bb}$ & $\eta_{hd}$ & $p$ & $B$ & \textbf{Épocas} & \textbf{Acurácia} & \textbf{F1 macro} \\
+\midrule
+UCSB & Híbrida & CoAtNet-0 & $3\cdot 10^{-5}$ & $10^{-3}$        & 0{,}3 & 8  & 10 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+CR   & Híbrida & CoAtNet-0 & $10^{-5}$        & $10^{-4}$        & 0{,}1 & 16 & 45 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA   & Híbrida & CoAtNet-0 & $10^{-5}$        & $10^{-4}$        & 0{,}1 & 16 & 31 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LG   & Híbrida & CoAtNet-0 & $10^{-5}$        & $10^{-4}$        & 0{,}1 & 16 & 26 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+NHL  & Híbrida & CoAtNet-0 & $3\cdot 10^{-5}$ & $3\cdot 10^{-4}$ & 0{,}5 & 32 & 22 & 0{,}980 & 0{,}980 $\pm$ 0{,}026 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Configurações selecionadas para a composição da dupla via}
+\label{subsec:configuracoes-selecionadas}
+
+As configurações ótimas identificadas nas ablações da via topológica e da via visual para a composição da arquitetura unificada de dupla via estão sintetizadas na Tabela~\ref{tab:abl-sel-dupla}. O modelo híbrido CoAtNet-0 obteve o maior desempenho médio na via visual em todas as cinco bases avaliadas, sendo associado ao codificador BiGRU nas bases UCSB, LA e LG, ao codificador GRU na base CR e ao codificador MLP na base NHL. Esses conjuntos de parâmetros fornecem as configurações fixadas para o treinamento de ponta a ponta e a avaliação confirmatória da rede de dupla via frente às modalidades isoladas na partição de teste independente, cujos resultados são analisados nas seções subsequentes deste capítulo.
+
+\begin{table}[htb]
+\centering
+\caption{Configurações ótimas selecionadas nas ablações para a composição da rede de dupla via em cada conjunto de dados.}
+\label{tab:abl-sel-dupla}
+\label{tab:abl-top-sel}
+\small
+\resizebox{0.7\textwidth}{!}{%
+\begin{tabular}{llccccccc}
+\toprule
+\textbf{\textit{Dataset}} & \multicolumn{4}{c}{\textbf{Via Topológica}} & \multicolumn{4}{c}{\textbf{Via Visual (CoAtNet-0)}} \\
+\cmidrule(lr){2-5} \cmidrule(lr){6-9}
+& \textbf{Codificador} & $\eta_{\mathrm{top}}$ & $h$ & $p$ & $\eta_{bb}$ & $\eta_{hd}$ & $p$ & $B$ \\
+\midrule
+UCSB & BiGRU & $3\cdot 10^{-3}$ & 256 & 0{,}3 & $3\cdot 10^{-5}$ & $10^{-3}$ & 0{,}3 & 8 \\
+CR   & GRU   & $10^{-2}$        & 128 & 0{,}1 & $10^{-5}$        & $10^{-4}$ & 0{,}1 & 16 \\
+LA   & BiGRU & $3\cdot 10^{-4}$ & 64  & 0{,}1 & $10^{-5}$        & $10^{-4}$ & 0{,}1 & 16 \\
+LG   & BiGRU & $3\cdot 10^{-3}$ & 512 & 0{,}5 & $10^{-5}$        & $10^{-4}$ & 0{,}1 & 16 \\
+NHL  & MLP   & $3\cdot 10^{-4}$ & 512 & 0{,}1 & $3\cdot 10^{-5}$ & $3\cdot 10^{-4}$ & 0{,}5 & 32 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\section{Desempenho das Vias Isoladas no Conjunto de Teste Independente}
+\label{sec:res-vias-isoladas}
+
+A capacidade de generalização de cada modalidade isolada foi mensurada na partição de teste independente de 20\% após o treinamento completo sobre a totalidade do conjunto de desenvolvimento (80\% dos dados), utilizando as configurações ótimas estabelecidas na ablação (Seção~\ref{sec:ablacao}). Para quantificar a variabilidade decorrente da inicialização dos pesos e das transformações estocásticas de aumento de dados, o treinamento final nos 80\% de desenvolvimento e a inferência no teste foram repetidos sob cinco sementes consecutivas ($s \in \{42, 43, 44, 45, 46\}$), reportando a média e o respectivo desvio padrão das métricas de F1 macro, acurácia e AUC-ROC. O número de épocas de treinamento foi fixado na média das épocas de parada antecipada obtidas na validação cruzada, prevenindo o sobreajuste e mantendo a reprodutibilidade entre as cinco rodadas com sementes distintas. Os desempenhos detalhados e as configurações completas de validação cruzada para a via topológica e para a via visual estão reunidos, respectivamente, no Apêndice~\ref{apendice:topologica} e no Apêndice~\ref{apendice:visual}, enquanto os desempenhos consolidados obtidos pelos codificadores da via topológica no teste independente estão reunidos na Tabela~\ref{tab:res-top-holdout}.
+
+\begin{table}[htb]
+\centering
+\caption{F1 macro (média $\pm$ desvio padrão ao longo de 5 sementes) no conjunto de teste independente (20\% dos dados) para os codificadores da via topológica.}
+\label{tab:res-top-holdout}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Codificador} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\midrule
+LSTM & 0{,}759 $\pm$ 0{,}097 & 0{,}772 $\pm$ 0{,}060 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}996 $\pm$ 0{,}008 & 0{,}845 $\pm$ 0{,}018 \\
+BiLSTM & 0{,}757 $\pm$ 0{,}055 & 0{,}888 $\pm$ 0{,}039 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}996 $\pm$ 0{,}008 & 0{,}854 $\pm$ 0{,}006 \\
+GRU & \textbf{0{,}916} $\pm$ 0{,}000 & 0{,}907 $\pm$ 0{,}001 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{0{,}894} $\pm$ 0{,}014 \\
+BiGRU & 0{,}864 $\pm$ 0{,}043 & \textbf{0{,}926} $\pm$ 0{,}015 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}879 $\pm$ 0{,}027 \\
+SAC-LSTM & 0{,}825 $\pm$ 0{,}006 & 0{,}864 $\pm$ 0{,}031 & 0{,}998 $\pm$ 0{,}004 & 0{,}981 $\pm$ 0{,}017 & 0{,}847 $\pm$ 0{,}018 \\
+MLP & 0{,}898 $\pm$ 0{,}064 & 0{,}902 $\pm$ 0{,}012 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}881 $\pm$ 0{,}022 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+A observação dos resultados da via topológica consolidados na Tabela~\ref{tab:res-top-holdout} indica que a GRU e a BiGRU mantiveram a maior estabilidade de generalização entre os modelos recorrentes, atingindo $0{,}916 \pm 0{,}000$ no conjunto UCSB e $0{,}926 \pm 0{,}015$ no conjunto CR. Em contrapartida, as arquiteturas LSTM padrão sofreram degradação acentuada frente aos índices apurados na validação cruzada (Tabela~\ref{tab:abl-f1}), apresentando quedas superiores a 20 pontos percentuais no conjunto CR, em que a média decresceu de $0{,}992 \pm 0{,}017$ para $0{,}772 \pm 0{,}060$ no teste independente. A maior complexidade paramétrica associada às portas da célula de memória da LSTM constitui uma hipótese plausível para explicar a memorização de ruído dos dados de treino sob restrição amostral. Todos os modelos sustentaram separação quase perfeita nos conjuntos LA e LG ($1{,}000 \pm 0{,}000$ e valores superiores a $0{,}981$), demonstrando que as medidas baseadas em redes complexas capturam distinções teciduais nítidas associadas à senescência e ao sexo do tecido hepático. Os desempenhos individuais registrados por semente para cada codificador na partição de teste estão disponibilizados na Tabela~\ref{tab:apendice-holdout} do Apêndice~\ref{apendice:holdout}.
+
+Paralelamente à análise das representações topológicas, a avaliação confirmatória da via visual isolada permitiu verificar como as diferentes famílias de visão computacional pré-treinadas respondem aos desafios morfológicos sob a mesma partição de teste independente. Os índices médios de F1 macro e seus respectivos desvios padrão ao longo das cinco sementes avaliadas estão reunidos na Tabela~\ref{tab:res-vis-holdout}, fornecendo o referencial de comparação para a subsequente etapa de fusão multimodal.
+
+\begin{table}[htb]
+\centering
+\caption{F1 macro (média $\pm$ desvio padrão ao longo de 5 sementes) no conjunto de teste independente (20\% dos dados) para as arquiteturas da via visual.}
+\label{tab:res-vis-holdout}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Família} & \textbf{Modelo} & \textbf{UCSB} & \textbf{CR} & \textbf{LA} & \textbf{LG} & \textbf{NHL} \\
+\midrule
+Convolucional & ResNet-50 & 0{,}947 $\pm$ 0{,}044 & 0{,}969 $\pm$ 0{,}028 & 0{,}993 $\pm$ 0{,}014 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}905 $\pm$ 0{,}014 \\
+Convolucional & EfficientNet-B0 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}994 $\pm$ 0{,}012 & \textbf{0{,}998} $\pm$ 0{,}004 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}953 $\pm$ 0{,}010 \\
+\textit{Transformer} & ViT-Tiny & 0{,}964 $\pm$ 0{,}044 & 0{,}988 $\pm$ 0{,}015 & 0{,}979 $\pm$ 0{,}011 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}858 $\pm$ 0{,}021 \\
+\textit{Transformer} & DeiT-Tiny & 0{,}982 $\pm$ 0{,}036 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}992 $\pm$ 0{,}012 & 0{,}992 $\pm$ 0{,}009 & 0{,}912 $\pm$ 0{,}043 \\
+Híbrida & MobileViT-S & 0{,}982 $\pm$ 0{,}036 & 0{,}994 $\pm$ 0{,}012 & \textbf{0{,}998} $\pm$ 0{,}004 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}909 $\pm$ 0{,}046 \\
+Híbrida & CoAtNet-0 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 & 0{,}980 $\pm$ 0{,}039 & \textbf{1{,}000} $\pm$ 0{,}000 & \textbf{0{,}962} $\pm$ 0{,}018 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+A avaliação confirmatória da via visual isolada na Tabela~\ref{tab:res-vis-holdout} confirma a prevalência das arquiteturas híbridas e convolucionais compactas sobre os transformadores visuais puros na partição de teste independente. No conjunto multiclasse NHL, a CoAtNet-0 alcançou a pontuação mais elevada ($0{,}962 \pm 0{,}018$), seguida pela EfficientNet-B0 ($0{,}953 \pm 0{,}010$). O modelo ViT-Tiny registrou a menor pontuação no mesmo conjunto ($0{,}858 \pm 0{,}021$), indicando que arquiteturas sem filtros convolucionais locais apresentam maior sensibilidade à escassez amostral em lâminas histopatológicas. Nas tarefas binárias dos conjuntos UCSB, CR e LG, a CoAtNet-0 sustentou a pontuação de $1{,}000 \pm 0{,}000$, mantendo $0{,}980 \pm 0{,}039$ no conjunto LA. O detalhamento das métricas de cada semente para os modelos visuais está registrado na Tabela~\ref{tab:apendice-holdout} do Apêndice~\ref{apendice:holdout}.
 
 \section{Comparação entre as Vias Isoladas e a Rede de Dupla Via}
 \label{sec:res-dupla-via}
 
-A avaliação central deste trabalho investiga se a integração conjunta das representações topológicas multiescala com as representações visuais profundas resulta em ganho preditivo frente ao processamento isolado de cada modalidade. Para cada conjunto de dados, a rede de dupla via foi configurada com o codificador topológico ótimo determinado no Capítulo~\ref{chap:res-ablacao} e com a melhor arquitetura de visão computacional selecionada na ablação correspondente. O desempenho preditivo alcançado pelas vias isoladas e pela rede unificada de dupla via na partição de teste independente está sintetizado na Tabela~\ref{tab:res-comparacao-final}.
+A investigação central deste trabalho analisa se a integração conjunta das medidas topológicas multiescala com as representações visuais profundas resulta em ganho preditivo frente a cada via operando de forma isolada. Para cada base de dados, a arquitetura de dupla via foi configurada com o codificador topológico ótimo e o modelo visual de maior desempenho selecionados nas etapas de ablação, sendo ajustada de ponta a ponta sobre os 80\% de desenvolvimento e avaliada nos 20\% de teste cego ao longo das cinco sementes pré-fixadas ($s \in \{42, 43, 44, 45, 46\}$). Os desempenhos individuais registrados em cada uma das cinco sementes na partição de teste independente estão compilados na Tabela~\ref{tab:apendice-holdout} do Apêndice~\ref{apendice:holdout}. A comparação direta consolidada entre as abordagens está registrada na Tabela~\ref{tab:res-comparacao-final}.
 
 \begin{table}[htb]
 \centering
@@ -18,27 +216,85 @@ A avaliação central deste trabalho investiga se a integração conjunta das re
 \toprule
 \textbf{\textit{Dataset}} & \textbf{Métrica} & \textbf{Via Topológica Isolada} & \textbf{Via Visual Isolada} & \textbf{Rede de Dupla Via} \\
 \midrule
-UCSB & F1 macro & \pend & \pend & \pend \\
-UCSB & Acurácia & \pend & \pend & \pend \\
-UCSB & AUC-ROC  & \pend & \pend & \pend \\
+UCSB & F1 macro & 0{,}899 $\pm$ 0{,}039 & 1{,}000 $\pm$ 0{,}000 & 0{,}964 $\pm$ 0{,}049 \\
+UCSB & Acurácia & 0{,}900 $\pm$ 0{,}037 & 1{,}000 $\pm$ 0{,}000 & 0{,}967 $\pm$ 0{,}046 \\
+UCSB & AUC-ROC  & 0{,}983 $\pm$ 0{,}016 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
 \midrule
-CR   & F1 macro & \pend & \pend & \pend \\
-CR   & Acurácia & \pend & \pend & \pend \\
-CR   & AUC-ROC  & \pend & \pend & \pend \\
+CR   & F1 macro & 0{,}926 $\pm$ 0{,}017 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
+CR   & Acurácia & 0{,}927 $\pm$ 0{,}017 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
+CR   & AUC-ROC  & 0{,}938 $\pm$ 0{,}014 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
 \midrule
-LA   & F1 macro & \pend & \pend & \pend \\
-LA   & Acurácia & \pend & \pend & \pend \\
-LA   & AUC-ROC  & \pend & \pend & \pend \\
+LA   & F1 macro & 1{,}000 $\pm$ 0{,}000 & 0{,}996 $\pm$ 0{,}008 & \textbf{0{,}998} $\pm$ 0{,}004 \\
+LA   & Acurácia & 1{,}000 $\pm$ 0{,}000 & 0{,}996 $\pm$ 0{,}008 & \textbf{0{,}998} $\pm$ 0{,}004 \\
+LA   & AUC-ROC  & 1{,}000 $\pm$ 0{,}000 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
 \midrule
-LG   & F1 macro & \pend & \pend & \pend \\
-LG   & Acurácia & \pend & \pend & \pend \\
-LG   & AUC-ROC  & \pend & \pend & \pend \\
+LG   & F1 macro & 0{,}996 $\pm$ 0{,}009 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
+LG   & Acurácia & 0{,}996 $\pm$ 0{,}008 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
+LG   & AUC-ROC  & 1{,}000 $\pm$ 0{,}000 & 1{,}000 $\pm$ 0{,}000 & \textbf{1{,}000} $\pm$ 0{,}000 \\
 \midrule
-NHL  & F1 macro & \pend & \pend & \pend \\
-NHL  & Acurácia & \pend & \pend & \pend \\
-NHL  & AUC-ROC  & \pend & \pend & \pend \\
+NHL  & F1 macro & 0{,}865 $\pm$ 0{,}025 & 0{,}922 $\pm$ 0{,}037 & \textbf{0{,}938} $\pm$ 0{,}026 \\
+NHL  & Acurácia & 0{,}864 $\pm$ 0{,}024 & 0{,}923 $\pm$ 0{,}037 & \textbf{0{,}939} $\pm$ 0{,}026 \\
+NHL  & AUC-ROC  & 0{,}978 $\pm$ 0{,}006 & 0{,}995 $\pm$ 0{,}007 & 0{,}992 $\pm$ 0{,}005 \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
+A comparação pareada registrada na Tabela~\ref{tab:res-comparacao-final} evidencia que o ganho proporcionado pela arquitetura de dupla via não é uniforme entre os diferentes conjuntos de dados. Em vez de atuar como uma abordagem universalmente superior em qualquer contexto, a integração das duas vias exibe respostas distintas conforme a complexidade taxonômica da tarefa, a presença de heterogeneidade na aquisição e o volume de imagens disponível:
+\begin{itemize}
+    \item no conjunto multiclasse NHL, caracterizado por heterogeneidade cromática interlaboratorial e três subtipos diagnósticos com sobreposição morfológica, a rede de dupla via alcançou F1 macro de $0{,}938 \pm 0{,}026$ e acurácia de $0{,}939 \pm 0{,}026$, superando tanto a via visual isolada ($0{,}922 \pm 0{,}037$) quanto a via topológica isolada ($0{,}865 \pm 0{,}025$). O ganho de $1{,}6$ ponto percentual no F1 macro foi acompanhado por uma redução de aproximadamente 30\% na dispersão entre as cinco sementes ($0{,}037$ para $0{,}026$), sugerindo um possível efeito de regularização decorrente da agregação de descritores determinísticos de conectividade;
+    \item no conjunto LA, com quatro classes etárias em 106 imagens de teste, a inclusão da via topológica refinou sutilmente a pontuação de $0{,}996 \pm 0{,}008$ para $0{,}998 \pm 0{,}004$, cortando a dispersão amostral pela metade e mantendo AUC-ROC de $1{,}000 \pm 0{,}000$;
+    \item nos conjuntos binários CR e LG, com classes morfológica e histologicamente bem delimitadas, a via visual isolada já alcançou separação completa ($1{,}000 \pm 0{,}000$). Nesses cenários caracterizados por efeito teto, a rede de dupla via sustentou a pontuação máxima nas três métricas avaliadas sem introduzir degradação, confirmando que a inclusão da via topológica preservou as decisões já consolidadas pela representação visual;
+    \item no conjunto UCSB, no qual a via visual isolada atingiu $1{,}000 \pm 0{,}000$, a rede de dupla via obteve F1 macro de $0{,}964 \pm 0{,}049$ e acurácia de $0{,}967 \pm 0{,}046$. Essa redução discreta decorre diretamente da dimensão extremamente restrita da partição de teste (apenas 12 imagens). Em uma amostragem tão limitada, a divergência de classificação em uma única imagem ao longo de duas sementes produz um deslocamento discreto de cerca de 8,3 pontos percentuais na métrica final. Como a partição de desenvolvimento do UCSB reuniu apenas 46 imagens para ajustar conjuntamente os pesos do extrator visual, do codificador topológico e das camadas de projeção e fusão, a arquitetura conjunta exibiu maior sensibilidade estocástica em comparação ao modelo puramente convolucional. A preservação da métrica AUC-ROC no patamar máximo de $1{,}000 \pm 0{,}000$ em todas as sementes indica que a capacidade de ordenação probabilística das predições permaneceu calibrada.
+\end{itemize}
+Esse padrão de resultados demonstra que a integração de dupla via é especialmente relevante em tarefas diagnósticas complexas com alta variabilidade cromática e sobreposição morfológica, tornando-se neutra em cenários binários já saturados e exigindo cautela em bases com amostragem excessivamente reduzida.
+
+\section{Análise Diagnóstica por Subtipo Patológico e Comportamento por Classe}
+\label{sec:res-classes}
+
+As diferenças de desempenho observadas adquirem significado prático quando contextualizadas perante os desafios morfológicos descritos na literatura médica para cada tecido biológico. Na base NHL, a tarefa diagnóstica abrange três subtipos de linfoma não-Hodgkin de células B: leucemia linfocítica crônica (CLL), linfoma folicular (FL) e linfoma de células do manto (MCL). No exame microscópico de lâminas histopatológicas, a diferenciação entre o linfoma folicular e o linfoma de células do manto impõe desafios frequentes em razão do compartilhamento de atipias citológicas microscópicas, caracterizadas por células linfoides de tamanho pequeno a intermediário com irregularidades nucleares e cromatina condensada. Em recortes padronizados de $256 \times 256$ pixels, as representações puramente visuais tornam-se suscetíveis a ambiguidades em virtude dessa similaridade celular em escala local.
+
+Sob a perspectiva histológica, a literatura documenta que esses dois subtipos exibem padrões de crescimento tecidual distintos em escalas mais amplas: o linfoma folicular tende a formar agregados nodulares circunscritos, enquanto o linfoma de células do manto apresenta proliferação difusa ou em manto ao redor de folículos residuais. A formulação de redes espaço-espectrais sobre múltiplos raios de vizinhança ($r=1$ a $r=15$) foi delineada teoricamente para mensurar essas relações entre a microtextura celular e a conformação tecidual mais ampla. O ganho observado de $1{,}6$ ponto percentual no F1 macro e a redução de 30\% na dispersão entre sementes alcançados pela rede de dupla via no conjunto NHL são compatíveis com a hipótese de que a agregação de propriedades relacionais multiescala provê informações adicionais que auxiliam na separação dessas classes. Deve ser enfatizado, contudo, que na ausência de mapas dedicados de explicabilidade visual (como mapas de calor por autoatenção ou gradientes na imagem), essa correspondência não deve ser interpretada como uma demonstração mecanicista direta de que o modelo identificou explicitamente arranjos foliculares ou mantos celulares, mas sim como uma evidência de que a integração de descritores topológicos produz representações discriminativas compatíveis com a motivação teórica proposta.
+
+No conjunto LA, a tarefa envolve quatro faixas etárias de camundongos. A senescência hepática está associada a alterações graduais no parênquima, abrangendo dilatações sinusoidais e aumento da heterogeneidade no volume nuclear dos hepatócitos. Na avaliação individual das sementes da via visual isolada (Tabela~\ref{tab:apendice-holdout} do Apêndice~\ref{apendice:holdout}), a semente 45 registrou queda pontual para F1 macro de $0{,}982$, decorrente de confusões entre faixas etárias adjacentes. A arquitetura de dupla via obteve índice médio de $0{,}998 \pm 0{,}004$ e reduziu a dispersão entre sementes pela metade frente à via visual ($0{,}008$ para $0{,}004$). Essa estabilização é compatível com a capacidade dos descritores nodais em quantificar variações graduais de densidade tecidual, atenuando a sensibilidade a flutuações de preparo histológico.
+
+No conjunto UCSB, a análise das sementes individuais no teste independente de 12 imagens (Tabela~\ref{tab:apendice-holdout} do Apêndice~\ref{apendice:holdout}) confirma que a rede de dupla via atingiu predição perfeita ($1{,}000$) em três das cinco execuções (sementes 43, 44 e 46). Nas sementes 42 e 45, o classificador errou a predição em uma única amostra, resultando em acurácia de $0{,}917$. Em decorrência do volume restrito do conjunto de teste, um único erro amostral induz uma variação discreta de $8{,}3$ pontos percentuais na métrica final. A manutenção da AUC-ROC no valor máximo de $1{,}000 \pm 0{,}000$ em todas as cinco sementes indica que a ordenação probabilística entre as classes foi preservada, sem inversões na escala de escores atribuídos às amostras benignas e malignas.
+
+Por fim, nos conjuntos CR e LG, a obtenção de F1 macro de $1{,}000 \pm 0{,}000$ por ambas as vias isoladas e pelo modelo integrado evidencia que tarefas histopatológicas binárias com contraste tecidual acentuado atingem saturação de desempenho. Nessas condições, as representações aprendidas diretamente dos pixels pelos modelos visuais pré-treinados são suficientes para a separação completa das classes, tornando a agregação da via topológica redundante. Esses resultados delimitam o escopo prático da arquitetura de dupla via, evidenciando que sua aplicação é especialmente vantajosa em cenários multiclasse desafiadores com alta variabilidade morfológica ou cromática, nos quais modelos visuais isolados exibem instabilidade.
+
+\section{Análise da Eficiência Paramétrica e Custo Computacional}
+\label{sec:res-eficiencia}
+
+A viabilidade da implementação de modelos de aprendizado profundo em ambientes de auxílio diagnóstico depende da relação entre o ganho de acurácia obtido e a complexidade computacional introduzida pela arquitetura. A contagem detalhada de parâmetros para os componentes individuais e para a rede de dupla via está apresentada na Tabela~\ref{tab:res-parametros}.
+
+\begin{table}[htb]
+\centering
+\caption{Contagem de parâmetros treináveis por componente da arquitetura de dupla via.}
+\label{tab:res-parametros}
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllcc}
+\toprule
+\textbf{Modalidade} & \textbf{Componente} & \textbf{Arquitetura / Função} & \textbf{Parâmetros} & \textbf{Proporção} \\
+\midrule
+Via Visual & \textit{Backbone} e Projeção & CoAtNet-0 ($D=768$) & 17{,}8 M & 98{,}7\% \\
+Via Visual & \textit{Backbone} e Projeção & ResNet-50 ($D=2048$) & 23{,}8 M & N/A \\
+Via Visual & \textit{Backbone} e Projeção & EfficientNet-B0 ($D=1280$) & 4{,}2 M & N/A \\
+Via Visual & \textit{Backbone} e Projeção & MobileViT-S ($D=640$) & 5{,}0 M & N/A \\
+Via Visual & \textit{Backbone} e Projeção & ViT-Tiny / DeiT-Tiny ($D=192$) & 5{,}5 M & N/A \\
+\midrule
+Via Topológica & Codificador Recorrente & GRU ($h=128$) & 56{,}1 mil & 0{,}3\% \\
+Via Topológica & Codificador Recorrente & BiGRU ($h=256$) & 145{,}0 mil & 0{,}8\% \\
+Via Topológica & Codificador Denso & MLP ($h=512$) & 189{,}1 mil & 1{,}0\% \\
+\midrule
+Fusão Multimodal & Cabeça de Classificação & MLP com \textit{LayerNorm} ($256 \to 128 \to C$) & 33{,}2 mil & 0{,}2\% \\
+\midrule
+\textbf{Rede de Dupla Via} & \textbf{Modelo Integrado} & \textbf{CoAtNet-0 + MLP + Cabeça de Fusão} & \textbf{18{,}0 M} & \textbf{100{,}0\%} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+Conforme sintetizado na Tabela~\ref{tab:res-parametros}, a inclusão da via topológica acarreta acréscimo reduzido à capacidade global da arquitetura. Na configuração empregada para a base NHL (CoAtNet-0 acoplada ao codificador MLP com $h=512$, conforme a Tabela~\ref{tab:abl-sel-dupla}), a via visual concentra 17{,}8 milhões de parâmetros (98{,}7\% do total), enquanto o codificador topológico soma 189 mil parâmetros (1{,}0\% do total) e a camada de fusão multimodal adiciona 33 mil parâmetros (0{,}2\% do total). Mesmo sob o codificador recorrente bidirecional BiGRU empregado nas bases UCSB, LA e LG (Tabela~\ref{tab:abl-sel-dupla}), o volume paramétrico da via topológica não ultrapassa 145 mil parâmetros (0{,}8\% da rede integrada).
+
+O procedimento de extração das medidas de redes complexas opera de forma determinística em UCP por meio de algoritmo paralelizado em OpenMP (Seção~\ref{sec:env}), sem consumir memória dedicada da GPU. Durante a etapa de inferência, o vetor topológico de 270 valores numéricos (Equação~\ref{eq:met-sequencia-topologica}) é processado pelo codificador sequencial em frações de milissegundo, preservando o tempo de resposta da classificação praticamente inalterado frente ao modelo puramente visual. A rede de dupla via estabelece, desse modo, uma relação favorável entre estabilização preditiva e consumo de recursos computacionais, proporcionando ganhos em conjuntos multiclasse sem onerar a infraestrutura de inferência.

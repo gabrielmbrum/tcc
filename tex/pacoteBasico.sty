@@ -94,6 +94,15 @@
     \renewcommand\cftsubsubsectionfont\normalfont 
     \renewcommand\cftparagraphfont{\normalfont\textit}
     
+    % Indentação hierárquica (padding) no Sumário:
+    % Capítulo alinhado à margem esquerda (0em), seção recuada (1.0em) e subseção mais recuada (2.0em)
+    \cftsetindents{part}{0em}{\cftlastnumwidth}
+    \cftsetindents{chapter}{0em}{\cftlastnumwidth}
+    \cftsetindents{section}{1.0em}{\cftlastnumwidth}
+    \cftsetindents{subsection}{2.0em}{\cftlastnumwidth}
+    \cftsetindents{subsubsection}{3.0em}{\cftlastnumwidth}
+    \cftsetindents{paragraph}{4.0em}{\cftlastnumwidth}
+    
     %----------------------------------------------------------------------------------------%
     % C A P A   E   F O L H A   D E   R O S T O
     %----------------------------------------------------------------------------------------%
@@ -123,7 +132,7 @@
     
             \vfill
                 \begin{center}
-                    {\bfseries{\normalsize{\tituloDoTrabalho: }}} 
+                    {\bfseries{\normalsize{\tituloDoTrabalho}}} 
                     \par \subtituloDoTrabalho
                 \end{center}
             \vfill
@@ -143,7 +152,7 @@
             \vspace*{\fill}\vspace*{\fill}
             
             \begin{center}
-                {\bfseries\tituloDoTrabalho: }
+                {\bfseries\tituloDoTrabalho}
                 \par\subtituloDoTrabalho
             \end{center}
             

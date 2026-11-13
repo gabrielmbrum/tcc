@@ -1,0 +1,53 @@
+\chapter{Resultados Completos da Validação Cruzada da Via Topológica}
+\label{apendice:topologica}
+
+Os desempenhos obtidos pelos codificadores da via topológica durante o procedimento de validação cruzada estratificada em cinco partições estão reunidos neste apêndice. Para cada conjunto de dados e para cada modelo avaliado, são detalhados os hiperparâmetros ótimos selecionados ($\eta, p, h, B$), a média de épocas executadas até a ativação da parada antecipada, a acurácia média e a pontuação de F1 macro acompanhada do desvio padrão.
+
+\begin{table}[H]
+\centering
+\caption{Desempenho detalhado por validação cruzada (5 partições) e configurações ótimas da via topológica.}
+\label{tab:apendice-top}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccccc}
+\toprule
+\textbf{\textit{Dataset}} & \textbf{Codificador} & $\eta$ & $p$ & $h$ & $B$ & \textbf{Épocas} & \textbf{Acurácia} & \textbf{F1 macro} \\
+\midrule
+CR & BiGRU & $3 \cdot 10^{-3}$ & 0{,}5 & 256 & 64 & 27{,}2 & 0{,}985 & 0{,}985 $\pm$ 0{,}034 \\
+CR & BiLSTM & $0{,}01$ & 0{,}3 & 64 & 32 & 18{,}4 & 0{,}985 & 0{,}985 $\pm$ 0{,}034 \\
+CR & GRU & $0{,}01$ & 0{,}1 & 128 & 16 & 19{,}0 & 0{,}993 & 0{,}993 $\pm$ 0{,}017 \\
+CR & LSTM & $0{,}03$ & 0{,}3 & 128 & 32 & 33{,}4 & 0{,}992 & 0{,}992 $\pm$ 0{,}017 \\
+CR & MLP & $3 \cdot 10^{-3}$ & 0{,}3 & 512 & 64 & 18{,}2 & 0{,}993 & 0{,}993 $\pm$ 0{,}017 \\
+CR & SAC-LSTM & $3 \cdot 10^{-3}$ & 0{,}5 & 64 & 64 & 16{,}2 & 0{,}977 & 0{,}977 $\pm$ 0{,}034 \\
+\midrule
+LA & BiGRU & $3 \cdot 10^{-4}$ & 0{,}1 & 64 & 16 & 85{,}0 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & BiLSTM & $3 \cdot 10^{-4}$ & 0{,}1 & 512 & 16 & 35{,}4 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & GRU & $3 \cdot 10^{-4}$ & 0{,}1 & 64 & 16 & 77{,}2 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & LSTM & $3 \cdot 10^{-4}$ & 0{,}1 & 128 & 16 & 41{,}0 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & MLP & $10^{-3}$ & 0{,}1 & 64 & 16 & 30{,}0 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+LA & SAC-LSTM & $3 \cdot 10^{-4}$ & 0{,}1 & 512 & 32 & 35{,}2 & 1{,}000 & 1{,}000 $\pm$ 0{,}000 \\
+\midrule
+LG & BiGRU & $3 \cdot 10^{-3}$ & 0{,}5 & 512 & 32 & 12{,}2 & 0{,}995 & 0{,}995 $\pm$ 0{,}011 \\
+LG & BiLSTM & $3 \cdot 10^{-3}$ & 0{,}1 & 256 & 16 & 7{,}0 & 0{,}995 & 0{,}995 $\pm$ 0{,}011 \\
+LG & GRU & $3 \cdot 10^{-3}$ & 0{,}1 & 256 & 32 & 15{,}4 & 0{,}995 & 0{,}995 $\pm$ 0{,}011 \\
+LG & LSTM & $3 \cdot 10^{-3}$ & 0{,}5 & 256 & 16 & 17{,}2 & 0{,}995 & 0{,}995 $\pm$ 0{,}011 \\
+LG & MLP & $3 \cdot 10^{-3}$ & 0{,}5 & 256 & 32 & 25{,}0 & 0{,}995 & 0{,}995 $\pm$ 0{,}011 \\
+LG & SAC-LSTM & $10^{-3}$ & 0{,}1 & 512 & 32 & 10{,}8 & 0{,}995 & 0{,}995 $\pm$ 0{,}011 \\
+\midrule
+NHL & BiGRU & $3 \cdot 10^{-3}$ & 0{,}3 & 256 & 32 & 14{,}6 & 0{,}967 & 0{,}966 $\pm$ 0{,}021 \\
+NHL & BiLSTM & $10^{-3}$ & 0{,}5 & 512 & 16 & 14{,}2 & 0{,}957 & 0{,}956 $\pm$ 0{,}019 \\
+NHL & GRU & $10^{-3}$ & 0{,}3 & 256 & 16 & 26{,}6 & 0{,}956 & 0{,}956 $\pm$ 0{,}049 \\
+NHL & LSTM & $3 \cdot 10^{-3}$ & 0{,}1 & 256 & 64 & 11{,}6 & 0{,}940 & 0{,}938 $\pm$ 0{,}043 \\
+NHL & MLP & $3 \cdot 10^{-4}$ & 0{,}1 & 512 & 16 & 24{,}0 & 0{,}973 & 0{,}973 $\pm$ 0{,}020 \\
+NHL & SAC-LSTM & $10^{-3}$ & 0{,}3 & 512 & 64 & 12{,}4 & 0{,}923 & 0{,}921 $\pm$ 0{,}046 \\
+\midrule
+UCSB & BiGRU & $3 \cdot 10^{-3}$ & 0{,}3 & 256 & 8 & 27{,}6 & 0{,}936 & 0{,}933 $\pm$ 0{,}061 \\
+UCSB & BiLSTM & $3 \cdot 10^{-3}$ & 0{,}3 & 512 & 4 & 6{,}6 & 0{,}873 & 0{,}870 $\pm$ 0{,}109 \\
+UCSB & GRU & $10^{-3}$ & 0{,}1 & 256 & 16 & 13{,}6 & 0{,}893 & 0{,}892 $\pm$ 0{,}107 \\
+UCSB & LSTM & $3 \cdot 10^{-3}$ & 0{,}3 & 256 & 4 & 10{,}8 & 0{,}896 & 0{,}893 $\pm$ 0{,}124 \\
+UCSB & MLP & $0{,}01$ & 0{,}5 & 256 & 4 & 16{,}6 & 0{,}873 & 0{,}871 $\pm$ 0{,}135 \\
+UCSB & SAC-LSTM & $0{,}01$ & 0{,}3 & 64 & 4 & 19{,}2 & 0{,}871 & 0{,}867 $\pm$ 0{,}090 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
