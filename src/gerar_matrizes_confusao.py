@@ -103,8 +103,8 @@ def train_eval_capture_vis(vis_cfg, Xtr_vis, ytr, Xte_vis, yte, C, seed, epochs,
     model = IsolatedVisualNet(vis_cfg["model"], C, vis_cfg["dropout"], pretrained=not no_pretrained).to(dev)
 
     groups = [
-        {"params": model.bb.bb.parameters(), "lr": vis_cfg["lr_bb"], "weight_decay": WD},
-        {"params": list(model.bb.proj.parameters()) + list(model.head.parameters()), "lr": vis_cfg["lr_hd"], "weight_decay": WD},
+        {"params": model.head.parameters(), "lr": vis_cfg["lr_hd"], "weight_decay": WD},
+        {"params": model.bb.parameters(), "lr": vis_cfg["lr_bb"], "weight_decay": WD},
     ]
     opt = torch.optim.AdamW(groups)
 
@@ -342,9 +342,9 @@ def run_confusion_analysis(ds, a):
     y_pred_vis_all = np.concatenate(all_preds_vis)
     y_pred_dup_all = np.concatenate(all_preds_dup)
 
-    p_top_c, r_top_c, f_top_c, _ = precision_recall_fscore_support(y_true_all, y_pred_top_all, labels=range(C))
-    p_vis_c, r_vis_c, f_vis_c, _ = precision_recall_fscore_support(y_true_all, y_pred_vis_all, labels=range(C))
-    p_dup_c, r_dup_c, f_dup_c, _ = precision_recall_fscore_support(y_true_all, y_pred_dup_all, labels=range(C))
+    p_top_c, r_top_c, f_top_c, _ = precision_recall_fscore_support(y_true_all, y_pred_top_all, labels=range(C), zero_division=0)
+    p_vis_c, r_vis_c, f_vis_c, _ = precision_recall_fscore_support(y_true_all, y_pred_vis_all, labels=range(C), zero_division=0)
+    p_dup_c, r_dup_c, f_dup_c, _ = precision_recall_fscore_support(y_true_all, y_pred_dup_all, labels=range(C), zero_division=0)
 
     df_per_class = []
     for i, cname in enumerate(class_names):
@@ -353,6 +353,9 @@ def run_confusion_analysis(ds, a):
             "Recall_Top": r_top_c[i],
             "Recall_Vis": r_vis_c[i],
             "Recall_Dupla": r_dup_c[i],
+            "Prec_Top": p_top_c[i],
+            "Prec_Vis": p_vis_c[i],
+            "Prec_Dupla": p_dup_c[i],
             "F1_Top": f_top_c[i],
             "F1_Vis": f_vis_c[i],
             "F1_Dupla": f_dup_c[i],
@@ -386,8 +389,7 @@ def run_confusion_analysis(ds, a):
         f.write(str(cm_vis_total) + "\n```\n\n")
         f.write("## 2. Matriz de Confusão Agregada - Rede de Dupla Via\n\n```\n")
         f.write(str(cm_dup_total) + "\n```\n\n")
-        f.write("## 3. Métricas por Classe\n\n")
-        f.write(df_cls.to_markdown(index=False) + "\n")
+        f.write(df_cls.to_string(index=False) + "\n")
     print(f"Relatório Markdown salvo em: {out_md}")
 
 
